@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>socialnetwork</artifactId>
+        <groupId>ru.skillbox.diplom</groupId>
+        <version>${revision}${sha1}${changelist}</version>
+    </parent>
+    <name>Group 19 :: SocialNetwork :: impl</name>
+    <groupId>ru.skillbox.diplom.impl</groupId>
+    <artifactId>impl</artifactId>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>ru.skillbox.diplom.api</groupId>
+            <artifactId>api</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.skillbox.diplom.domain</groupId>
+            <artifactId>domain</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.skillbox.diplom.bd</groupId>
+            <artifactId>bd</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>ru.skillbox.diplom.Application</mainClass>
+                    <layout>JAR</layout>
+                </configuration>
+                <executions>
+                    <execution>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>ru.skillbox.diplom.Application</mainClass>
+                                    <layout>jar</layout>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <goals>
+                                <goal>repackage</goal>
+                            </goals>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
