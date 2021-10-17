@@ -43,6 +43,7 @@
 		<spring-boot-maven-plugin.version>2.5.5</spring-boot-maven-plugin.version>
 		<dockerhub.repository>javaprogroup19</dockerhub.repository>
 		<java.version>11</java.version>
+		<junit.version>4.13.2</junit.version>
 	</properties>
 
 	<modules>
