@@ -4,7 +4,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 api/target
-bd/target
+db/target
 domain/target
 impl/target
 

@@ -24,9 +24,9 @@
         <groupId>ru.skillbox.diplom</groupId>
         <version>${revision}${sha1}${changelist}</version>
     </parent>
-    <name>Group 19 :: SocialNetwork :: bd</name>
-    <groupId>ru.skillbox.diplom.bd</groupId>
-    <artifactId>bd</artifactId>
+    <name>Group 19 :: SocialNetwork :: db</name>
+    <groupId>ru.skillbox.diplom.db</groupId>
+    <artifactId>db</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>

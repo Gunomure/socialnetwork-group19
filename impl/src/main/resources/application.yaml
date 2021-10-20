@@ -2,13 +2,14 @@ server:
   port: 8086
 spring:
   datasource:
-    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:5432/new
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:5432/group19?currentSchema=group19
     driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: 12341234
+    username: group19
+    password: group19
   liquibase:
     enabled: true
-    change-log: classpath:db/changelog/db.changelog-master.yaml
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    default-schema: group19
   jpa:
     show-sql: false
     hibernate:

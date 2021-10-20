@@ -50,7 +50,7 @@
 		<module>api</module>
 		<module>domain</module>
 		<module>impl</module>
-		<module>bd</module>
+		<module>db</module>
 	</modules>
 
 	<dependencies>
