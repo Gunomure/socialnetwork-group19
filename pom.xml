@@ -20,7 +20,6 @@
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
 		<revision>1.0.0</revision>
-		<sha1></sha1>
 		<changelist>-SNAPSHOT</changelist>
 		<org.springframework.version>5.3.10</org.springframework.version>
 		<org.apache.maven.version>3.8.3</org.apache.maven.version>
@@ -41,9 +40,9 @@
 		<lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<spring-boot-maven-plugin.version>2.5.5</spring-boot-maven-plugin.version>
-		<dockerhub.repository>javaprogroup19</dockerhub.repository>
 		<java.version>11</java.version>
 		<junit.version>4.13.2</junit.version>
+		<dockerhub.repository>javaprogroup19</dockerhub.repository>
 	</properties>
 
 	<modules>
@@ -83,6 +82,24 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 			<version>${spring-boot-starter-web.version}</version>
+
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
+
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
