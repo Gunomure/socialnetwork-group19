@@ -2,7 +2,7 @@ package ru.skillbox.diplom.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.skillbox.diplom.model.Enum.MessagePermission;
+import ru.skillbox.diplom.model.enums.MessagePermission;
 
 import java.util.Date;
 
