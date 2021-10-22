@@ -13,18 +13,18 @@ import java.time.ZonedDateTime;
 public class Notification extends BaseEntity {
 
     @NotNull
-    @Column(columnDefinition="type_id")
+    @Column(name="type_id")
     private Long typeId;
     @NotNull
-    @Column(columnDefinition="sent_time")
+    @Column(name="sent_time")
     private ZonedDateTime sentTime;
     @NotNull
-    @Column(columnDefinition="person_id")
+    @Column(name="person_id")
     private Long personId;
     @NotNull
-    @Column(columnDefinition="entity_id")
+    @Column(name="entity_id")
     private Long entityId;
     //@NotNull TODO: Question: Does this column matter/has value in all situations?
-    @Column(columnDefinition="entity_id")
+    @Column(name="contact")
     private String contact;
 }
