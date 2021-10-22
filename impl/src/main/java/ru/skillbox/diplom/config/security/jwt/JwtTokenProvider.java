@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.util.jwt;
+package ru.skillbox.diplom.config.security.jwt;
 
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -70,6 +70,11 @@ public class JwtTokenProvider {
     }
 
     public String resolveToken(HttpServletRequest request) {
-        return request.getHeader(authorizationHeader);
+        final String header = request.getHeader(authorizationHeader);
+        String jwt = null;
+        if (header != null && header.startsWith("Bearer ")){
+            jwt = header.substring(7);
+        }
+        return jwt;
     }
 }

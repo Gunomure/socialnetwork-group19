@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.repository;
+package ru.skillbox.diplom.config.security;
 
 
 import lombok.Data;
@@ -6,7 +6,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import ru.skillbox.diplom.model.User;
-import ru.skillbox.diplom.model.enums.Status;
 
 import java.util.Collection;
 import java.util.List;
@@ -61,14 +60,15 @@ public class UserDetailsImpl implements UserDetails {
         return isActive;
     }
 
+    // todo chek user
     public static UserDetails fromUser(User user) {
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(), user.getPassword(),
-                user.getStatus().equals(Status.ACTIVE),
-                user.getStatus().equals(Status.ACTIVE),
-                user.getStatus().equals(Status.ACTIVE),
-                user.getStatus().equals(Status.ACTIVE),
-                user.getRole().getAuthorities()
+                true,
+                true,
+                true,
+               true,
+                user.getType().getAuthorities()
         );
     }
 }

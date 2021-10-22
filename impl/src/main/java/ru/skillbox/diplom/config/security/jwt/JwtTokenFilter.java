@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.util.jwt;
+package ru.skillbox.diplom.config.security.jwt;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

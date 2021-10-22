@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.util.jwt;
+package ru.skillbox.diplom.config.security.jwt;
 
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

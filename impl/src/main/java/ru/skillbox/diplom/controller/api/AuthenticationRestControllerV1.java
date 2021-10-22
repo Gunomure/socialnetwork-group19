@@ -18,8 +18,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 import ru.skillbox.diplom.model.User;
+import ru.skillbox.diplom.model.request.RequestLogin;
+import ru.skillbox.diplom.model.response.ResponseLogin;
 import ru.skillbox.diplom.repository.UserRepository;
-import ru.skillbox.diplom.util.jwt.JwtTokenProvider;
+import ru.skillbox.diplom.config.security.jwt.JwtTokenProvider;
+import ru.skillbox.diplom.util.Utils;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -36,15 +39,12 @@ public class AuthenticationRestControllerV1 {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequestDTO request) {
+    public ResponseEntity<?> authenticate(@RequestBody RequestLogin request) {
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+            authenticationManager.authenticate(Utils.getUsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
             User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User doesn't exists"));
-            String token = jwtTokenProvider.createToken(request.getEmail(), user.getRole().name());
-            Map<Object, Object> response = new HashMap<>();
-            response.put("email", request.getEmail());
-            response.put("token", token);
-            return ResponseEntity.ok(response);
+            String token = jwtTokenProvider.createToken(request.getEmail(), user.getType().name());
+            return ResponseEntity.ok(new ResponseLogin(request.getEmail(), token));
         } catch (AuthenticationException e) {
             return new ResponseEntity<>("Invalid email/password combination", HttpStatus.FORBIDDEN);
         }
