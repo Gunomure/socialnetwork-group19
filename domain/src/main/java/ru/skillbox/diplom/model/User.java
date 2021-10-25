@@ -31,6 +31,7 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String password;
 
+    @Column(columnDefinition = "enum('USER', 'ADMIN', 'MODERATOR')")
     @Enumerated(EnumType.STRING)
     @ColumnDefault("USER")
     private UserType type;

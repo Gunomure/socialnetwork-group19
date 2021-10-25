@@ -8,6 +8,7 @@ import javax.persistence.Table;
 
 @Data
 @Entity
+//TODO is it better to define schema in one place: application.yaml? In case it changes
 @Table(name = "notification_type", schema = "group19")
 public class NotificationType extends BaseEntity {
     @NotNull

@@ -5,7 +5,6 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
     <changeSet id="creation_table_persons" author="eduard">
-        <sql>CREATE TYPE permission AS ENUM ('ALL', 'FRIEND')</sql>
         <createTable tableName="persons">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -18,11 +17,9 @@
             <column name="description" type="TEXT"/>
             <column name="city" type="VARCHAR(255)"/>
             <column name="country" type="VARCHAR(255)"/>
-            <column name="confirmation_code" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
+            <column name="confirmation_code" type="VARCHAR(255)"/>
             <column name="is_approved" type="BOOLEAN" defaultValue="true"/>
-            <column name="message_permission" type="permission" defaultValue="ALL"/>
+            <column name="message_permission" type="VARCHAR(50)" defaultValue="ALL"/>
             <column name="last_online_time" type="timestamptz"/>
             <column name="is_blocked" type="BOOLEAN" defaultValue="false"/>
         </createTable>
