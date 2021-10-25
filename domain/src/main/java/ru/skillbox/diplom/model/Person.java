@@ -30,14 +30,14 @@ public class Person extends User {
 
     private String country;
 
-    @Column(name = "confirmation_code", nullable = false)
+    @Column(name = "confirmation_code")
     private String confirmationCode;
 
     @Column(name = "is_approved", columnDefinition = "BOOLEAN NOT NULL")
     @ColumnDefault("true")
     private Boolean isApproved;
 
-    @Column(name = "message_permission", nullable = false)
+    @Column(name = "message_permission", nullable = false, columnDefinition = "enum('ALL', 'FRIEND')")
     @Enumerated(EnumType.STRING)
     @ColumnDefault("ALL")
     private MessagePermission permission;

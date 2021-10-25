@@ -20,6 +20,7 @@
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
 		<revision>1.0.0</revision>
+		<sha1/>
 		<changelist>-SNAPSHOT</changelist>
 		<sha1></sha1>
 		<org.springframework.version>5.3.10</org.springframework.version>
@@ -41,6 +42,8 @@
 		<lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<spring-boot-maven-plugin.version>2.5.5</spring-boot-maven-plugin.version>
+		<spring-boot-starter-mail.version>2.5.5</spring-boot-starter-mail.version>
+		<dockerhub.repository>javaprogroup19</dockerhub.repository>
 		<java.version>11</java.version>
 		<junit.version>4.13.2</junit.version>
 		<dockerhub.repository>javaprogroup19</dockerhub.repository>
@@ -169,6 +172,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-maven-plugin</artifactId>
 			<version>${spring-boot-maven-plugin.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+			<version>${spring-boot-starter-mail.version}</version>
 		</dependency>
 
 	</dependencies>

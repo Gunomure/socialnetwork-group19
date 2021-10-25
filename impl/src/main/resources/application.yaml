@@ -14,6 +14,21 @@ spring:
     show-sql: false
     hibernate:
       ddl-auto: none
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: javaproGroup19@gmail.com
+    password: ${MAIL_SERVICE_PASSWORD}
+    protocol: smtp
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.timeout: 10000
+
+group19:
+  passwordRecoveryPath: change-password
+  websiteHost: localhost
+  frontendPort: 8099
 values:
   jwt:
     header: Authorization

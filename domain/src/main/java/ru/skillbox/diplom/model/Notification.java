@@ -9,6 +9,7 @@ import java.time.ZonedDateTime;
 
 @Data
 @Entity
+//TODO is it better to define schema in one place: application.yaml? In case it changes
 @Table(name = "notification", schema = "group19")
 public class Notification extends BaseEntity {
 

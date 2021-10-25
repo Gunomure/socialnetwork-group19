@@ -5,7 +5,6 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
     <changeSet id="creation_table_users" author="eduard">
-        <sql>CREATE TYPE userType AS ENUM ('USER', 'ADMIN', 'MODERATOR')</sql>
         <createTable tableName="users">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -23,7 +22,7 @@
             <column name="password" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="type" type="userType" defaultValue="USER"/>
+            <column name="type" type="VARCHAR(50)" defaultValue="USER"/>
         </createTable>
     </changeSet>
 </databaseChangeLog>
