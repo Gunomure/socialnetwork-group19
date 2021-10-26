@@ -22,7 +22,7 @@ public class SpecificationUtil<T> {
 
     }
     private Specification<T> equals(Path<String> key, String value) {
-        return (root, query, builder) -> Objects.isNull(value) ? builder.conjunction() : builder.equal(builder.lower(key), value.toLowerCase());
+        return (root, query, builder) -> Objects.isNull(value) ? builder.conjunction() : builder.equal(key, value);
     }
 
     public Specification<T> contains(String key, String value) {
