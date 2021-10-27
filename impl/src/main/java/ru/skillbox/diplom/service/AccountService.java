@@ -8,6 +8,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.skillbox.diplom.exception.EntityNotFoundException;
 import ru.skillbox.diplom.model.PasswordSetRequest;
 import ru.skillbox.diplom.model.Person;
 import ru.skillbox.diplom.repository.PersonRepository;
@@ -44,7 +45,7 @@ public class AccountService {
 
     public void sendPasswordRecoveryEmail(String receiverEmail) {
         Person currentUser = personRepository.findByEmail(receiverEmail).orElseThrow(
-                () -> new UsernameNotFoundException(String.format("User %s not found", receiverEmail)));
+                () -> new EntityNotFoundException(String.format("User %s not found", receiverEmail)));
         UUID confirmationCode = UUID.randomUUID();
 
         currentUser.setConfirmationCode(confirmationCode.toString());
@@ -73,7 +74,7 @@ public class AccountService {
     public void setPassword(PasswordSetRequest passwordSetRequest) {
         LOGGER.debug("setPassword: {}", passwordSetRequest);
         Person currentUser = personRepository.findByConfirmationCode(passwordSetRequest.getToken()).orElseThrow(
-                () -> new UsernameNotFoundException(String.format("User not found by confirmation code: %s", passwordSetRequest.getToken())));
+                () -> new EntityNotFoundException(String.format("User not found by confirmation code: %s", passwordSetRequest.getToken())));
 
         currentUser.setPassword(passwordEncoder.encode(passwordSetRequest.getPassword()));
         personRepository.save(currentUser);
