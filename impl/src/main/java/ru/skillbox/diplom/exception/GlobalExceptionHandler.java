@@ -15,9 +15,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<CustomErrorResponse> handleEntityNotFoundException(Exception ex) {
         CustomErrorResponse error = new CustomErrorResponse();
         error.setErrorDescription(ErrorDetailType.BAD_CRED.getErrorType());
-        error.setTimestamp(LocalDateTime.now());
         error.setError(ErrorCommonType.INVALID_REQUEST.toString().toLowerCase());
-        error.setExceptionMessage(ex.getMessage());
+//        error.setTimestamp(LocalDateTime.now());
+//        error.setExceptionMessage(ex.getMessage());
 
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
