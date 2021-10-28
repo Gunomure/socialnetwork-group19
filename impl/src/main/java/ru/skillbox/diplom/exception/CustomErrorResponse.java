@@ -17,7 +17,7 @@ public class CustomErrorResponse {
     @JsonProperty("error_description")
     private String errorDescription;
     // tech information
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss")
-    private LocalDateTime timestamp;
-    private String exceptionMessage;
+//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss")
+//    private LocalDateTime timestamp;
+//    private String exceptionMessage;
 }
