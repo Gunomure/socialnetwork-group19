@@ -2,14 +2,15 @@ package ru.skillbox.diplom.controller.api;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.skillbox.diplom.controller.AccountController;
-import ru.skillbox.diplom.model.CommonResponse;
-import ru.skillbox.diplom.model.PasswordRecoveryRequest;
-import ru.skillbox.diplom.model.PasswordRecoveryResponse;
-import ru.skillbox.diplom.model.PasswordSetRequest;
+import ru.skillbox.diplom.exception.CustomErrorResponse;
+import ru.skillbox.diplom.model.*;
+import ru.skillbox.diplom.model.request.RequestRegister;
 import ru.skillbox.diplom.service.AccountService;
 import ru.skillbox.diplom.util.TimeUtil;
 
@@ -39,6 +40,13 @@ public class AccountControllerImpl implements AccountController {
         return createResponse("Password has been changed");
     }
 
+    @Override
+    public ResponseEntity<?> register(@RequestBody RequestRegister registerRequest) {
+        LOGGER.info("register: {}", registerRequest.toString());
+        accountService.registerAccount(registerRequest);
+        return ResponseEntity.ok(createResponse("ok"));
+    }
+
     private CommonResponse createResponse(String message) {
         CommonResponse response = new CommonResponse();
 
@@ -47,4 +55,5 @@ public class AccountControllerImpl implements AccountController {
 
         return response;
     }
+
 }
