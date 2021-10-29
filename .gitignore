@@ -7,6 +7,7 @@ api/target
 db/target
 domain/target
 impl/target
+/logs/*.log
 
 ### STS ###
 .apt_generated

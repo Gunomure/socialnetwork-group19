@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+    <changeSet id="1" author="eduard">
+        <insert tableName="persons">
+            <column name="id">1</column>
+            <column name="description">I'm just a poor boy</column>
+            <column name="registration_date">2020-05-24 22:35:43.149000 +00:00</column>
+            <column name="phone">89516008024</column>
+            <column name="city_id">1</column>
+            <column name="country_id">1</column>
+            <column name="photo">https://pbs.twimg.com/media/BNN-z84CYAIM7uJ.jpg</column>
+            <column name="last_online_time">2021-09-24 22:35:00.100000 +02:00</column>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
