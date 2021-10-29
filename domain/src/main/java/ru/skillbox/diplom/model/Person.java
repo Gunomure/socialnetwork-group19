@@ -26,9 +26,13 @@ public class Person extends User {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private String city;
+    @ManyToOne
+    @JoinColumn(name = "city_id")
+    private City city;
 
-    private String country;
+    @ManyToOne
+    @JoinColumn(name = "country_id")
+    private Country country;
 
     @Column(name = "confirmation_code")
     private String confirmationCode;

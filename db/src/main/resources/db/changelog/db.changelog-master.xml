@@ -10,9 +10,13 @@ http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd">
     <include file="db/changelog/create_table_PostFile.changelog.xml"/>
     <include file="db/changelog/create_table_PostLike.changelog.xml"/>
     <include file="db/changelog/create_table_TagToPost.changelog.xml"/>
+    <include file="db/changelog/create_table-Country.changelog.xml"/>
+    <include file="db/changelog/create_table-City.changelog.xml"/>
     <include file="db/changelog/create_table-User.changelog.xml"/>
     <include file="db/changelog/create_table-Person.changelog.xml"/>
     <include file="db/changelog/create_table-BlockHistory.changelog.xml"/>
     <include file="db/changelog/create_table-Language.changelog.xml"/>
+    <include file="db/changelog/insert_into_table-User.changelog.xml"/>
+    <include file="db/changelog/insert_into_table-Person.changelog.xml"/>
     <include file="db/changelog/create_tables_notifications.xml"/>
-</databaseChangeLog> 
+</databaseChangeLog>

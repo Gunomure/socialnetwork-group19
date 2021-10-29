@@ -3,7 +3,9 @@ package ru.skillbox.diplom.mappers;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import ru.skillbox.diplom.model.Person;
-import ru.skillbox.diplom.model.NewPersonDto;
+import ru.skillbox.diplom.model.PersonDTO;
+
+import java.util.Date;
 
 @Mapper(componentModel = "spring")
 public interface PersonMapper {
@@ -12,7 +14,9 @@ public interface PersonMapper {
         return Mappers.getMapper(PersonMapper.class);
     }
 
-    NewPersonDto toDto(Person person);
+    PersonDTO toPersonDTO(Person person);
 
-    Person toEntity(NewPersonDto personDto);
+    Person toPersonEntity(PersonDTO personDTO);
+
+    Date map(Long value);
 }

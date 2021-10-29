@@ -15,8 +15,8 @@
             <column name="phone" type="VARCHAR(16)"/>
             <column name="photo" type="VARCHAR(255)"/>
             <column name="description" type="TEXT"/>
-            <column name="city" type="VARCHAR(255)"/>
-            <column name="country" type="VARCHAR(255)"/>
+            <column name="city_id" type="INT"/>
+            <column name="country_id" type="INT"/>
             <column name="confirmation_code" type="VARCHAR(255)"/>
             <column name="is_approved" type="BOOLEAN" defaultValue="true"/>
             <column name="message_permission" type="VARCHAR(50)" defaultValue="ALL"/>
@@ -24,8 +24,12 @@
             <column name="is_blocked" type="BOOLEAN" defaultValue="false"/>
         </createTable>
     </changeSet>
-    <changeSet id="add_foreign_key" author="eduard">
+    <changeSet id="add_foreign_keys" author="eduard">
         <addForeignKeyConstraint baseColumnNames="id" baseTableName="persons" constraintName="fk_person_id"
                                  referencedColumnNames="id" referencedTableName="users"/>
+        <addForeignKeyConstraint baseColumnNames="city_id" baseTableName="persons" constraintName="fk_city_id"
+                                 referencedColumnNames="id" referencedTableName="cities"/>
+        <addForeignKeyConstraint baseColumnNames="country_id" baseTableName="persons" constraintName="fk_country_id"
+                                 referencedColumnNames="id" referencedTableName="countries"/>
     </changeSet>
 </databaseChangeLog>
