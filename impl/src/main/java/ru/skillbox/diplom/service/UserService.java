@@ -1,5 +1,6 @@
 package ru.skillbox.diplom.service;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.exception.EntityNotFoundException;
 import ru.skillbox.diplom.mappers.CityMapper;
@@ -9,6 +10,7 @@ import ru.skillbox.diplom.model.CityDTO;
 import ru.skillbox.diplom.model.CountryDTO;
 import ru.skillbox.diplom.model.Person;
 import ru.skillbox.diplom.model.PersonDTO;
+import ru.skillbox.diplom.model.enums.MessagePermission;
 import ru.skillbox.diplom.model.response.loginResponse.LoginResponse;
 import ru.skillbox.diplom.repository.PersonRepository;
 
@@ -26,7 +28,7 @@ public class UserService {
 
 
     public LoginResponse getProfileData() {
-        String email = "test@mail.ru";
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Person person;
         Optional<Person> optionalPerson = personRepository.findByEmail(email);
         if (optionalPerson.isPresent()){
@@ -40,9 +42,9 @@ public class UserService {
         response.setCountry(countryDTO);
         response.setPerson(personDTO);
         response.setTimestamp(ZonedDateTime.now());
-        response.setBlocked(person.getIsBlocked());
-        response.setLastOnlineTime(person.getLastOnlineTime().toInstant().getEpochSecond() * 1000);
-        response.setMessagePermission(person.getPermission().toString());
+        response.setBlocked(person.getIsBlocked() != null && person.getIsBlocked());
+        if (person.getLastOnlineTime() != null) response.setLastOnlineTime(person.getLastOnlineTime().toInstant().getEpochSecond() * 1000);
+        response.setMessagePermission(person.getPermission().toString() == null ? MessagePermission.ALL.toString() : person.getPermission().toString());
         return response;
     }
 }
