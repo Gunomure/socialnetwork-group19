@@ -9,7 +9,7 @@ ADD pom.xml pom.xml
 RUN mvn clean package
 RUN mkdir app
 
-FROM openjdk:11 as app
+FROM adoptopenjdk:11-jre-hotspot as app
 
 WORKDIR app
 COPY --from=build /src/impl/target/javapro-socialnetwork-studygroup-19.jar .
