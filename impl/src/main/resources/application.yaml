@@ -27,8 +27,8 @@ spring:
 
 group19:
   passwordRecoveryPath: change-password
-  websiteHost: localhost
-  frontendPort: 8099
+  websiteHost: ${WEBSITE_HOST:localhost}
+  frontendPort: ${FRONTEND_PORT:8099}
 values:
   jwt:
     header: Authorization

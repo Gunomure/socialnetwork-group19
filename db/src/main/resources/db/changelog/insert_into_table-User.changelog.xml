@@ -11,7 +11,7 @@
             <column name="last_name">Ivanov</column>
             <column name="birth_date">1990-01-01</column>
             <column name="type">USER</column>
-            <column name="email">test@mail.ru</column>
+            <column name="email">javaprogroup19@gmail.com</column>
             <column name="password">$2a$12$8z0DK/yPZIDt7p6MiJZ3PuNAeTkud8c.P8jdFWd9BpjMH8KwTT/H6</column>
         </insert>
     </changeSet>
