@@ -4,7 +4,10 @@ package ru.skillbox.diplom.controller.api;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -49,7 +52,8 @@ public class AuthenticationRestControllerV1 {
     @PostMapping("/login")
     public ResponseEntity<?> authenticate(@RequestBody RequestLogin request) {
         try {
-            authenticationManager.authenticate(Utils.getUsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+            Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(auth);
             User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User doesn't exists"));
             String token = jwtTokenProvider.createToken(request.getEmail(), user.getType().name());
             return ResponseEntity.ok(authService.login(request.getEmail(), token));
@@ -61,8 +65,9 @@ public class AuthenticationRestControllerV1 {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         try {
-            SecurityContextLogoutHandler securityContextLogoutHandler = new SecurityContextLogoutHandler();
-            securityContextLogoutHandler.logout(request, response, null);
+            SecurityContextHolder.clearContext();
+//            SecurityContextLogoutHandler securityContextLogoutHandler = new SecurityContextLogoutHandler();
+//            securityContextLogoutHandler.logout(request, response, null);
             LogoutResponse logoutResponse = new LogoutResponse();
             logoutResponse.setTimestamp(ZonedDateTime.now());
             logoutResponse.getData().put("message", "ok");

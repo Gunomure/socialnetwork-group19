@@ -6,6 +6,7 @@ import ru.skillbox.diplom.mappers.CityMapper;
 import ru.skillbox.diplom.mappers.CountryMapper;
 import ru.skillbox.diplom.mappers.PersonMapper;
 import ru.skillbox.diplom.model.*;
+import ru.skillbox.diplom.model.enums.MessagePermission;
 import ru.skillbox.diplom.model.response.loginResponse.LoginResponse;
 import ru.skillbox.diplom.repository.PersonRepository;
 
@@ -36,9 +37,9 @@ public class AuthService {
         response.setPerson(personDTO);
         response.setTimestamp(ZonedDateTime.now());
         response.setToken(token);
-        response.setBlocked(person.getIsBlocked());
-        response.setLastOnlineTime(person.getLastOnlineTime().toInstant().getEpochSecond() * 1000);
-        response.setMessagePermission(person.getPermission().toString());
+        response.setBlocked(person.getIsBlocked() != null && person.getIsBlocked());
+        if (person.getLastOnlineTime() != null) response.setLastOnlineTime(person.getLastOnlineTime().toInstant().getEpochSecond() * 1000);
+        response.setMessagePermission(person.getPermission().toString() == null ? MessagePermission.ALL.toString() : person.getPermission().toString());
         return response;
     }
 }
