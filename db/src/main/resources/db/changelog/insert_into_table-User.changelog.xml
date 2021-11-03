@@ -6,7 +6,6 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
     <changeSet id="1" author="eduard">
         <insert tableName="users">
-            <column name="id">1</column>
             <column name="first_name">Ivan</column>
             <column name="last_name">Ivanov</column>
             <column name="birth_date">1990-01-01</column>

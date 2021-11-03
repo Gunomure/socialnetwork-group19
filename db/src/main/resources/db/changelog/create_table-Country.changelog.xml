@@ -16,7 +16,6 @@
     </changeSet>
     <changeSet id="1" author="eduard">
         <insert tableName="countries">
-            <column name="id">1</column>
             <column name="title">Russia</column>
         </insert>
     </changeSet>
