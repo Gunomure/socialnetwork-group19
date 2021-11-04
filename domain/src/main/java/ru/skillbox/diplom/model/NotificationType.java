@@ -1,18 +1,21 @@
 package ru.skillbox.diplom.model;
 
 import com.sun.istack.NotNull;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import ru.skillbox.diplom.model.enums.NotificationTypes;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
-@Data
+@Getter
+@Setter
 @Entity
-//TODO is it better to define schema in one place: application.yaml? In case it changes
-@Table(name = "notification_type", schema = "group19")
+@Table(name = "notification_type")
 public class NotificationType extends BaseEntity {
     @NotNull
     private String code;
     @NotNull
-    private String name;
+    @Column(columnDefinition = "enum('POST', 'POST_COMMENT', 'COMMENT_COMMENT', 'FRIEND_REQUEST', 'MESSAGE')")
+    @Enumerated(EnumType.STRING)
+    private NotificationTypes name;
 }

@@ -11,12 +11,12 @@ import java.time.ZonedDateTime;
 @Setter
 @Entity
 @Table(name = "friendship_status")
-public class FriendshipStatus extends BaseEntity{
+public class FriendshipStatus extends BaseEntity {
     @Column(name = "time")
     private ZonedDateTime time;
     @Column(name = "name")
     private String name;
-    @Column(name = "status_code")
+    @Column(columnDefinition = "enum('REQUEST', 'FRIEND', 'BLOCKED', 'DECLINED', 'SUBSCRIBED')")
     @Enumerated(EnumType.STRING)
     private FriendshipCode code;
 }

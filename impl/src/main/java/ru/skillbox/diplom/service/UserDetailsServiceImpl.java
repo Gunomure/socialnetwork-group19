@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.config.security.UserDetailsImpl;
+import ru.skillbox.diplom.exception.EntityNotFoundException;
 import ru.skillbox.diplom.repository.UserRepository;
 import ru.skillbox.diplom.model.User;
 
@@ -22,8 +23,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email).orElseThrow(() ->
-                new UsernameNotFoundException("User doesn't exists"));
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new EntityNotFoundException(String.format("User %s not found", email))
+        );
         return UserDetailsImpl.fromUser(user);
     }
 }

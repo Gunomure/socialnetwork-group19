@@ -2,11 +2,8 @@
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd
-        http://www.liquibase.org/xml/ns/pro
-        http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd">
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
 
     <changeSet id="create-table-friendship_status" author="Stepan">
         <createTable tableName="friendship_status">
@@ -15,7 +12,7 @@
             </column>
             <column name="time" type="timestamptz"/>
             <column name="name" type="varchar(255)"/>
-            <column name="status_code" type="varchar(50)"/>
+            <column name="code" type="varchar(50)"/>
         </createTable>
     </changeSet>
 

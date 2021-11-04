@@ -1,13 +1,9 @@
 package ru.skillbox.diplom.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
-public class CityDTO {
-
+@Data
+public class CountryDto {
     private Long id;
-
     private String title;
 }

@@ -6,19 +6,15 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.time.LocalDateTime;
-
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(EntityNotFoundException.class)
+    @ExceptionHandler({EntityNotFoundException.class, BadRequestException.class})
     protected ResponseEntity<CustomErrorResponse> handleEntityNotFoundException(Exception ex) {
         CustomErrorResponse error = new CustomErrorResponse();
-        error.setErrorDescription(ErrorDetailType.BAD_CRED.getErrorType());
         error.setError(ErrorCommonType.INVALID_REQUEST.toString().toLowerCase());
-//        error.setTimestamp(LocalDateTime.now());
-//        error.setExceptionMessage(ex.getMessage());
+        error.setErrorDescription(ex.getMessage());
 
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 }
