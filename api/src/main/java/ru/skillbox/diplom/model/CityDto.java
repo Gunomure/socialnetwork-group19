@@ -5,9 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CountryDTO {
-
+public class CityDto {
     private Long id;
-
     private String title;
 }

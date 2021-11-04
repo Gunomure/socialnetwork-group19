@@ -1,11 +1,15 @@
 package ru.skillbox.diplom.util;
 
-import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 public class TimeUtil {
 
     public static long getCurrentTimestampUtc() {
-        return Instant.now().atZone(ZoneId.of("UTC")).toEpochSecond();
+        return zonedDateTimeToLong(ZonedDateTime.now());
+    }
+
+    public static long zonedDateTimeToLong(ZonedDateTime zonedDateTime) {
+        return ZonedDateTime.ofInstant(zonedDateTime.toInstant(), ZoneId.of("UTC")).toEpochSecond();
     }
 }

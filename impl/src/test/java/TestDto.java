@@ -2,7 +2,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ru.skillbox.diplom.mappers.PersonMapper;
 import ru.skillbox.diplom.model.Person;
-import ru.skillbox.diplom.model.PersonDTO;
+import ru.skillbox.diplom.model.PersonDto;
+
+import java.time.ZonedDateTime;
 
 public class TestDto {
 
@@ -14,8 +16,9 @@ public class TestDto {
         person.setEmail("ivan_petrov@gmail.com");
         person.setConfirmationCode("597558");
         person.setPassword("qwerty");
+        person.setLastOnlineTime(ZonedDateTime.now());
 
-        PersonDTO PersonDto = PersonMapper.getInstance().toPersonDTO(person);
+        PersonDto PersonDto = PersonMapper.getInstance().toPersonDTO(person);
         Assertions.assertEquals(person.getFirstName(), PersonDto.getFirstName());
         Assertions.assertEquals(person.getLastName(), PersonDto.getLastName());
         Assertions.assertEquals(person.getEmail(), PersonDto.getEmail());

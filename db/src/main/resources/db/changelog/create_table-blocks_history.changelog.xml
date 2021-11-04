@@ -5,7 +5,6 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
     <changeSet id="creation_table_blockHistory" author="eduard">
-        <sql>CREATE TYPE blockState AS ENUM ('BLOCK', 'UNBLOCK')</sql>
         <createTable tableName="blocks_history">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -18,7 +17,7 @@
             <column name="person_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
-            <column name="action" type="blockState">
+            <column name="action" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
         </createTable>

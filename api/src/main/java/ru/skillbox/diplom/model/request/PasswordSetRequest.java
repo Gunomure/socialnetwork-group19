@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.model;
+package ru.skillbox.diplom.model.request;
 
 import lombok.Data;
 

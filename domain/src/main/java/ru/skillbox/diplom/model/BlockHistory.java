@@ -27,7 +27,7 @@ public class BlockHistory extends BaseEntity{
     @Column(name = "comment_id", columnDefinition = "BIGINT")
     private Long commentId;
 
+    @Column(columnDefinition = "enum('BLOCK', 'UNBLOCK')", nullable = false)
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private Action action;
 }

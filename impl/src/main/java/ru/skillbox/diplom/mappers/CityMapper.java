@@ -3,7 +3,7 @@ package ru.skillbox.diplom.mappers;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import ru.skillbox.diplom.model.City;
-import ru.skillbox.diplom.model.CityDTO;
+import ru.skillbox.diplom.model.CityDto;
 
 @Mapper(componentModel = "spring")
 public interface CityMapper {
@@ -12,7 +12,7 @@ public interface CityMapper {
         return Mappers.getMapper(CityMapper.class);
     }
 
-    CityDTO toCityDTO(City city);
+    CityDto toCityDTO(City city);
 
-    City toCityEntity(CityDTO cityDTO);
+    City toCityEntity(CityDto cityDTO);
 }

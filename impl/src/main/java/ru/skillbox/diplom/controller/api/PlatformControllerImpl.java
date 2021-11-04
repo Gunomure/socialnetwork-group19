@@ -2,7 +2,6 @@ package ru.skillbox.diplom.controller.api;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.skillbox.diplom.controller.PlatformController;
 import ru.skillbox.diplom.model.request.LanguageRequest;

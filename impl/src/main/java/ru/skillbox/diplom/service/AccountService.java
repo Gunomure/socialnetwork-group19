@@ -3,29 +3,23 @@ package ru.skillbox.diplom.service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.skillbox.diplom.exception.CustomErrorResponse;
+import ru.skillbox.diplom.exception.BadRequestException;
 import ru.skillbox.diplom.exception.EntityNotFoundException;
-import ru.skillbox.diplom.model.PasswordSetRequest;
+import ru.skillbox.diplom.model.request.PasswordSetRequest;
 import ru.skillbox.diplom.model.Person;
-import ru.skillbox.diplom.model.request.RequestRegister;
-import ru.skillbox.diplom.model.User;
 import ru.skillbox.diplom.model.enums.MessagePermission;
 import ru.skillbox.diplom.model.enums.UserType;
+import ru.skillbox.diplom.model.request.RegisterRequest;
 import ru.skillbox.diplom.repository.PersonRepository;
-import ru.skillbox.diplom.repository.UserRepository;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.persistence.EntityExistsException;
 import java.time.ZonedDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -66,7 +60,7 @@ public class AccountService {
     }
 
     private void sendEmail(String to, String text) {
-        LOGGER.info("sendEmail: to={}, text={}", to, text);
+        LOGGER.info("start sendEmail: to={}, text={}", to, text);
         MimeMessage message = emailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
 
@@ -79,6 +73,7 @@ public class AccountService {
         } catch (MessagingException e) {
             LOGGER.error("Got error while sending email to {}", to, e);
         }
+        LOGGER.info("finish sendEmail: to={}, text={}", to, text);
     }
 
     public void setPassword(PasswordSetRequest passwordSetRequest) {
@@ -90,24 +85,25 @@ public class AccountService {
         personRepository.save(currentUser);
     }
 
-    public void registerAccount(RequestRegister registerRequest) {
-        Optional<Person> existingUser = personRepository.findByEmail(registerRequest.getEmail());
-        //TODO: change exception type
-        if (existingUser.isPresent()) throw new EntityNotFoundException("invalid_request");
-            /*CustomErrorResponse customErrorResponse = new CustomErrorResponse();
-            customErrorResponse.setError("invalid_request");
-            customErrorResponse.setErrorDescription("string");
-            return new ResponseEntity<>(customErrorResponse, HttpStatus.BAD_REQUEST);*/
-
-        Person user = new Person();
-        user.setEmail(registerRequest.getEmail());
-        user.setFirstName(registerRequest.getFirstName());
-        user.setLastName(registerRequest.getLastName());
-        user.setPassword(passwordEncoder.encode(registerRequest.getPasswd1()));
-        user.setRegistrationDate(ZonedDateTime.now());
-        user.setPermission(MessagePermission.ALL);
-        user.setType(UserType.USER);
-        user.setConfirmationCode(registerRequest.getCode());
-        personRepository.save(user);
+    public void registerAccount(RegisterRequest registerRequest) {
+        LOGGER.info("start registerAccount: {}", registerRequest);
+        boolean personExists = personRepository.isExists(registerRequest.getEmail());
+        if (!personExists) {
+            Person user = new Person();
+            user.setEmail(registerRequest.getEmail());
+            user.setFirstName(registerRequest.getFirstName());
+            user.setLastName(registerRequest.getLastName());
+            user.setPassword(passwordEncoder.encode(registerRequest.getPasswd1()));
+            user.setRegistrationDate(ZonedDateTime.now());
+            user.setPermission(MessagePermission.ALL);
+            user.setType(UserType.USER);
+            user.setConfirmationCode(registerRequest.getCode());
+            user.setLastOnlineTime(ZonedDateTime.now());
+            personRepository.save(user);
+        } else {
+            throw new BadRequestException(String.format("User with email %s already exists",
+                    registerRequest.getEmail()));
+        }
+        LOGGER.info("finish registerAccount: {}", registerRequest);
     }
 }

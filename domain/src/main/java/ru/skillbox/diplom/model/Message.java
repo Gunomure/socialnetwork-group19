@@ -11,7 +11,7 @@ import java.time.ZonedDateTime;
 @Setter
 @Entity
 @Table(name = "message")
-public class Message extends BaseEntity{
+public class Message extends BaseEntity {
     @Column(name = "time")
     private ZonedDateTime time;
     @Column(name = "author_id")
@@ -20,7 +20,7 @@ public class Message extends BaseEntity{
     private Long recipientId;
     @Column(name = "message_text")
     private String messageText;
-    @Column(name = "read_status")
+    @Column(name = "read_status", columnDefinition = "enum('SENT', 'READ')")
     @Enumerated(EnumType.STRING)
     private ReadStatus status;
 }

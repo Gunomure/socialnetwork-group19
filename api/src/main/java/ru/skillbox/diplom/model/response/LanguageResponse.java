@@ -12,19 +12,3 @@ public class LanguageResponse extends CommonResponse<List<LanguageDto>> {
     private int offset;
     private int perPage;
 }
-
-/*
-{
-  "error": "string",
-  "timestamp": 1559751301818,
-  "total": 0,
-  "offset": 0,
-  "perPage": 20,
-  "data": [
-    {
-      "id": 1,
-      "title": "Русский"
-    }
-  ]
-}
- */
