@@ -2,6 +2,7 @@ package ru.skillbox.diplom.service;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.List;
 public class LanguageService {
     private final static Logger LOGGER = LogManager.getLogger(LanguageService.class);
     private final LanguageRepository languageRepository;
+    private final LanguageMapper languageMapper = Mappers.getMapper(LanguageMapper.class);
 
     public LanguageService(LanguageRepository languageRepository) {
         this.languageRepository = languageRepository;
@@ -30,7 +32,7 @@ public class LanguageService {
         PageRequest pageRequest = PageRequest.of(request.getOffset(), request.getItemPerPage(), Sort.by("language").ascending());
         List<Language> languagesByLanguageContaining =
                 languageRepository.findByLanguageContaining(request.getLanguage(), pageRequest);
-        List<LanguageDto> languageResponseList = LanguageMapper.getInstance().toLanguageDto(languagesByLanguageContaining);
+        List<LanguageDto> languageResponseList = languageMapper.toLanguageDto(languagesByLanguageContaining);
         LanguageResponse response = new LanguageResponse();
         response.setOffset(request.getOffset());
         response.setPerPage(request.getItemPerPage());

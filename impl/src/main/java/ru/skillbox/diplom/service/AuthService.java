@@ -2,6 +2,7 @@ package ru.skillbox.diplom.service;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.exception.EntityNotFoundException;
 import ru.skillbox.diplom.mappers.PersonMapper;
@@ -16,6 +17,7 @@ public class AuthService {
     private final static Logger LOGGER = LogManager.getLogger(AuthService.class);
 
     private final PersonRepository personRepository;
+    private final PersonMapper personMapper = Mappers.getMapper(PersonMapper.class);
 
     public AuthService(PersonRepository personRepository) {
         this.personRepository = personRepository;
@@ -28,7 +30,7 @@ public class AuthService {
                 () -> new EntityNotFoundException(String.format("User %s not found", email))
         );
 
-        PersonDto personDTO = PersonMapper.getInstance().toPersonDTO(person);
+        PersonDto personDTO = personMapper.toPersonDTO(person);
         CommonResponse<PersonDto> response = new CommonResponse<>();
         response.setData(personDTO);
         response.setTimestamp(TimeUtil.getCurrentTimestampUtc());
