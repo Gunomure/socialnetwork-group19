@@ -1,5 +1,7 @@
-FROM openjdk:11
-ADD target/javapro-socialnetwork-studygroup-19.jar javapro-socialnetwork-studygroup-19.jar
+FROM adoptopenjdk:11-jre-hotspot
 
-ENTRYPOINT ["java", "-jar","javapro-socialnetwork-studygroup-19.jar"]
+WORKDIR app
+ADD impl/target/javapro-socialnetwork-studygroup-19.jar javapro-socialnetwork-studygroup-19.jar
+
 EXPOSE 8086
+ENTRYPOINT ["java", "-jar","javapro-socialnetwork-studygroup-19.jar"]

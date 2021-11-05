@@ -1,0 +1,104 @@
+#default image unless otherwise specified
+image: maven:3.8.3-jdk-11
+
+variables:
+  POSTGRES_CONTAINER_NAME: postgres
+  POSTGRES_IMAGE: javaprogroup19/postgres:1.0-ARM
+  BACK_CONTAINER_NAME: group19-backend
+  BACK_IMAGE: javaprogroup19/impl:1.0.3-ARM
+
+stages:
+  - build
+  - test
+  - package
+  - deploy
+  - notify #implement notify via telegram bot
+
+build:
+  stage: build
+  only:
+    - develop
+    - merge_requests
+  except:
+    - tags
+  script:
+    - mvn compile
+  cache:
+    paths:
+      - ./impl/target
+      - ./.m2
+
+test:
+  stage: test
+  only:
+    - develop
+    - merge_requests
+  except:
+    - tags
+  script:
+    - mvn test
+  cache:
+    paths:
+      - ./target
+      - ./.m2
+
+package:
+  stage: package
+  only:
+    - develop
+    - merge_requests
+  except:
+    - tags
+  script:
+    - mvn package -Dmaven.test.skip=true
+  artifacts:
+    paths:
+      - impl/target/*.jar
+  cache:
+    policy: pull
+    paths:
+      - ./impl/target
+      - ./.m2
+
+build_and_push_image:
+  image: docker:latest
+  stage: deploy
+  only:
+    - develop
+    - merge_requests
+  except:
+    - tags
+  before_script:
+    - docker logout
+    - docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASS
+  script:
+    - docker build -f impl/Dockerfile --platform linux/arm64/v8 -t javaprogroup19/impl:1.0.3-ARM .
+    - docker push javaprogroup19/impl:1.0.3-ARM
+  artifacts:
+    paths:
+      - impl/target/*.jar
+
+deploy_prod_server:
+    stage: deploy
+    only:
+      - develop
+      - main
+    except:
+      - tags
+    before_script:
+      - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
+      - eval $(ssh-agent -s)
+      - echo "$SSH_PRIVATE_KEY" | ssh-add -
+      - mkdir -p ~/.ssh
+      - chmod 700 ~/.ssh
+      - ssh-keyscan $PROD_HOST >> ~/.ssh/known_hosts
+      - chmod 644 ~/.ssh/known_hosts
+    script:
+      #rerun postgre to update container and reset structure
+      - ssh $PROD_USER@$PROD_HOST "docker stop $POSTGRES_CONTAINER_NAME"
+      - ssh $PROD_USER@$PROD_HOST "docker pull $POSTGRES_IMAGE"
+      - ssh $PROD_USER@$PROD_HOST "docker run --name $POSTGRES_CONTAINER_NAME -d --rm -p 5432:5432 -e POSTGRES_PASSWORD=group19 -e POSTGRES_DB=group19 -e POSTGRES_USER=group19 --network group19-net javaprogroup19/postgres:1.0-ARM"
+      #rerun backend
+      - ssh $PROD_USER@$PROD_HOST "docker stop $BACK_CONTAINER_NAME"
+      - ssh $PROD_USER@$PROD_HOST "docker pull $BACK_IMAGE"
+      - ssh $PROD_USER@$PROD_HOST "docker run --name $BACK_CONTAINER_NAME -d --rm -p 8086:8086 -e POSTGRES_HOST=$POSTGRES_CONTAINER_NAME -e  MAIL_SERVICE_PASSWORD=$MAIL_SERVICE_PASSWORD -e WEBSITE_HOST=$PROD_HOST -e FRONTEND_PORT=8099 --network group19-net $BACK_IMAGE"
