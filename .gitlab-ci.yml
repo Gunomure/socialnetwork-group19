@@ -46,7 +46,7 @@ package:
   stage: package
   only:
     - develop
-    - merge_requests
+    - main
   except:
     - tags
   script:
@@ -65,7 +65,7 @@ build_and_push_image:
   stage: deploy
   only:
     - develop
-    - merge_requests
+    - main
   except:
     - tags
   before_script:
