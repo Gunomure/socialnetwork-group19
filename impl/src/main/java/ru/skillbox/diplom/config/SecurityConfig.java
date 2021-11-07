@@ -32,13 +32,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
-//                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .authorizeRequests()
                 .antMatchers("/").permitAll()
                 .antMatchers("/api/v1/auth/login").permitAll()
+                .antMatchers("/api/v1/auth/refresh").permitAll()
                 .antMatchers("/api/v1/auth/logout").permitAll()
-                .antMatchers("/api/v1/users/me").permitAll()
                 .antMatchers("/api/v1/account/**").permitAll()
                 .antMatchers("/api/v1/platform/**").permitAll()
                 .anyRequest()

@@ -1,7 +1,7 @@
 package ru.skillbox.diplom.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.spotify.docker.client.shaded.com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -46,4 +46,7 @@ public class PersonDto {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String token;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String refreshToken;
 }

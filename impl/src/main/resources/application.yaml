@@ -33,4 +33,5 @@ values:
   jwt:
     header: Authorization
     secretKey: secret
-    expiration: 604800
+    expiration: 120
+    refreshExpirationDateInMs: 9000000

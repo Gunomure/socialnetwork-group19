@@ -15,6 +15,7 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Map;
 
 @Component
 public class JwtTokenProvider {
@@ -27,6 +28,8 @@ public class JwtTokenProvider {
     private String authorizationHeader;
     @Value("${values.jwt.expiration}")
     private long validityInMilliseconds;
+    @Value("${values.jwt.refreshExpirationDateInMs}")
+    private long refreshExpirationDateInMs;
 
     public JwtTokenProvider(@Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
@@ -58,6 +61,12 @@ public class JwtTokenProvider {
         } catch (JwtException | IllegalArgumentException e) {
             throw new JwtAuthenticationException("JWT token is expired or invalid", HttpStatus.UNAUTHORIZED);
         }
+    }
+
+    public String generateTokenFromEmail(String email) {
+        return Jwts.builder().setSubject(email).setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + validityInMilliseconds * 1000)).signWith(SignatureAlgorithm.HS512, secretKey)
+                .compact();
     }
 
     public Authentication getAuthentication(String token) {
