@@ -11,7 +11,8 @@ stages:
   - build
   - test
   - package
-  - deploy
+  - deploy_dockerhub
+  - deploy_prod
   - notify #implement notify via telegram bot
 
 build:
@@ -62,7 +63,7 @@ package:
 
 build_and_push_image:
   image: docker:latest
-  stage: deploy
+  stage: deploy_dockerhub
   only:
     - develop
     - main
@@ -79,7 +80,7 @@ build_and_push_image:
       - impl/target/*.jar
 
 deploy_prod_server:
-    stage: deploy
+    stage: deploy_prod
     only:
       - develop
       - main
