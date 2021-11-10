@@ -48,7 +48,7 @@
              <column name="confirmation_code" value="3655"/>
             <column name="registration_date" value="2021-10-28 11:31:04.812073 +00:00"/>
             <column name="is_approved" value="true"/>
-            <column name="message_permission" value="FRIENDS"/>
+            <column name="message_permission" value="FRIEND"/>
             <column name="is_blocked" value="false"/>
 
         </insert>

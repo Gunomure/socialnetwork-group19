@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet author="eduard" id="insert_post-comments">
+        <insert tableName="post_comments">
+            <column name="comment_text">useful information!</column>
+            <column name="author_id">2</column>
+            <column name="post_id">1</column>
+            <column name="is_blocked">false</column>
+            <column name="time">2020-09-24 20:35:00.100000 +00</column>
+        </insert>
+        <insert tableName="post_comments">
+            <column name="comment_text">agree with you</column>
+            <column name="author_id">3</column>
+            <column name="post_id">1</column>
+            <column name="is_blocked">false</column>
+            <column name="time">2020-09-25 20:35:00.100000 +00</column>
+            <column name="parent_id">1</column>
+        </insert>
+        <insert tableName="post_comments">
+            <column name="comment_text">thank you all for support</column>
+            <column name="author_id">1</column>
+            <column name="post_id">1</column>
+            <column name="is_blocked">false</column>
+            <column name="time">2020-09-26 20:35:00.100000 +00</column>
+        </insert>
+        <insert tableName="post_comments">
+            <column name="comment_text">another comment</column>
+            <column name="author_id">2</column>
+            <column name="post_id">1</column>
+            <column name="is_blocked">false</column>
+            <column name="time">2020-09-27 20:35:00.100000 +00</column>
+        </insert>
+        <insert tableName="post_comments">
+            <column name="comment_text">blocked comment</column>
+            <column name="author_id">3</column>
+            <column name="post_id">1</column>
+            <column name="is_blocked">true</column>
+            <column name="time">2020-09-28 20:35:00.100000 +00</column>
+        </insert>
+        <insert tableName="post_comments">
+            <column name="comment_text">comment to post 2</column>
+            <column name="author_id">1</column>
+            <column name="post_id">2</column>
+            <column name="is_blocked">false</column>
+            <column name="time">2020-09-28 20:35:00.100000 +00</column>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

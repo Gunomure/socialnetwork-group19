@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd
+        http://www.liquibase.org/xml/ns/pro
+        http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd">
+
+    <changeSet id="create-table-post_comment" author="stepan">
+        <createTable tableName="post_comments">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="time" type="timestamp with time zone"/>
+            <column name="post_id" type="bigint"/>
+            <column name="parent_id" type="bigint"/>
+            <column name="author_id" type="bigint"/>
+            <column name="comment_text" type="text"/>
+            <column name="is_blocked" type="boolean"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

@@ -5,24 +5,29 @@ import org.springframework.data.jpa.domain.Specification;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Objects;
 
 public class SpecificationUtil<T> {
 
-    public Specification<T> between(String key, LocalDateTime from, LocalDateTime to){
-        LocalDateTime fromDate = Objects.isNull(from) ?
-                LocalDateTime.of(1900, 1,1,0,0,0) : from;
-        LocalDateTime toDate = Objects.isNull(to) ? LocalDateTime.now() : to;
+    public Specification<T> between(String key, ZonedDateTime from, ZonedDateTime to){
+        ZonedDateTime fromDate = Objects.isNull(from) ?
+                ZonedDateTime.of(LocalDateTime.of(1900, 1,1,0,0,0), ZoneId.of("UTC")) : from;
+        ZonedDateTime toDate = Objects.isNull(to) ? ZonedDateTime.now() : to;
         return (root, query, builder) -> builder.between(root.get(key), fromDate, toDate);
     }
 
     public Specification<T> equals(String key, String value) {
         return (root, query, builder)  -> equals(root.get(key), value).toPredicate(root, query, builder);
-
     }
     private Specification<T> equals(Path<String> key, String value) {
         return (root, query, builder) -> Objects.isNull(value) ? builder.conjunction() : builder.equal(key, value);
+    }
+
+    public Specification<T> equals(String key, Boolean value) {
+        return (root, query, builder) -> builder.equal(root.get("isBlocked"), value);
     }
 
     public Specification<T> contains(String key, String value) {
