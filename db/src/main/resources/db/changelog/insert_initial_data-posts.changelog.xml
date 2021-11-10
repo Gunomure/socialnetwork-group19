@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+    <changeSet id="insert_posts" author="eduard">
+        <insert tableName="posts">
+            <column name="time">2010-11-09 10:52:47.719000 +00:00</column>
+            <column name="title">some title</column>
+            <column name="author_id">1</column>
+            <column name="post_text">some text some text some text some text some text some text </column>
+            <column name="is_blocked">false</column>
+        </insert>
+        <insert tableName="posts">
+            <column name="time">2011-11-09 10:52:47.719000 +00:00</column>
+            <column name="title">another title</column>
+            <column name="author_id">2</column>
+            <column name="post_text">some text some text some text some text some text some text </column>
+            <column name="is_blocked">false</column>
+        </insert>
+        <insert tableName="posts">
+            <column name="time">2012-11-09 10:52:47.719000 +00:00</column>
+            <column name="title">Docker</column>
+            <column name="author_id">3</column>
+            <column name="post_text">Docker is docker</column>
+            <column name="is_blocked">false</column>
+        </insert>
+        <insert tableName="posts">
+            <column name="time">2010-11-09 11:52:47.719000 +00:00</column>
+            <column name="title">Git</column>
+            <column name="author_id">1</column>
+            <column name="post_text">Git - system of versions control</column>
+            <column name="is_blocked">false</column>
+        </insert>
+        <insert tableName="posts">
+            <column name="time">2013-11-09 10:52:47.719000 +00:00</column>
+            <column name="title">What is Java?</column>
+            <column name="author_id">2</column>
+            <column name="post_text">Java isn't JavaScript</column>
+            <column name="is_blocked">false</column>
+        </insert>
+        <insert tableName="posts">
+            <column name="time">2014-11-09 10:52:47.719000 +00:00</column>
+            <column name="title">What is Java? Part 2</column>
+            <column name="author_id">2</column>
+            <column name="post_text">Java is object oriented programming language </column>
+            <column name="is_blocked">false</column>
+        </insert>
+        <insert tableName="posts">
+            <column name="time">2023-11-09 10:52:47.719000 +00:00</column>
+            <column name="title">future post</column>
+            <column name="author_id">1</column>
+            <column name="post_text">this post shouldn't be included in response</column>
+            <column name="is_blocked">false</column>
+        </insert>
+        <insert tableName="posts">
+            <column name="time">2010-11-09 10:53:47.719000 +00:00</column>
+            <column name="title">blocked post</column>
+            <column name="author_id">3</column>
+            <column name="post_text">this post shouldn't be included in response</column>
+            <column name="is_blocked">true</column>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

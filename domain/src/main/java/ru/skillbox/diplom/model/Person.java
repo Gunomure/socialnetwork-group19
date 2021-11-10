@@ -8,6 +8,7 @@ import ru.skillbox.diplom.model.enums.UserType;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -52,6 +53,9 @@ public class Person extends User {
     @Column(name = "is_blocked", columnDefinition = "BOOLEAN NOT NULL")
     @ColumnDefault("false")
     private Boolean isBlocked;
+
+    @OneToMany(mappedBy = "authorId", cascade = CascadeType.ALL)
+    private List<Post> posts;
 
     @Override
     @Transient

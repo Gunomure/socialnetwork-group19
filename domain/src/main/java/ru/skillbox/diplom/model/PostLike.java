@@ -4,21 +4,24 @@ import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import java.time.LocalDateTime;
+import javax.persistence.*;
+import java.time.ZonedDateTime;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "post_like")
 public class PostLike extends BaseEntity {
-    private LocalDateTime time;
+
+    private ZonedDateTime time;
+
     @NotNull
-    @Column(name = "person_id")
-    private Long personId; //TODO change datatype to Person
+    @ManyToOne
+    @JoinColumn(name = "person_id")
+    private Person personId;
+
     @NotNull
-    @Column(name = "post_id")
-    private Long postId; //TODO change datatype to Post
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Post postId;
 }

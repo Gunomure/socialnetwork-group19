@@ -1,18 +1,30 @@
 package ru.skillbox.diplom.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.time.ZonedDateTime;
+import java.util.List;
 
-@Data
+@Getter
+@Setter
 public class PostDto {
-    private ZonedDateTime time;
-    @JsonProperty("author_id")
-    private Long authorId;
+
+    private Long id;
+
+    private Long time;
+
+    private PersonDto author;
+
     private String title;
+
     @JsonProperty("post_text")
     private String postText;
+
     @JsonProperty("is_blocked")
     private Boolean isBlocked;
+
+    private int likes;
+
+    private List<PostCommentDto> comments;
 }
