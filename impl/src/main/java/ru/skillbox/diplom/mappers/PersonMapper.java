@@ -6,7 +6,9 @@ import ru.skillbox.diplom.model.Person;
 import ru.skillbox.diplom.model.PersonDto;
 
 import java.time.ZonedDateTime;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import static ru.skillbox.diplom.util.TimeUtil.zonedDateTimeToLong;
 
@@ -20,6 +22,8 @@ public interface PersonMapper {
     PersonDto toPersonDTO(Person person);
 
     Person toPersonEntity(PersonDto personDTO);
+
+    List<PersonDto> toPersonDTO(Collection<Person> persons);
 
     Date map(Long value);
 

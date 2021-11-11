@@ -1,5 +1,6 @@
 package ru.skillbox.diplom.model;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -14,6 +15,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "persons")
+@Data
 public class Person extends User {
 
     @Column(name = "registration_date", nullable = false)
