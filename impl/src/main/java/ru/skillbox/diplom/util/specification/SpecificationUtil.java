@@ -4,13 +4,22 @@ import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Objects;
 
 public class SpecificationUtil<T> {
+
+    public Specification<T> between(String key, LocalDateTime from, LocalDateTime to) {
+        LocalDateTime fromDate = Objects.isNull(from) ?
+                LocalDateTime.of(1900, 1, 1, 0, 0, 0) : from;
+        LocalDateTime toDate = Objects.isNull(to) ? LocalDateTime.now() : to;
+        return (root, query, builder) -> builder.between(root.get(key), fromDate, toDate);
+    }
 
     public Specification<T> between(String key, ZonedDateTime from, ZonedDateTime to){
         ZonedDateTime fromDate = Objects.isNull(from) ?
@@ -19,9 +28,17 @@ public class SpecificationUtil<T> {
         return (root, query, builder) -> builder.between(root.get(key), fromDate, toDate);
     }
 
-    public Specification<T> equals(String key, String value) {
-        return (root, query, builder)  -> equals(root.get(key), value).toPredicate(root, query, builder);
+    public Specification<T> between(String key, Date from, Date to) {
+        Date fromDate = Objects.isNull(from) ?
+                new Date(1900, 1, 1, 0, 0, 0) : from;
+        Date toDate = Objects.isNull(to) ? new Date() : to;
+        return (root, query, builder) -> builder.between(root.get(key), fromDate, toDate);
     }
+
+    public Specification<T> equals(String key, String value) {
+        return (root, query, builder) -> equals(makePath(root, key), value).toPredicate(root, query, builder);
+    }
+
     private Specification<T> equals(Path<String> key, String value) {
         return (root, query, builder) -> Objects.isNull(value) ? builder.conjunction() : builder.equal(key, value);
     }
@@ -30,19 +47,28 @@ public class SpecificationUtil<T> {
         return (root, query, builder) -> builder.equal(root.get("isBlocked"), value);
     }
 
-    public Specification<T> contains(String key, String value) {
-        return (root, query, builder) -> contains(root.get(key), value).toPredicate(root, query, builder);
+    public Specification<T> equals(String key, Long value) {
+        return (root, query, builder) -> equals(makePath(root, key), value).toPredicate(root, query, builder);
     }
 
-    public Specification<T> contains(String key, Predicate.BooleanOperator booleanOperator, String... values){
-        return (root, query, builder) -> contains(root.get(key), booleanOperator, values).toPredicate(root, query, builder);
+    private Specification<T> equals(Path<String> key, Long value) {
+        System.out.println(key);
+        return (root, query, builder) -> Objects.isNull(value) ? builder.conjunction() : builder.equal(key, value);
+    }
+
+    public Specification<T> contains(String key, String value) {
+        return (root, query, builder) -> contains(makePath(root, key), value).toPredicate(root, query, builder);
+    }
+
+    public Specification<T> contains(String key, Predicate.BooleanOperator booleanOperator, String... values) {
+        return (root, query, builder) -> contains(makePath(root, key), booleanOperator, values).toPredicate(root, query, builder);
     }
 
     private Specification<T> contains(Path<String> key, String value) {
         return (root, query, builder) -> Objects.isNull(value) ? builder.conjunction() : builder.like(builder.lower(key), "%" + value.toLowerCase() + "%");
     }
 
-    private Specification<T> contains(Path<String> key, Predicate.BooleanOperator booleanOperator, String... values){
+    private Specification<T> contains(Path<String> key, Predicate.BooleanOperator booleanOperator, String... values) {
         return Arrays.stream(values)
                 .map(v -> contains(key, v))
                 .reduce((s1, s2) -> s1 = booleanOperator == Predicate.BooleanOperator.OR ? s1.or(s2) : s1.and(s2))
@@ -53,4 +79,14 @@ public class SpecificationUtil<T> {
         return (root, query, builder) -> operator == Predicate.BooleanOperator.AND ? builder.conjunction() : builder.disjunction();
     }
 
+    private Path<String> makePath(Root<T> root, String key) {
+        String[] path = key.split("\\.");
+        Path<String> objectPath = root.get(path[0]);
+        if (path.length > 1) {
+            for (int i = 1; i < path.length; i++) {
+                objectPath = objectPath.get(path[i]);
+            }
+        }
+        return objectPath;
+    }
 }

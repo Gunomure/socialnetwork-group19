@@ -33,14 +33,13 @@ public class FeedService {
     public FeedsResponse<List<PostDto>> getFeeds(String name, Integer offset, Integer itemPerPage){
         LOGGER.info("getFeeds: text = {}, offset = {}, itemPerPage = {}", name, offset, itemPerPage);
         SpecificationUtil<Post> feedSpec = new SpecificationUtil<>();
-        Specification<Post> s1 = feedSpec.between("time", null, null);
+//        Specification<Post> s1 = feedSpec.between("time", null, null);
         Specification<Post> s2 = feedSpec.contains("title", name);
         Specification<Post> s3 = feedSpec.contains("postText", name);
         Specification<Post> s4 = feedSpec.equals("isBlocked", false);
         List<Post> feeds = postRepository.findAll(
                 Specification.
-                        where(s1).
-                        and(s2.or(s3)).
+                        where(s2.or(s3)).
                         and(s4),
                         PageRequest.of(offset, itemPerPage))
                 .getContent();
