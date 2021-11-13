@@ -15,7 +15,6 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 import java.util.Date;
-import java.util.Map;
 
 @Component
 public class JwtTokenProvider {
@@ -80,10 +79,9 @@ public class JwtTokenProvider {
 
     public String resolveToken(HttpServletRequest request) {
         final String header = request.getHeader(authorizationHeader);
-        String jwt = null;
         if (header != null && header.startsWith("Bearer ")){
-            jwt = header.substring(7);
+            return header.substring(7);
         }
-        return jwt;
+        return header;
     }
 }

@@ -1,5 +1,6 @@
 package ru.skillbox.diplom.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,8 +20,11 @@ import javax.servlet.http.HttpServletResponse;
 public interface AuthController {
 
     @PostMapping("/login")
-    CommonResponse<PersonDto> authenticate(@RequestBody LoginRequest request);
+    ResponseEntity<?> authenticate(@RequestBody LoginRequest request);
 
     @PostMapping("/logout")
-    CommonResponse<LogoutResponse> logout(HttpServletRequest request, HttpServletResponse response);
+    ResponseEntity<?> logout();
+
+    @PostMapping("/refresh")
+    ResponseEntity<?> refreshToken(@RequestBody TokenRefreshRequest request);
 }

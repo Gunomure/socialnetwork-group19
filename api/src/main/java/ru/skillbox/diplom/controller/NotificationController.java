@@ -8,12 +8,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @CrossOrigin
-@RequestMapping("api/v1/feeds")
+@RequestMapping("api/v1/notifications")
 @PreAuthorize("hasAuthority('developers:read')")
-public interface FeedController {
+public interface NotificationController {
 
     @GetMapping
-    ResponseEntity<?> getFeeds(@RequestParam (required = false) String name,
-                            @RequestParam (defaultValue = "0") Integer offset,
-                            @RequestParam (defaultValue = "20") Integer itemPerPage);
+    ResponseEntity<?> getNotifications(@RequestParam (defaultValue = "0") Integer offset,
+                                       @RequestParam (defaultValue = "20") Integer itemPerPage);
 }

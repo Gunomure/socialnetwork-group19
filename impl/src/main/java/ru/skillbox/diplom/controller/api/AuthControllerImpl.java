@@ -33,34 +33,24 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 public class AuthControllerImpl implements AuthController {
 
-    private final AuthenticationManager authenticationManager;
-    private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthService authService;
     private final RefreshTokenService refreshTokenService;
 
-    public AuthControllerImpl(AuthenticationManager authenticationManager,
-                              UserRepository userRepository,
-                              JwtTokenProvider jwtTokenProvider,
-                              AuthService authService, RefreshTokenService refreshTokenService) {
-        this.authenticationManager = authenticationManager;
-        this.userRepository = userRepository;
+    public AuthControllerImpl(JwtTokenProvider jwtTokenProvider,
+                              AuthService authService,
+                              RefreshTokenService refreshTokenService) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.authService = authService;
         this.refreshTokenService = refreshTokenService;
     }
 
     @Override
-    public CommonResponse<PersonDto> authenticate(@RequestBody LoginRequest request) {
-        Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(auth);
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User doesn't exists"));
-        String token = jwtTokenProvider.createToken(request.getEmail(), user.getType().name());
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
-        return authService.login(request.getEmail(), token, refreshToken);
+    public ResponseEntity<?> authenticate(@RequestBody LoginRequest request) {
+        return ResponseEntity.ok(authService.login(request));
     }
 
-    @PostMapping("/refresh")
+    @Override
     public ResponseEntity<?> refreshToken(@RequestBody TokenRefreshRequest request) {
         String requestRefreshToken = request.getRefreshToken();
 
@@ -76,17 +66,7 @@ public class AuthControllerImpl implements AuthController {
     }
 
     @Override
-    public CommonResponse<LogoutResponse> logout(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            SecurityContextHolder.clearContext();
-//            SecurityContextLogoutHandler securityContextLogoutHandler = new SecurityContextLogoutHandler();
-//            securityContextLogoutHandler.logout(request, response, null);
-            CommonResponse<LogoutResponse> commonResponse = new CommonResponse<>();
-            commonResponse.setTimestamp(TimeUtil.getCurrentTimestampUtc());
-            commonResponse.setData(new LogoutResponse("ok"));
-            return commonResponse;
-        } catch (Exception e) {
-            throw new BadRequestException("Logout error");
-        }
+    public ResponseEntity<?> logout() {
+            return ResponseEntity.ok(authService.logout());
     }
 }

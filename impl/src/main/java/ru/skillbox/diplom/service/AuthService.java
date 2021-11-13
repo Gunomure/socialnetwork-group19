@@ -3,13 +3,17 @@ package ru.skillbox.diplom.service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mapstruct.factory.Mappers;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.skillbox.diplom.exception.EntityNotFoundException;
+import ru.skillbox.diplom.config.security.jwt.JwtTokenProvider;
 import ru.skillbox.diplom.mappers.PersonMapper;
-import ru.skillbox.diplom.model.CommonResponse;
-import ru.skillbox.diplom.model.Person;
-import ru.skillbox.diplom.model.PersonDto;
-import ru.skillbox.diplom.model.RefreshToken;
+import ru.skillbox.diplom.model.*;
+import ru.skillbox.diplom.model.request.LoginRequest;
+import ru.skillbox.diplom.model.response.LogoutResponse;
 import ru.skillbox.diplom.repository.PersonRepository;
 import ru.skillbox.diplom.util.TimeUtil;
 
@@ -19,17 +23,32 @@ public class AuthService {
 
     private final PersonRepository personRepository;
     private final PersonMapper personMapper = Mappers.getMapper(PersonMapper.class);
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenService refreshTokenService;
 
-    public AuthService(PersonRepository personRepository) {
+    public AuthService(PersonRepository personRepository,
+                       AuthenticationManager authenticationManager,
+                       JwtTokenProvider jwtTokenProvider,
+                       RefreshTokenService refreshTokenService) {
         this.personRepository = personRepository;
+        this.authenticationManager = authenticationManager;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.refreshTokenService = refreshTokenService;
     }
 
-    public CommonResponse<PersonDto> login(String email, String token, RefreshToken refreshToken) {
+    public CommonResponse<PersonDto> login(LoginRequest request) {
+        String email = request.getEmail();
+        String password = request.getPassword();
+        LOGGER.info("login data: email={}, password={}", email, password);
+        Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        Person person = personRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User doesn't exists"));
+        String token = jwtTokenProvider.createToken(email, person.getType().name());
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(person.getId());
+
         LOGGER.info("start login: email={}, token={}", email, token);
 
-        Person person = personRepository.findByEmail(email).orElseThrow(
-                () -> new EntityNotFoundException(String.format("User %s not found", email))
-        );
         PersonDto personDTO = personMapper.toPersonDTO(person);
         personDTO.setToken(token);
         personDTO.setRefreshToken(refreshToken.getToken());
@@ -40,4 +59,15 @@ public class AuthService {
 
         return response;
     }
+
+    public CommonResponse<LogoutResponse> logout(){
+        SecurityContextHolder.clearContext();
+        CommonResponse<LogoutResponse> response = new CommonResponse<>();
+        response.setTimestamp(TimeUtil.getCurrentTimestampUtc());
+        response.setData(new LogoutResponse("ok"));
+        LOGGER.info("success logout");
+        return response;
+    }
+
+
 }
