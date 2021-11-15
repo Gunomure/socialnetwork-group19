@@ -3,6 +3,7 @@ package ru.skillbox.diplom.config;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -35,14 +36,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/").permitAll()
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers("/api/v1/auth/login").permitAll()
                 .antMatchers("/api/v1/auth/refresh").permitAll()
                 .antMatchers("/api/v1/auth/logout").permitAll()
                 .antMatchers("/api/v1/account/**").permitAll()
                 .antMatchers("/api/v1/platform/**").permitAll()
-                .antMatchers("/api/v1/feeds/**").permitAll()
-                .antMatchers("/api/v1/users/**").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
