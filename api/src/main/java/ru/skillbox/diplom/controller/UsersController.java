@@ -1,12 +1,10 @@
 package ru.skillbox.diplom.controller;
 
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.model.CommonResponse;
 import ru.skillbox.diplom.model.PersonDto;
+import ru.skillbox.diplom.model.request.UpdateRequest;
 import ru.skillbox.diplom.model.response.UsersSearchResponse;
 
 @CrossOrigin
@@ -16,6 +14,8 @@ public interface UsersController {
 
     @GetMapping("/me")
     CommonResponse<PersonDto> getProfile();
+    @PutMapping("/me")
+    CommonResponse<PersonDto> updateProfile(@RequestBody UpdateRequest updateRequest);
 
     @GetMapping("/search")
     UsersSearchResponse searchUsers(@RequestParam(name = "first_name", required = false) String firstName,

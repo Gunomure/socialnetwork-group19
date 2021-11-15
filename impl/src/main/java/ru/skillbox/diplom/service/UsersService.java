@@ -13,6 +13,7 @@ import ru.skillbox.diplom.mappers.PersonMapper;
 import ru.skillbox.diplom.model.CommonResponse;
 import ru.skillbox.diplom.model.Person;
 import ru.skillbox.diplom.model.PersonDto;
+import ru.skillbox.diplom.model.request.UpdateRequest;
 import ru.skillbox.diplom.model.response.UsersSearchResponse;
 import ru.skillbox.diplom.repository.PersonRepository;
 import ru.skillbox.diplom.util.TimeUtil;
@@ -48,6 +49,35 @@ public class UsersService {
         response.setTimestamp(TimeUtil.getCurrentTimestampUtc());
         LOGGER.info("finish getProfileData");
 
+        return response;
+    }
+
+    public CommonResponse<PersonDto> updateProfileData(UpdateRequest data) {
+        LOGGER.info("start updateProfileData");
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Person person = personRepository.findByEmail(email).orElseThrow(
+                () -> new EntityNotFoundException(String.format("User %s not found", email))
+        );
+
+
+        person.setFirstName(data.getFirstName());
+        person.setLastName(data.getLastName());
+        person.setBirthDate(data.getBirthDate());
+        /*Optional<City> city = cityRepository.findByTitle(data.getTownId());
+        if (city.isPresent()) person.setCity(city.get());
+        else throw new EntityNotFoundException(String.format("City %s not found", data.getTownId()));
+        Optional<Country> country = countryRepository.findByTitle(data.getCountryId());
+        if (country.isPresent()) person.setCountry(country.get());
+        else throw new EntityNotFoundException(String.format("Country %s not found", data.getCountryId()));*/
+        person.setPhone(data.getPhone());
+        person.setDescription(data.getAbout());
+        /*person.setPermission(Utils.parsePermission(data.getPermission()));*/
+
+        PersonDto responseData = PersonMapper.getInstance().toPersonDTO(person);
+        CommonResponse<PersonDto> response = new CommonResponse<>();
+        response.setTimestamp(TimeUtil.getCurrentTimestampUtc());
+        response.setData(responseData);
+        LOGGER.info("finish updateProfileData");
         return response;
     }
 
