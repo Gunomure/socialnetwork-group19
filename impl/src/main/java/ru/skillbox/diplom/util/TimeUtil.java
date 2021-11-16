@@ -1,9 +1,6 @@
 package ru.skillbox.diplom.util;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.Date;
 
 public class TimeUtil {
@@ -15,6 +12,9 @@ public class TimeUtil {
 
     public static long zonedDateTimeToLong(ZonedDateTime zonedDateTime) {
         return ZonedDateTime.ofInstant(zonedDateTime.toInstant(), ZONE_UTC).toEpochSecond();
+    }
+    public static ZonedDateTime getZonedDateTimeFromMillis(Long millis) {
+        return millis == null ? null :  ZonedDateTime.ofInstant(Instant.ofEpochMilli(millis), ZONE_UTC);
     }
 
     public static LocalDateTime DateToLocalDateTime(Date date) {

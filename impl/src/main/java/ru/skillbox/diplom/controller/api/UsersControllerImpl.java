@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.skillbox.diplom.controller.UsersController;
 import ru.skillbox.diplom.model.CommonResponse;
 import ru.skillbox.diplom.model.PersonDto;
+import ru.skillbox.diplom.model.PostDto;
 import ru.skillbox.diplom.model.request.UpdateRequest;
+import ru.skillbox.diplom.model.request.postRequest.PostBodyRequest;
 import ru.skillbox.diplom.model.response.UsersSearchResponse;
 import ru.skillbox.diplom.service.UsersService;
 
@@ -40,5 +42,10 @@ public class UsersControllerImpl implements UsersController {
     @Override
     public CommonResponse<PersonDto> updateProfile(@RequestBody UpdateRequest updateRequest) {
         return usersService.updateProfileData(updateRequest);
+    }
+
+    @Override
+    public CommonResponse<PersonDto> createPost(Long id, Long date, PostBodyRequest body) {
+        return usersService.createPost(id, date, body);
     }
 }

@@ -27,4 +27,6 @@ public class PostDto {
     private int likes;
 
     private List<PostCommentDto> comments;
+
+    private List<TagDto> tags;
 }

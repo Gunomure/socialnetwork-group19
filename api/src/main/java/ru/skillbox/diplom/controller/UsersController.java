@@ -4,7 +4,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.model.CommonResponse;
 import ru.skillbox.diplom.model.PersonDto;
+import ru.skillbox.diplom.model.PostDto;
 import ru.skillbox.diplom.model.request.UpdateRequest;
+import ru.skillbox.diplom.model.request.postRequest.PostBodyRequest;
 import ru.skillbox.diplom.model.response.UsersSearchResponse;
 
 @CrossOrigin
@@ -26,4 +28,9 @@ public interface UsersController {
                                     @RequestParam(required = false) String city,
                                     @RequestParam(defaultValue = "0", required = false) int offset,
                                     @RequestParam(defaultValue = "10", required = false) int itemPerPage);
+
+    @PostMapping("/{id}/wall")
+    CommonResponse<PersonDto> createPost(@PathVariable Long id,
+                                       @RequestParam(name = "publish_date", required = false) Long date,
+                                       @RequestBody PostBodyRequest body);
 }

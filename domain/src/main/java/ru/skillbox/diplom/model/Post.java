@@ -31,9 +31,6 @@ public class Post extends BaseEntity{
     private List<PostComment> comments;
 
     @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL)
-    private List<PostToTag> tags;
-
-    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL)
     private List<PostLike> likes;
 
     @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL)

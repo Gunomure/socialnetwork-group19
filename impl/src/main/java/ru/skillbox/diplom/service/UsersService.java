@@ -9,11 +9,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.exception.EntityNotFoundException;
+import ru.skillbox.diplom.mappers.FeedMapper;
 import ru.skillbox.diplom.mappers.PersonMapper;
-import ru.skillbox.diplom.model.CommonResponse;
-import ru.skillbox.diplom.model.Person;
-import ru.skillbox.diplom.model.PersonDto;
+import ru.skillbox.diplom.model.*;
 import ru.skillbox.diplom.model.request.UpdateRequest;
+import ru.skillbox.diplom.model.request.postRequest.PostBodyRequest;
 import ru.skillbox.diplom.model.response.UsersSearchResponse;
 import ru.skillbox.diplom.repository.PersonRepository;
 import ru.skillbox.diplom.util.TimeUtil;
@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static ru.skillbox.diplom.util.TimeUtil.LocalDateToDate;
+import static ru.skillbox.diplom.util.TimeUtil.getZonedDateTimeFromMillis;
 
 @Service
 public class UsersService {
@@ -30,6 +31,7 @@ public class UsersService {
 
     private final PersonRepository personRepository;
     private final PersonMapper personMapper = Mappers.getMapper(PersonMapper.class);
+    private final FeedMapper postMapper = Mappers.getMapper(FeedMapper.class);
 
     public UsersService(PersonRepository personRepository) {
         this.personRepository = personRepository;
@@ -43,7 +45,7 @@ public class UsersService {
                 () -> new EntityNotFoundException(String.format("User %s not found", email))
         );
 
-        PersonDto personDTO = PersonMapper.getInstance().toPersonDTO(person);
+        PersonDto personDTO = personMapper.toPersonDTO(person);
         CommonResponse<PersonDto> response = new CommonResponse<>();
         response.setData(personDTO);
         response.setTimestamp(TimeUtil.getCurrentTimestampUtc());
@@ -73,7 +75,7 @@ public class UsersService {
         person.setDescription(data.getAbout());
         /*person.setPermission(Utils.parsePermission(data.getPermission()));*/
 
-        PersonDto responseData = PersonMapper.getInstance().toPersonDTO(person);
+        PersonDto responseData = personMapper.toPersonDTO(person);
         CommonResponse<PersonDto> response = new CommonResponse<>();
         response.setTimestamp(TimeUtil.getCurrentTimestampUtc());
         response.setData(responseData);
@@ -116,6 +118,30 @@ public class UsersService {
         response.setItemPerPage(itemPerPage);
         LOGGER.info("finish searchUsers");
 
+        return response;
+    }
+
+    public CommonResponse<PersonDto> createPost(Long id, Long date, PostBodyRequest body) {
+        LOGGER.info("start createPost id = {}, body = {}", id, body.toString());
+
+        Person person = personRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException(String.format("User %s not found", id)));
+        List<Post> posts = person.getPosts();
+        Post post = new Post();
+        post.setAuthorId(person);
+        post.setTitle(body.getTitle());
+        post.setPostText(body.getPostText().replaceAll("\\<[^>]*>",""));
+        post.setIsBlocked(false);
+        post.setTime(getZonedDateTimeFromMillis(date == null ? System.currentTimeMillis() : date));
+        posts.add(post);
+        person.setPosts(posts);
+
+        Person newPerson = personRepository.save(person);
+        PersonDto responseData = personMapper.toPersonDTO(newPerson);
+        CommonResponse<PersonDto> response = new CommonResponse<>();
+        response.setTimestamp(TimeUtil.getCurrentTimestampUtc());
+        response.setData(responseData);
+        LOGGER.info("finish createPost");
         return response;
     }
 }
