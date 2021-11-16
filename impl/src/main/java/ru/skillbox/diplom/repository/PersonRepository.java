@@ -13,6 +13,7 @@ public interface PersonRepository extends JpaRepository<Person, Integer>, JpaSpe
 
     Optional<Person> findByEmail(String email);
     Optional<Person> findByConfirmationCode(String confirmationCode);
+    Optional<Person> findById(Long id);
 //    List<Person> findAll(Specification<Person> spec);
 
     @Query("SELECT COUNT(*) > 0 FROM Person p where p.email = :email")
