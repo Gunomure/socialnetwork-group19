@@ -7,8 +7,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import ru.skillbox.diplom.mappers.FeedMapper;
 import ru.skillbox.diplom.mappers.PostCommentMapper;
+import ru.skillbox.diplom.mappers.PostMapper;
 import ru.skillbox.diplom.model.*;
 import ru.skillbox.diplom.model.request.postRequest.CommentBodyRequest;
 import ru.skillbox.diplom.model.request.postRequest.PostBodyRequest;
@@ -34,7 +34,7 @@ public class PostService {
     private final static String ERROR = "invalid_request";
 
 //    private final PostMapper postMapper = Mappers.getMapper(PostMapper.class);
-    private final FeedMapper  mapper = Mappers.getMapper(FeedMapper.class);
+    private final PostMapper mapper = Mappers.getMapper(PostMapper.class);
     private final PostCommentMapper commentMapper =  Mappers.getMapper(PostCommentMapper.class);
 
 
@@ -72,7 +72,7 @@ public class PostService {
             postList = postList.stream().filter(x -> personList.contains(x.getAuthorId())).collect(Collectors.toList());
         }
 
-        List<PostDto> postDtoList = mapper.toDtoList(postList);
+        List<PostDto> postDtoList = mapper.convertToListPostDto(postList);
 
         PostListResponse response = new PostListResponse();
         response.setTimestamp(TimeUtil.getCurrentTimestampUtc());
@@ -82,7 +82,7 @@ public class PostService {
     }
 
     private PostResponse getResponseOk(Post post){
-        PostDto postDto = mapper.toDto(post);
+        PostDto postDto = mapper.convertToDto(post);
         PostResponse response = new PostResponse();
         response.setTimestamp(TimeUtil.getCurrentTimestampUtc());
         response.setData(postDto);

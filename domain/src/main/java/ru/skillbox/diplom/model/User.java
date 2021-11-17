@@ -6,7 +6,7 @@ import org.hibernate.annotations.ColumnDefault;
 import ru.skillbox.diplom.model.enums.UserType;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 @Entity
 @Getter
@@ -22,8 +22,7 @@ public class User extends BaseEntity {
     private String lastName;
 
     @Column(name = "birth_date")
-    @Temporal(TemporalType.DATE)
-    private Date birthDate;
+    private ZonedDateTime birthDate;
 
     @Column(nullable = false)
     private String email;

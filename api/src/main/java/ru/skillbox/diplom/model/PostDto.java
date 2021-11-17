@@ -24,7 +24,7 @@ public class PostDto {
     @JsonProperty("is_blocked")
     private Boolean isBlocked;
 
-    private int likes;
+    private Integer likes;
 
     private List<PostCommentDto> comments;
 
