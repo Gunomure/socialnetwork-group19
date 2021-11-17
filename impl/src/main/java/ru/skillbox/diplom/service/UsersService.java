@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import ru.skillbox.diplom.exception.BadRequestException;
 import ru.skillbox.diplom.exception.EntityNotFoundException;
 import ru.skillbox.diplom.mappers.PersonMapper;
 import ru.skillbox.diplom.model.CommonResponse;
@@ -96,10 +97,10 @@ public class UsersService {
         Specification<Person> s1 = spec.contains("firstName", firstName);
         Specification<Person> s2 = spec.contains("lastName", lastName);
         Specification<Person> s3 = spec.between("birthDate", ZonedDateTime.now().minusYears(ageTo),
-                ZonedDateTime.now().minusYears(ageTo));
+                ZonedDateTime.now().minusYears(ageFrom));
         Specification<Person> s4 = spec.equals("country.title", country);
         Specification<Person> s5 = spec.equals("city.title", city);
-        PageRequest pageRequest = PageRequest.of(offset, itemPerPage, Sort.by("id").ascending());
+        PageRequest pageRequest = PageRequest.of(offset, itemPerPage, Sort.by("firstName").ascending());
 
         List<Person> personEntities = personRepository.findAll(Specification.where(s1)
                                 .and(s2)
@@ -117,6 +118,22 @@ public class UsersService {
         response.setOffset(response.getOffset());
         response.setItemPerPage(itemPerPage);
         LOGGER.info("finish searchUsers");
+
+        return response;
+    }
+
+    public CommonResponse<PersonDto> searchUserById(Long id) {
+        LOGGER.info("start searchUser: id={}", id);
+
+        Person personEntity = personRepository.findById(id).orElseThrow(
+                () -> new BadRequestException("User not found")
+        );
+        PersonDto personDto = personMapper.toPersonDTO(personEntity);
+
+        CommonResponse<PersonDto> response = new CommonResponse<>();
+        response.setData(personDto);
+        response.setTimestamp(getCurrentTimestampUtc());
+        LOGGER.info("finish searchUser: id={}", id);
 
         return response;
     }
