@@ -1,27 +1,34 @@
 package ru.skillbox.diplom.mappers;
 
-import org.mapstruct.*;
-import ru.skillbox.diplom.model.*;
-import ru.skillbox.diplom.util.MapperUtils;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.NullValueCheckStrategy;
+import org.mapstruct.ReportingPolicy;
+import ru.skillbox.diplom.mappers.converters.Converters;
+import ru.skillbox.diplom.model.Post;
+import ru.skillbox.diplom.model.PostComment;
+import ru.skillbox.diplom.model.PostCommentDto;
+import ru.skillbox.diplom.model.PostDto;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring",
-        uses = {PostCommentMapper.class, PersonMapper.class, //TagMapper.class,
-        MapperUtils.class},
-        nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
+@Mapper(uses = {Converters.class, PersonMapper.class},
+        componentModel = "spring",
+        nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
+        unmappedTargetPolicy = ReportingPolicy.IGNORE
+)
 public interface PostMapper {
 
-//    PostMapper INSTANCE = Mappers.getMapper(PostMapper.class);
+    @Mapping(target = "likes", qualifiedByName = "convertLikesListToLikesSize")
+    @Mapping(target = "time", qualifiedByName = "convertDateToLong")
+    PostDto convertToDto(Post post);
 
-    @Mappings({
-            @Mapping(target = "likes", qualifiedByName = { "Utils", "listToIntSize" }),
-            @Mapping(target = "author", source = "authorId"),
-            @Mapping(target = "time", qualifiedByName = { "Utils", "zonedDateTimeToLong" })
-    })
+    @Mapping(target = "authorId", qualifiedByName = "convertPersonToId")
+    @Mapping(target = "time", qualifiedByName = "convertDateToLong")
+    @Mapping(target = "parentId", qualifiedByName = "convertCommentToParentId")
+    @Mapping(source = "post", target = "postId", qualifiedByName = "convertPostToId")
+    PostCommentDto convertToDtoPostComment(PostComment postComment);
 
-    PostDto toPostDto(Post post);
-
-    List<PostDto> toPostDto(List<Post> post);
+    List<PostDto> convertToListPostDto(List<Post> posts);
 
 }

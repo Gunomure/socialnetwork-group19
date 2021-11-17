@@ -1,44 +1,32 @@
 package ru.skillbox.diplom.mappers;
 
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.NullValueCheckStrategy;
+import org.mapstruct.ReportingPolicy;
+import ru.skillbox.diplom.mappers.converters.Converters;
 import ru.skillbox.diplom.model.Person;
 import ru.skillbox.diplom.model.PersonDto;
-import ru.skillbox.diplom.util.MapperUtils;
-import ru.skillbox.diplom.util.TimeUtil;
 
-import java.time.ZonedDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
-@Mapper(componentModel = "spring",
-//        uses = {MapperUtils.class, CityMapper.class, CountryMapper.class},
-        nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
+@Mapper(uses = {Converters.class},
+        componentModel = "spring",
+        nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
+        unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PersonMapper {
 
-//    PersonMapper INSTANCE = Mappers.getMapper(PersonMapper.class);
-
-    @Mappings({
-            @Mapping(target = "birthDate", qualifiedByName = "dateToLong"),//{ "Utils", "dateToLong" }),
-            @Mapping(target = "registrationDate", qualifiedByName = "zonedDateTimeToLong"),//{ "Utils", "zonedDateTimeToLong" }),
-            @Mapping(target = "lastOnlineTime", qualifiedByName = "zonedDateTimeToLong"),//{ "Utils", "zonedDateTimeToLong" }),
-            @Mapping(target = "token", ignore = true)
-    })
+    @Mapping(target = "birthDate", qualifiedByName = "convertDateToLong")
+    @Mapping(target = "registrationDate", qualifiedByName = "convertDateToLong")
+    @Mapping(target = "lastOnlineTime", qualifiedByName = "convertDateToLong")
+    @Mapping(target = "token", ignore = true)
     PersonDto toPersonDTO(Person person);
 
-    List<PersonDto> toPersonDTO(Collection<Person> persons);
+    @Mapping(target = "birthDate", qualifiedByName = "convertLongToDate")
+    @Mapping(target = "registrationDate", qualifiedByName = "convertLongToDate")
+    @Mapping(target = "lastOnlineTime", qualifiedByName = "convertLongToDate")
+    Person toPersonEntity(PersonDto personDTO);
 
-    Person toPersonEntity(PersonDto personDto);
-
-    Date map(Long value);
-
-    @Named("dateToLong")
-    static Long map(Date date){
-        return date.getTime();
-    }
-    @Named("zonedDateTimeToLong")
-    static Long map(ZonedDateTime time){
-        return TimeUtil.zonedDateTimeToLong(time);
-    }
-
+    List<PersonDto> toListPersonDTO(Collection<Person> persons);
 }

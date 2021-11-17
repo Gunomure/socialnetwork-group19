@@ -2,8 +2,6 @@ package ru.skillbox.diplom.model.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import ru.skillbox.diplom.model.CityDto;
-import ru.skillbox.diplom.model.CountryDto;
 
 import java.util.Date;
 
@@ -16,7 +14,7 @@ public class UpdateRequest {
     private String lastName;
 
     @JsonProperty(value = "birth_date")
-    private Date birthDate;
+    private Date birthDate; //TODO изменить получение даты с фронта на ZonedDateTime. В базе поменял уже.
 
     private String phone;
 

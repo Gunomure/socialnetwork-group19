@@ -6,13 +6,11 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import ru.skillbox.diplom.exception.BadRequestException;
-import ru.skillbox.diplom.exception.EntityNotFoundException;
-import ru.skillbox.diplom.mappers.FeedMapper;
-import ru.skillbox.diplom.model.*;
+import ru.skillbox.diplom.mappers.ResponseMapper;
+import ru.skillbox.diplom.model.Post;
+import ru.skillbox.diplom.model.PostDto;
 import ru.skillbox.diplom.model.response.FeedsResponse;
 import ru.skillbox.diplom.repository.PostRepository;
-import ru.skillbox.diplom.util.TimeUtil;
 import ru.skillbox.diplom.util.specification.SpecificationUtil;
 
 import java.time.ZonedDateTime;
@@ -22,7 +20,7 @@ import java.util.List;
 public class FeedService {
 
     private final static Logger LOGGER = LogManager.getLogger(FeedService.class);
-    private final FeedMapper mapper = Mappers.getMapper(FeedMapper.class);
+    private final ResponseMapper responseMapper = Mappers.getMapper(ResponseMapper.class);
 
     private final PostRepository postRepository;
 
@@ -44,18 +42,8 @@ public class FeedService {
                         and(s1),
                         PageRequest.of(offset, itemPerPage))
                 .getContent();
-        FeedsResponse<List<PostDto>> response = new FeedsResponse<>();
-        response.setTimestamp(TimeUtil.getCurrentTimestampUtc());
-        response.setOffset(offset);
-        response.setPerPage(itemPerPage);
-        response.setTotal(feeds.size());
-        if (feeds.isEmpty()) {
-            response.setError("По указанному запросу не найдено новостей");
-            return response;
-        }
-        List<PostDto> feedsDto = mapper.toDtoList(feeds);
-        response.setData(feedsDto);
-        response.setError("getting feed success");
+        FeedsResponse<List<PostDto>> response = responseMapper.convertToFeedsResponse(offset,itemPerPage);
+        responseMapper.updateToFeedsResponse(feeds,response);
         return response;
     }
 }
