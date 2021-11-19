@@ -9,12 +9,19 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import ru.skillbox.diplom.config.security.jwt.JwtTokenProvider;
+import ru.skillbox.diplom.exception.TokenRefreshException;
 import ru.skillbox.diplom.mappers.PersonMapper;
 import ru.skillbox.diplom.model.*;
 import ru.skillbox.diplom.model.request.LoginRequest;
+import ru.skillbox.diplom.model.request.TokenRefreshRequest;
+import ru.skillbox.diplom.model.response.MessageResponse;
+import ru.skillbox.diplom.model.response.TokenRefreshResponse;
 import ru.skillbox.diplom.repository.PersonRepository;
 import ru.skillbox.diplom.util.TimeUtil;
+
+import javax.naming.NamingException;
 
 @Service
 public class AuthService {
@@ -66,13 +73,13 @@ public class AuthService {
             response.setData(validateAndReturnNewJwtAndRefreshToken(request.getRefreshToken()));
             response.setError("No error");
             return response;
-        } catch (TokenRefreshException e) {
+        } catch (TokenRefreshException | NamingException e) {
             response.setError(e.getMessage());
             return response;
         }
     }
 
-    private TokenRefreshResponse validateAndReturnNewJwtAndRefreshToken(String refreshToken) {
+    private TokenRefreshResponse validateAndReturnNewJwtAndRefreshToken(String refreshToken) throws NamingException {
         return refreshTokenService.findByToken(refreshToken)
                 .map(refreshTokenService::verifyExpiration)
                 .map(RefreshToken::getUser)
@@ -88,9 +95,9 @@ public class AuthService {
 
     public CommonResponse<MessageResponse> logout(){
         SecurityContextHolder.clearContext();
-        CommonResponse<LogoutResponse> response = new CommonResponse<>();
+        CommonResponse<MessageResponse> response = new CommonResponse<>();
         response.setTimestamp(TimeUtil.getCurrentTimestampUtc());
-        response.setData(new LogoutResponse("ok"));
+        response.setData(new MessageResponse("ok"));
         LOGGER.info("success logout");
         return response;
     }
