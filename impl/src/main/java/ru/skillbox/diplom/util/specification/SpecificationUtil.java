@@ -28,13 +28,6 @@ public class SpecificationUtil<T> {
         return (root, query, builder) -> builder.between(root.get(key), fromDate, toDate);
     }
 
-    public Specification<T> between(String key, Date from, Date to) {
-        Date fromDate = Objects.isNull(from) ?
-                new Date(1900, 1, 1, 0, 0, 0) : from;
-        Date toDate = Objects.isNull(to) ? new Date() : to;
-        return (root, query, builder) -> builder.between(root.get(key), fromDate, toDate);
-    }
-
     public Specification<T> equals(String key, String value) {
         return (root, query, builder) -> equals(makePath(root, key), value).toPredicate(root, query, builder);
     }

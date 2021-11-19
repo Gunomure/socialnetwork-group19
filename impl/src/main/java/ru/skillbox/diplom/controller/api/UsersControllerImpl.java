@@ -2,12 +2,10 @@ package ru.skillbox.diplom.controller.api;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.controller.UsersController;
 import ru.skillbox.diplom.model.CommonResponse;
 import ru.skillbox.diplom.model.PersonDto;
-import ru.skillbox.diplom.model.PostDto;
 import ru.skillbox.diplom.model.request.UpdateRequest;
 import ru.skillbox.diplom.model.request.postRequest.PostBodyRequest;
 import ru.skillbox.diplom.model.response.UsersSearchResponse;
@@ -37,6 +35,12 @@ public class UsersControllerImpl implements UsersController {
                         "ageFrom={}, ageTo={}, country={}, city={}, offset={}, itemPerPage={}",
                 firstName, lastName, ageFrom, ageTo, country, city, offset, itemPerPage);
         return usersService.searchUsers(firstName, lastName, ageFrom, ageTo, country, city, offset, itemPerPage);
+    }
+
+    @Override
+    public CommonResponse<PersonDto> searchUser(@PathVariable Long id) {
+        LOGGER.info("searchUser by id={}", id);
+        return usersService.searchUserById(id);
     }
 
     @Override
