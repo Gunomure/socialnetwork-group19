@@ -17,16 +17,10 @@ import ru.skillbox.diplom.service.RefreshTokenService;
 @RestController
 public class AuthControllerImpl implements AuthController {
 
-    private final JwtTokenProvider jwtTokenProvider;
     private final AuthService authService;
-    private final RefreshTokenService refreshTokenService;
 
-    public AuthControllerImpl(JwtTokenProvider jwtTokenProvider,
-                              AuthService authService,
-                              RefreshTokenService refreshTokenService) {
-        this.jwtTokenProvider = jwtTokenProvider;
+    public AuthControllerImpl(AuthService authService) {
         this.authService = authService;
-        this.refreshTokenService = refreshTokenService;
     }
 
     @Override
@@ -36,17 +30,7 @@ public class AuthControllerImpl implements AuthController {
 
     @Override
     public ResponseEntity<?> refreshToken(@RequestBody TokenRefreshRequest request) {
-        String requestRefreshToken = request.getRefreshToken();
-
-        return refreshTokenService.findByToken(requestRefreshToken)
-                .map(refreshTokenService::verifyExpiration)
-                .map(RefreshToken::getUser)
-                .map(user -> {
-                    String token = jwtTokenProvider.generateTokenFromEmail(user.getEmail());
-                    return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
-                })
-                .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
-                        "Refresh token is not in database!"));
+        return ResponseEntity.ok(authService.refreshToken(request));
     }
 
     @Override

@@ -9,11 +9,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import ru.skillbox.diplom.config.security.jwt.JwtTokenProvider;
+import ru.skillbox.diplom.exception.TokenRefreshException;
 import ru.skillbox.diplom.mappers.PersonMapper;
 import ru.skillbox.diplom.model.*;
 import ru.skillbox.diplom.model.request.LoginRequest;
-import ru.skillbox.diplom.model.response.MessageResponse;
+import ru.skillbox.diplom.model.request.TokenRefreshRequest;
+import ru.skillbox.diplom.model.response.LogoutResponse;
+import ru.skillbox.diplom.model.response.TokenRefreshResponse;
 import ru.skillbox.diplom.repository.PersonRepository;
 import ru.skillbox.diplom.util.TimeUtil;
 
@@ -58,6 +62,33 @@ public class AuthService {
         LOGGER.info("finish getProfileData");
 
         return response;
+    }
+
+    public CommonResponse<TokenRefreshResponse> refreshToken(@RequestBody TokenRefreshRequest request) {
+        CommonResponse<TokenRefreshResponse> response = new CommonResponse<>();
+        response.setTimestamp(TimeUtil.getCurrentTimestampUtc());
+        try {
+            response.setData(validateAndReturnNewJwtAndRefreshToken(request.getRefreshToken()));
+            response.setError("No error");
+            return response;
+        } catch (TokenRefreshException e) {
+            response.setError(e.getMessage());
+            return response;
+        }
+    }
+
+    private TokenRefreshResponse validateAndReturnNewJwtAndRefreshToken(String refreshToken) {
+        return refreshTokenService.findByToken(refreshToken)
+                .map(refreshTokenService::verifyExpiration)
+                .map(RefreshToken::getUser)
+                .map(user -> {
+                            String newJwtToken = jwtTokenProvider.generateTokenFromEmail(user.getEmail());
+                            refreshTokenService.deleteByUserId(user.getId());
+                            String newRefreshToken = refreshTokenService.createRefreshToken(user.getId()).getToken();
+                            return new TokenRefreshResponse(newJwtToken, newRefreshToken);
+                        }
+                ).orElseThrow(() -> new TokenRefreshException(refreshToken,
+                        "Refresh token is not in database!"));
     }
 
     public CommonResponse<MessageResponse> logout(){
