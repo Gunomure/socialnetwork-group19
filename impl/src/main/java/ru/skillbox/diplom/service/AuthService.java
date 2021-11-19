@@ -13,7 +13,6 @@ import ru.skillbox.diplom.config.security.jwt.JwtTokenProvider;
 import ru.skillbox.diplom.mappers.PersonMapper;
 import ru.skillbox.diplom.model.*;
 import ru.skillbox.diplom.model.request.LoginRequest;
-import ru.skillbox.diplom.model.response.LogoutResponse;
 import ru.skillbox.diplom.repository.PersonRepository;
 import ru.skillbox.diplom.util.TimeUtil;
 
