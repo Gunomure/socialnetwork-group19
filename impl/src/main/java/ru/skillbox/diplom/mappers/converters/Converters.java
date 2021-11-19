@@ -36,7 +36,7 @@ public class Converters {
 
     @Named("convertCommentToParentId")
     public static Long convertCommentToParentId(PostComment comment) {
-        return comment.getParentId().getId();
+        return comment.getParentId() == null ? null : comment.getParentId().getId();
     }
 
     @Named("convertPostToId")

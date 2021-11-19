@@ -13,5 +13,13 @@
             <column name="email">javaprogroup19@gmail.com</column>
             <column name="password">$2a$12$8z0DK/yPZIDt7p6MiJZ3PuNAeTkud8c.P8jdFWd9BpjMH8KwTT/H6</column>
         </insert>
+        <insert tableName="users">
+            <column name="first_name">Михаил</column>
+            <column name="last_name">Шуфутинский</column>
+            <column name="birth_date">1965-09-03</column>
+            <column name="type">USER</column>
+            <column name="email">qwerty11@qwerty11.qw</column>
+            <column name="password">$2a$12$NGiIPwt.WbtC2b9ZC9IriegHcXW0u0p61T6Tv93CLg.afOUsROzxC</column>
+        </insert>
     </changeSet>
 </databaseChangeLog>

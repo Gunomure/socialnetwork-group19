@@ -22,6 +22,7 @@ public class FeedService {
     private final static Logger LOGGER = LogManager.getLogger(FeedService.class);
     private final ResponseMapper responseMapper = Mappers.getMapper(ResponseMapper.class);
 
+
     private final PostRepository postRepository;
 
     public FeedService(PostRepository postRepository) {
