@@ -4,6 +4,7 @@ image: maven:3.8.3-jdk-11
 variables:
   POSTGRES_CONTAINER_STATUS: $(docker container inspect -f {{.State.Status}} $POSTGRES_CONTAINER_NAME)
   BACKEND_CONTAINER_STATUS: $(docker container inspect -f {{.State.Status}} $BACK_CONTAINER_NAME)
+  MAVEN_LOCAL_REPOSITORY: "-Dmaven.repo.local=./.m2/repository"
 
 stages:
   - build
@@ -21,7 +22,7 @@ build:
   except:
     - tags
   script:
-    - mvn compile
+    - mvn $MAVEN_LOCAL_REPOSITORY compile
   cache:
     paths:
       - ./impl/target
@@ -35,7 +36,7 @@ test:
   except:
     - tags
   script:
-    - mvn test
+    - mvn $MAVEN_LOCAL_REPOSITORY test
   cache:
     paths:
       - ./target
@@ -49,12 +50,12 @@ package:
   except:
     - tags
   script:
-    - mvn package -Dmaven.test.skip=true
+    - mvn $MAVEN_LOCAL_REPOSITORY package -Dmaven.test.skip=true
   artifacts:
     paths:
       - impl/target/*.jar
   cache:
-    policy: pull
+#    policy: pull
     paths:
       - ./impl/target
       - ./.m2
@@ -113,7 +114,7 @@ package_dev:
   except:
     - tags
   script:
-    - mvn package -Dmaven.test.skip=true
+    - mvn $MAVEN_LOCAL_REPOSITORY package -Dmaven.test.skip=true
   artifacts:
     paths:
       - impl/target/*.jar
