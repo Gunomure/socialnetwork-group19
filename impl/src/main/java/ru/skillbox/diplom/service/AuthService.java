@@ -9,15 +9,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 import ru.skillbox.diplom.config.security.jwt.JwtTokenProvider;
-import ru.skillbox.diplom.exception.TokenRefreshException;
 import ru.skillbox.diplom.mappers.PersonMapper;
 import ru.skillbox.diplom.model.*;
 import ru.skillbox.diplom.model.request.LoginRequest;
-import ru.skillbox.diplom.model.request.TokenRefreshRequest;
 import ru.skillbox.diplom.model.response.LogoutResponse;
-import ru.skillbox.diplom.model.response.TokenRefreshResponse;
 import ru.skillbox.diplom.repository.PersonRepository;
 import ru.skillbox.diplom.util.TimeUtil;
 
@@ -93,9 +89,9 @@ public class AuthService {
 
     public CommonResponse<MessageResponse> logout(){
         SecurityContextHolder.clearContext();
-        CommonResponse<MessageResponse> response = new CommonResponse<>();
+        CommonResponse<LogoutResponse> response = new CommonResponse<>();
         response.setTimestamp(TimeUtil.getCurrentTimestampUtc());
-        response.setData(new MessageResponse("ok"));
+        response.setData(new LogoutResponse("ok"));
         LOGGER.info("success logout");
         return response;
     }
