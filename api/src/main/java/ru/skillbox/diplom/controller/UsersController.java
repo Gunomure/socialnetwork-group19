@@ -16,7 +16,6 @@ public interface UsersController {
 
     @GetMapping("/me")
     CommonResponse<PersonDto> getProfile();
-
     @PutMapping("/me")
     CommonResponse<PersonDto> updateProfile(@RequestBody UpdateRequest updateRequest);
 
@@ -35,6 +34,9 @@ public interface UsersController {
 
     @PostMapping("/{id}/wall")
     CommonResponse<PersonDto> createPost(@PathVariable Long id,
-                                         @RequestParam(name = "publish_date", required = false) Long date,
-                                         @RequestBody PostBodyRequest body);
+                                       @RequestParam(name = "publish_date", required = false) Long date,
+                                       @RequestBody PostBodyRequest body);
+
+    @GetMapping("/{id}/wall")
+    CommonResponse<PersonDto> getPosts(@PathVariable Long id);
 }

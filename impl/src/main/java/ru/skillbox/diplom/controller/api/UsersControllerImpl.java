@@ -52,4 +52,9 @@ public class UsersControllerImpl implements UsersController {
     public CommonResponse<PersonDto> createPost(Long id, Long date, PostBodyRequest body) {
         return usersService.createPost(id, date, body);
     }
+
+    @Override
+    public CommonResponse<PersonDto> getPosts(Long id) {
+        return usersService.getPosts(id);
+    }
 }
