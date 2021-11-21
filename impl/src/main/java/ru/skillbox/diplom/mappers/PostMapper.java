@@ -22,10 +22,10 @@ public interface PostMapper {
     @Mapping(target = "author", source = "authorId")
     PostDto convertToDto(Post post);
 
-    @Mapping(target = "authorId", qualifiedByName = "convertPersonToId")
+    @Mapping(target = "authorId", source = "author", qualifiedByName = "convertPersonToId")
     @Mapping(target = "time", qualifiedByName = "convertDateToLong")
-    @Mapping(target = "parentId", qualifiedByName = "convertCommentToParentId")
-    @Mapping(source = "post", target = "postId", qualifiedByName = "convertPostToId")
+    @Mapping(target = "parentId", source = "parent", qualifiedByName = "convertCommentToId")
+    @Mapping(target = "postId", source = "post", qualifiedByName = "convertPostToId")
     PostCommentDto convertToDtoPostComment(PostComment postComment);
 
     List<PostDto> convertToListPostDto(List<Post> posts);

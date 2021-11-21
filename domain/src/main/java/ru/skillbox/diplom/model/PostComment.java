@@ -1,14 +1,12 @@
 package ru.skillbox.diplom.model;
 
 import com.sun.istack.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
 
-@Getter
-@Setter
+@Data
 @Entity
 @Table(name = "post_comments")
 public class PostComment extends BaseEntity {
@@ -17,22 +15,17 @@ public class PostComment extends BaseEntity {
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name="post_id", insertable = false, updatable = false)
-    private Post postId;
+    @JoinColumn(name="post_id")
+    private Post post;
 
     @OneToOne
     @JoinColumn(name="parent_id")
-    private PostComment parentId;
+    private PostComment parent;
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name="author_id", insertable = false, updatable = false)
-    private Person authorId;
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name="post_id", insertable = false, updatable = false)
-    private Post post;
+    @JoinColumn(name="author_id")
+    private Person author;
 
     @Column(name = "comment_text")
     private String commentText;

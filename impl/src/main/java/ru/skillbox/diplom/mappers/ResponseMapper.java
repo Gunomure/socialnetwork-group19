@@ -1,17 +1,16 @@
 package ru.skillbox.diplom.mappers;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.NullValueCheckStrategy;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 import ru.skillbox.diplom.mappers.converters.Converters;
 import ru.skillbox.diplom.model.*;
 import ru.skillbox.diplom.model.response.FeedsResponse;
+import ru.skillbox.diplom.model.response.postResponse.CommentListResponse;
 import ru.skillbox.diplom.util.TimeUtil;
 
 import java.util.List;
 
 @Mapper(uses = {Converters.class},
+        imports = TimeUtil.class,
         componentModel = "spring",
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
         unmappedTargetPolicy = ReportingPolicy.IGNORE
@@ -35,10 +34,11 @@ public abstract class ResponseMapper {
     @Mapping(target = "token", ignore = true)
     public abstract PersonDto toPersonDTO(Person person);
 
-    @Mapping(target = "authorId", qualifiedByName = "convertPersonToId")
-    @Mapping(target = "time", qualifiedByName = "convertDateToLong")
-    @Mapping(target = "parentId", qualifiedByName = "convertCommentToParentId")
-    @Mapping(source = "post", target = "postId", qualifiedByName = "convertPostToId")
+    @Mapping(target = "time", qualifiedByName =  "convertDateToLong")
+    @Mapping(target = "blocked", source = "isBlocked")
+    @Mapping(target = "parentId", source = "parent", qualifiedByName = "convertCommentToId")
+    @Mapping(target = "postId", source = "post", qualifiedByName = "convertPostToId")
+    @Mapping(target = "authorId", source = "author", qualifiedByName = "convertPersonToId")
     public abstract PostCommentDto convertToDtoPostComment(PostComment postComment);
 
     public void updateToFeedsResponse(List<Post> list, FeedsResponse<List<PostDto>> response) {

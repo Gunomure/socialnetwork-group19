@@ -1,13 +1,10 @@
 package ru.skillbox.diplom.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-import java.time.ZonedDateTime;
-
-@Getter
-@Setter
+@Data
 public class PostCommentDto {
 
     private Long id;
@@ -21,6 +18,7 @@ public class PostCommentDto {
     private boolean isBlocked;
 
     @JsonProperty(value = "parent_id")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long parentId;
 
     @JsonProperty(value = "post_id")
