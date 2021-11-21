@@ -1,6 +1,7 @@
 package ru.skillbox.diplom.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.model.request.PostSearchRequest;
@@ -12,6 +13,7 @@ import ru.skillbox.diplom.model.response.LanguageResponse;
 import javax.validation.Valid;
 
 @CrossOrigin
+//@PreAuthorize("hasAuthority('developers:read')")
 @RequestMapping("/api/v1/post")
 public interface PostController {
 
@@ -32,19 +34,26 @@ public interface PostController {
     ResponseEntity<?> deletePost(@PathVariable Long id);
 
     @GetMapping(value = "/{id}/comments")
-    ResponseEntity<?> getCommentsById(@PathVariable Long id, @RequestParam PostRequest request);
+    ResponseEntity<?> getCommentsById(@PathVariable Long id,
+                                      @RequestParam (defaultValue = "0", required = false) Integer offset,
+                                      @RequestParam (defaultValue = "10", required = false) Integer itemPerPage);
 
     @PostMapping(value = "/{id}/comments")
-    ResponseEntity<?> createComment(@PathVariable Long id, @RequestBody CommentBodyRequest body);
+    ResponseEntity<?> createComment(@PathVariable Long id,
+                                    @RequestBody CommentBodyRequest body);
 
     @PutMapping(value = "/{id}/comments/{comment_id}")
-    ResponseEntity<?> editComment(@PathVariable Long id, @PathVariable(value = "comment_id") Long commentId, @RequestBody CommentBodyRequest body);
+    ResponseEntity<?> editComment(@PathVariable Long id,
+                                  @PathVariable(value = "comment_id") Long commentId,
+                                  @RequestBody CommentBodyRequest body);
 
     @DeleteMapping(value = "/{id}/comments/{comment_id}")
-    ResponseEntity<?> deleteComment(@PathVariable Long id, @PathVariable(value = "comment_id") Long commentId);
+    ResponseEntity<?> deleteComment(@PathVariable Long id,
+                                    @PathVariable(value = "comment_id") Long commentId);
 
     @PutMapping(value = "/{id}/comments/{comment_id}/recover")
-    ResponseEntity<?> recoverComment(@PathVariable Long id, @PathVariable(value = "comment_id") Long commentId);
+    ResponseEntity<?> recoverComment(@PathVariable Long id,
+                                     @PathVariable(value = "comment_id") Long commentId);
 
 //    @PutMapping(value = "/{id}/recover")
 //    ResponseEntity<?> editPost(@PathVariable Long id);
@@ -53,7 +62,8 @@ public interface PostController {
 //    ResponseEntity<?> editPost(@PathVariable Long id, @RequestParam(name = "publish_date") Long publishDate, @RequestBody PostBodyRequest body);
 //    @PostMapping(value = "/{id}/report")
 //    ResponseEntity<?> createPostReport(@PathVariable Long id);
-//
-//    @PostMapping(value = "/{id}/comments/{comment_id}/report")
-//    ResponseEntity<?> createCommentReport(@PathVariable Long id, @PathVariable(value = "comment_id") Long commentId);
+
+    @PostMapping(value = "/{id}/comments/{comment_id}/report")
+    ResponseEntity<?> createCommentReport(@PathVariable Long id,
+                                          @PathVariable(value = "comment_id") Long commentId);
 }

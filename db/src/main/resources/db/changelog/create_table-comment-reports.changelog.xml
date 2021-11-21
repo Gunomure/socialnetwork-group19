@@ -5,13 +5,15 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
 
-    <changeSet id="create-table-tag" author="salat23">
-        <createTable tableName="tag">
+    <changeSet id="create-table-comment_report" author="eduard">
+        <createTable tableName="comment_reports">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="tag" type="varchar(255)"/>
+            <column name="time" type="timestamp with time zone"/>
+            <column name="comment_id" type="bigint"/>
         </createTable>
+        <addForeignKeyConstraint baseColumnNames="comment_id" baseTableName="comment_reports" constraintName="fk_comment_id"
+                                 referencedColumnNames="id" referencedTableName="post_comments"/>
     </changeSet>
-
 </databaseChangeLog>

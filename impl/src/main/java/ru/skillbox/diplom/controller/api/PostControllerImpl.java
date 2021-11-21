@@ -44,28 +44,35 @@ public class PostControllerImpl implements PostController {
     }
 
     @Override
-    public ResponseEntity<?> getCommentsById(@PathVariable Long id, @RequestParam PostRequest request){
-        return postService.getCommentsById(id, request);
+    public ResponseEntity<?> getCommentsById(@PathVariable Long id,
+                                             @RequestParam (defaultValue = "0", required = false) Integer offset,
+                                             @RequestParam (defaultValue = "10", required = false) Integer itemPerPage){
+        return ResponseEntity.ok(postService.getCommentsById(id, offset, itemPerPage));
     }
 
     @Override
-    public ResponseEntity<?> createComment(@PathVariable Long id, @RequestBody CommentBodyRequest body){
-        return postService.createComment(id, body);
+    public ResponseEntity<?> createComment(@PathVariable Long id,
+                                           @RequestBody CommentBodyRequest body){
+        return ResponseEntity.ok(postService.createComment(id, body));
     }
 
     @Override
-    public ResponseEntity<?> editComment(@PathVariable Long id, @PathVariable(value = "comment_id") Long commentId, @RequestBody CommentBodyRequest body){
-        return postService.editComment(id, commentId, body);
+    public ResponseEntity<?> editComment(@PathVariable Long id,
+                                         @PathVariable(value = "comment_id") Long commentId,
+                                         @RequestBody CommentBodyRequest body){
+        return ResponseEntity.ok(postService.editComment(id, commentId, body));
     }
 
     @Override
-    public ResponseEntity<?> deleteComment(@PathVariable Long id, @PathVariable(value = "comment_id") Long commentId){
-        return postService.deleteComment(id, commentId);
+    public ResponseEntity<?> deleteComment(@PathVariable Long id,
+                                           @PathVariable(value = "comment_id") Long commentId){
+        return ResponseEntity.ok(postService.deleteComment(id, commentId));
     }
 
     @Override
-    public ResponseEntity<?> recoverComment(@PathVariable Long id, @PathVariable(value = "comment_id") Long commentId){
-        return postService.recoverComment(id, commentId);
+    public ResponseEntity<?> recoverComment(@PathVariable Long id,
+                                            @PathVariable(value = "comment_id") Long commentId){
+        return ResponseEntity.ok(postService.recoverComment(id, commentId));
     }
 
 
@@ -79,9 +86,10 @@ public class PostControllerImpl implements PostController {
 //        return postService.createPostReport(id);
 //    }
 //
-//    @PostMapping(value = "/{id}/comments/{comment_id}/report")
-//    public ResponseEntity<?> createCommentReport(@PathVariable Long id, @PathVariable(value = "comment_id") Long commentId){
-//        return postService.createCommentReport(id, commentId);
-//    }
+    @PostMapping(value = "/{id}/comments/{comment_id}/report")
+    public ResponseEntity<?> createCommentReport(@PathVariable Long id,
+                                                 @PathVariable(value = "comment_id") Long commentId){
+        return ResponseEntity.ok(postService.createCommentReport(id, commentId));
+    }
 
 }

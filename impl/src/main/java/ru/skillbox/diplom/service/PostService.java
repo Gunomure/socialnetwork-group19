@@ -3,54 +3,68 @@ package ru.skillbox.diplom.service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mapstruct.factory.Mappers;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import ru.skillbox.diplom.exception.EntityNotFoundException;
 import ru.skillbox.diplom.mappers.PostCommentMapper;
 import ru.skillbox.diplom.mappers.PostMapper;
+import ru.skillbox.diplom.mappers.ReportMapper;
+import ru.skillbox.diplom.mappers.ResponseMapper;
 import ru.skillbox.diplom.model.*;
 import ru.skillbox.diplom.model.request.postRequest.CommentBodyRequest;
 import ru.skillbox.diplom.model.request.postRequest.PostBodyRequest;
-import ru.skillbox.diplom.model.request.postRequest.PostRequest;
-import ru.skillbox.diplom.model.response.postResponse.*;
+import ru.skillbox.diplom.model.response.MessageResponse;
+import ru.skillbox.diplom.model.response.postResponse.CommonBadResponse;
+import ru.skillbox.diplom.model.response.postResponse.PostListResponse;
+import ru.skillbox.diplom.model.response.postResponse.PostResponse;
 import ru.skillbox.diplom.repository.PersonRepository;
 import ru.skillbox.diplom.repository.PostCommentRepository;
 import ru.skillbox.diplom.repository.PostRepository;
+import ru.skillbox.diplom.repository.ReportCommentRepository;
 import ru.skillbox.diplom.util.TimeUtil;
 import ru.skillbox.diplom.util.specification.SpecificationUtil;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class PostService {
 
-    private final static Logger LOGGER = LogManager.getLogger(LanguageService.class);
+    private final static Logger LOGGER = LogManager.getLogger(PostService.class);
 
     private final static String POST_ID_NOT_FOUND = "Post id not found";
-//    private final static String COMMENT_ID_NOT_FOUND = "Comment id not found";
-    private final static String POST_COMMENT_NOT_FOUND = "Post comment not found ";
+    private final static String COMMENT_ID_NOT_FOUND = "Comment doesn't exist or blocked";
+    private final static String PARENT_COMMENT_ID_NOT_FOUND = "Parent comment doesn't exist or blocked";
     private final static String ERROR = "invalid_request";
 
 //    private final PostMapper postMapper = Mappers.getMapper(PostMapper.class);
     private final PostMapper mapper = Mappers.getMapper(PostMapper.class);
-    private final PostCommentMapper commentMapper =  Mappers.getMapper(PostCommentMapper.class);
+    private final PostCommentMapper commentMapper = Mappers.getMapper(PostCommentMapper.class);
+    private final ResponseMapper responseMapper = Mappers.getMapper(ResponseMapper.class);
+    private final ReportMapper reportMapper = Mappers.getMapper(ReportMapper.class);
 
 
     private final PostRepository postRepository;
     private final PersonRepository personRepository;
     private final PostCommentRepository commentRepository;
-    private final CommentsService commentsService;
+    private final ReportCommentRepository reportCommentRepository;
 
-    public PostService(PostRepository postRepository, PersonRepository personRepository, PostCommentRepository commentRepository, CommentsService commentsService) {
+    public PostService(PostRepository postRepository,
+                       PersonRepository personRepository,
+                       PostCommentRepository commentRepository,
+                       ReportCommentRepository reportCommentRepository) {
         this.postRepository = postRepository;
         this.personRepository = personRepository;
         this.commentRepository = commentRepository;
-        this.commentsService = commentsService;
+        this.reportCommentRepository = reportCommentRepository;
     }
 
-    public ResponseEntity<?> getPosts(String text, Long dateFrom, Long dateTo, String author){ //String text, Long dateFrom, Long dateTo) {
+    public ResponseEntity<?> getPosts(String text, Long dateFrom, Long dateTo, String author) { //String text, Long dateFrom, Long dateTo) {
 
         SpecificationUtil<Person> spec = new SpecificationUtil<>();
         Specification<Person> PersonS1 = spec.contains("firstName", author);
@@ -95,7 +109,7 @@ public class PostService {
 
     public ResponseEntity<?> getPostById(Long id) {
         LOGGER.info("start getPostById: {}", id);
-        Post post = postRepository.findByIdAndIsBlocked(id, false);
+        Post post = postRepository.findByIdAndIsBlocked(id, false).get();
         if (post == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(getResponseNotFound());
         }
@@ -104,7 +118,7 @@ public class PostService {
 
     public ResponseEntity<?> editPost(Long id, Long publishDate, PostBodyRequest edit) {
         LOGGER.info("start id = {}, publish date = {}, edit = {} ", id, publishDate, edit);
-        Post post = postRepository.findByIdAndIsBlocked(id, false);
+        Post post = postRepository.findByIdAndIsBlocked(id, false).get();
         if (post == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(getResponseNotFound());
         }
@@ -117,7 +131,7 @@ public class PostService {
 
     public ResponseEntity<?> deletePost(Long id) {
         LOGGER.info("start deletePost: {}", id);
-        Post post = postRepository.findByIdAndIsBlocked(id, false);
+        Post post = postRepository.findByIdAndIsBlocked(id, false).get();
         if (post == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(getResponseNotFound());
         }
@@ -126,118 +140,94 @@ public class PostService {
         return ResponseEntity.ok(getResponseOk(post));
     }
 
-    public ResponseEntity<?> getCommentsById(Long id, PostRequest request) {
-        LOGGER.info("start getCommentsById: {}", id);
-        Post post = postRepository.findByIdAndIsBlocked(id, false);
-        if (post == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(getResponseNotFound());
-        }
-        List<PostComment> commentList = post.getComments()
-                .stream().filter(x -> !x.getIsBlocked()).collect(Collectors.toList());
-        List<PostCommentDto> commentsDto = commentMapper.toDtoPostComment(commentList);
-
-        CommentListResponse response = new CommentListResponse();
-        response.setTimestamp(TimeUtil.getCurrentTimestampUtc());
-        response.setData(commentsDto);
-        return ResponseEntity.ok(response);
+    public CommonResponse<List<PostCommentDto>> getCommentsById(Long postId, Integer offset, Integer itemPerPage) {
+        LOGGER.debug("start getCommentsById: post_id = {}", postId);
+        SpecificationUtil<PostComment> specification = new SpecificationUtil<>();
+        List<PostComment> commentList = commentRepository.findAll(
+                Specification
+                        .where(specification.equals("post", postId))
+                        .and(specification.between("time", null, ZonedDateTime.now())),
+                PageRequest.of(offset, itemPerPage, Sort.by("time").descending())).getContent();
+        return commentMapper.convertToPostCommentListResponse(offset, itemPerPage, commentList);
     }
 
-    public ResponseEntity<?> createComment(Long id, CommentBodyRequest body) {
-        LOGGER.info("start createComment: {}", id);
-        Post post = postRepository.findByIdAndIsBlocked(id, false);
-        if (post == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(getResponseNotFound());
-        }
-        List<PostComment> comments = post.getComments();
-
-        Long parentId = body.getId();
+    public CommonResponse<PostCommentDto> createComment(Long postId, CommentBodyRequest body) {
+        LOGGER.debug("start createComment: post_id = {}", postId);
+        Post post = postRepository.findByIdAndIsBlocked(postId, false).orElseThrow(() -> {
+            LOGGER.error(EntityNotFoundException.class.getSimpleName() + ": " + POST_ID_NOT_FOUND);
+            throw new EntityNotFoundException(POST_ID_NOT_FOUND);
+        });
+        Long parentId = body.getParentId();
         PostComment parentComment = null;
         if (parentId != null) {
-            parentComment = commentRepository.getById(parentId);
-            if (!comments.contains(parentComment)){
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(getResponseNotFound());
+            parentComment = commentRepository.findByIdAndIsBlocked(parentId, false).orElseThrow(() -> {
+                LOGGER.error(EntityNotFoundException.class.getSimpleName() + ": " + PARENT_COMMENT_ID_NOT_FOUND);
+                throw new EntityNotFoundException(PARENT_COMMENT_ID_NOT_FOUND);
+            });
+            if (!post.getComments().contains(parentComment)) {
+                LOGGER.error(EntityNotFoundException.class.getSimpleName() + ": " + ERROR);
+                throw new EntityNotFoundException(ERROR);
             }
         }
-
-        PostComment comment = commentsService.addComment(post.getAuthorId(), parentComment, post, body.getCommentText());
-        PostCommentDto commentDto = commentMapper.toDtoPostComment(comment);
-        CommentResponse response = new CommentResponse();
-        response.setTimestamp(TimeUtil.getCurrentTimestampUtc());
-        response.setData(commentDto);
-
-        return ResponseEntity.ok(response);
+        PostComment comment = commentMapper.convertToPostCommentEntity(post, post.getAuthorId(), parentComment, body.getCommentText());
+        commentRepository.save(comment);
+        return commentMapper.convertToCommonResponse(comment);
     }
 
-    public ResponseEntity<?> editComment(Long id, Long commentId, CommentBodyRequest body) {
-        LOGGER.info("start editComment: {}", id);
-        Post post = postRepository.findByIdAndIsBlocked(id, false);
-        if (post == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(getResponseNotFound());
-        }
-        PostComment comment = commentRepository.findByIdAndIsBlocked(commentId, false);
-        List<PostComment> comments = post.getComments();
-        if (!comments.contains(comment)){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CommonBadResponse(ERROR, POST_COMMENT_NOT_FOUND));
-        }
-        PostComment parentComment = commentRepository.getById(body.getId());
-        comment.setCommentText(body.getCommentText());
-        comment.setParentId(parentComment);
-
-        PostComment savedComment = commentRepository.save(comment);
-        PostCommentDto commentDto = commentMapper.toDtoPostComment(savedComment);
-
-        CommentResponse response = new CommentResponse();
-        response.setTimestamp(TimeUtil.getCurrentTimestampUtc());
-        response.setData(commentDto);
-
-        return ResponseEntity.ok(response);
+    public CommonResponse<PostCommentDto> editComment(Long postId, Long commentId, CommentBodyRequest request) {
+        LOGGER.debug("start editComment: post_id = {}, comment_id = {}", postId, commentId);
+        PostComment comment = commentRepository.findByIdAndIsBlockedAndPostId(commentId, false, postId)
+                .orElseThrow(() -> {
+                    LOGGER.error(EntityNotFoundException.class.getSimpleName() + ": " + COMMENT_ID_NOT_FOUND);
+                    throw new EntityNotFoundException(COMMENT_ID_NOT_FOUND);
+                });
+        if (request.getParentId() != null) {
+            PostComment parentComment = commentRepository.findByIdAndIsBlockedAndPostId(request.getParentId(), false, postId)
+                    .orElseThrow(() -> {
+                        LOGGER.error(EntityNotFoundException.class.getSimpleName() + ": " + PARENT_COMMENT_ID_NOT_FOUND);
+                        throw new EntityNotFoundException(PARENT_COMMENT_ID_NOT_FOUND);
+                    });
+            comment.setParent(parentComment);
+        } else comment.setParent(null);
+        comment.setCommentText(request.getCommentText());
+        commentRepository.save(comment);
+        return commentMapper.convertToCommonResponse(comment);
     }
 
-    public ResponseEntity<?> deleteComment(Long id, Long commentId) {
-        LOGGER.info("start deleteComment postId = {}, commentId = {}", id, commentId);
-        Post post = postRepository.findByIdAndIsBlocked(id, false);
-        if (post == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(getResponseNotFound());
-        }
-        PostComment comment = commentRepository.findByIdAndIsBlocked(commentId, false);
-        List<PostComment> comments = post.getComments();
-        if (!comments.contains(comment)){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CommonBadResponse(ERROR, POST_COMMENT_NOT_FOUND));
-        }
+    public CommonResponse<IdResponse> deleteComment(Long postId, Long commentId) {
+        LOGGER.debug("start deleteComment: postId = {}, commentId = {}", postId, commentId);
+        PostComment comment = commentRepository.findByIdAndIsBlockedAndPostId(commentId, false, postId)
+                .orElseThrow(() -> {
+                    LOGGER.error(EntityNotFoundException.class.getSimpleName() + ": " + COMMENT_ID_NOT_FOUND);
+                    throw new EntityNotFoundException(COMMENT_ID_NOT_FOUND);
+                });
         comment.setIsBlocked(true);
-        PostComment savedComment = commentRepository.save(comment);
-        PostCommentDto commentDto = commentMapper.toDtoPostComment(savedComment);
-
-        CommentResponse response = new CommentResponse();
-        response.setTimestamp(TimeUtil.getCurrentTimestampUtc());
-        response.setData(commentDto);
-
-        return ResponseEntity.ok(response);
+        commentRepository.save(comment);
+        return commentMapper.convertToCommonResponse(new IdResponse(comment.getId()));
     }
 
-    public ResponseEntity<?> recoverComment(Long id, Long commentId) {
-        LOGGER.info("start recoverComment postId = {}, commentId = {}", id, commentId);
-        Post post = postRepository.findByIdAndIsBlocked(id, false);
-        if (post == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(getResponseNotFound());
-        }
-        PostComment comment = commentRepository.findByIdAndIsBlocked(commentId, true);
-        List<PostComment> comments = post.getComments();
-        if (!comments.contains(comment)){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CommonBadResponse(ERROR, POST_COMMENT_NOT_FOUND));
-        }
+    public CommonResponse<PostCommentDto> recoverComment(Long postId, Long commentId) {
+        LOGGER.debug("start recoverComment: postId = {}, commentId = {}", postId, commentId);
+        PostComment comment = commentRepository.findByIdAndIsBlockedAndPostId(commentId, true, postId)
+                .orElseThrow(() -> {
+                    LOGGER.error(EntityNotFoundException.class.getSimpleName() + ": " + COMMENT_ID_NOT_FOUND);
+                    throw new EntityNotFoundException(COMMENT_ID_NOT_FOUND);
+                });
         comment.setIsBlocked(false);
-        PostComment savedComment = commentRepository.save(comment);
-        PostCommentDto commentDto = commentMapper.toDtoPostComment(savedComment);
+        commentRepository.save(comment);
+        return commentMapper.convertToCommonResponse(comment);
+    }
 
-        CommentResponse response = new CommentResponse();
-        response.setTimestamp(TimeUtil.getCurrentTimestampUtc());
-        response.setData(commentDto);
-
-        return ResponseEntity.ok(response);
+    public CommonResponse<MessageResponse> createCommentReport(Long postId, Long commentId){
+        LOGGER.debug("start createCommentReport: postId = {}, commentId = {}", postId, commentId);
+        PostComment comment = commentRepository.findByIdAndIsBlockedAndPostId(commentId, false, postId)
+                .orElseThrow(() -> {
+                    LOGGER.error(EntityNotFoundException.class.getSimpleName() + ": " + COMMENT_ID_NOT_FOUND);
+                    throw new EntityNotFoundException(COMMENT_ID_NOT_FOUND);
+                });
+        CommentReport report = reportMapper.convertToCommentReportEntity(comment);
+        reportCommentRepository.save(report);
+        return reportMapper.convertToCommonResponse(new MessageResponse("ok"));
     }
 
 //    public ResponseEntity<?> recoverPost(Long id) {

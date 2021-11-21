@@ -30,17 +30,13 @@ public class FeedService {
     }
 
     public FeedsResponse<List<PostDto>> getFeeds(String name, Integer offset, Integer itemPerPage){
-        LOGGER.info("getFeeds: text = {}, offset = {}, itemPerPage = {}", name, offset, itemPerPage);
-        SpecificationUtil<Post> feedSpec = new SpecificationUtil<>();
-        Specification<Post> s1 = feedSpec.between("time", null, ZonedDateTime.now());
-        Specification<Post> s2 = feedSpec.contains("title", name);
-        Specification<Post> s3 = feedSpec.contains("postText", name);
-        Specification<Post> s4 = feedSpec.equals("isBlocked", false);
+        LOGGER.debug("getFeeds: text = {}, offset = {}, itemPerPage = {}", name, offset, itemPerPage);
+        SpecificationUtil<Post> spec = new SpecificationUtil<>();
         List<Post> feeds = postRepository.findAll(
                 Specification.
-                        where(s2.or(s3)).
-                        and(s4).
-                        and(s1),
+                        where(spec.contains("title", name).or(spec.contains("postText", name))).
+                        and(spec.equals("isBlocked", false)).
+                        and(spec.between("time", null, ZonedDateTime.now())),
                         PageRequest.of(offset, itemPerPage))
                 .getContent();
         FeedsResponse<List<PostDto>> response = responseMapper.convertToFeedsResponse(offset,itemPerPage);

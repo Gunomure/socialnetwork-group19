@@ -10,6 +10,7 @@ import ru.skillbox.diplom.util.TimeUtil;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Collection;
 import java.util.List;
 
 public class Converters {
@@ -34,9 +35,9 @@ public class Converters {
         return (long) likes.size();
     }
 
-    @Named("convertCommentToParentId")
-    public static Long convertCommentToParentId(PostComment comment) {
-        return comment.getParentId() == null ? null : comment.getParentId().getId();
+    @Named("convertCommentToId")
+    public static Long convertCommentToId(PostComment comment) {
+        return comment == null ? null : comment.getId();
     }
 
     @Named("convertPostToId")
@@ -47,6 +48,11 @@ public class Converters {
     @Named("convertToTimestampNow")
     public static Long convertToTimestampNow() {
         return TimeUtil.getCurrentTimestampUtc();
+    }
+
+    @Named("convertCollectionToSize")
+    public static Integer convertCollectionToSize(Collection<?> collection){
+        return collection.size();
     }
 
 }

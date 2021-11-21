@@ -7,5 +7,9 @@ import ru.skillbox.diplom.model.Post;
 import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificationExecutor<Post> {
-    Post findByIdAndIsBlocked(Long  id, boolean isBlocked);
+//    Post findByIdAndIsBlocked(Long  id, boolean isBlocked);
+
+    Optional<Post> findByIdAndIsBlocked(Long  id, boolean isBlocked);
+
+
 }

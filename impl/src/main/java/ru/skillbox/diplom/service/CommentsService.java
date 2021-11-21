@@ -17,9 +17,9 @@ public class CommentsService {
 
     public PostComment addComment(Person person, PostComment parentComment, Post post, String text){
         PostComment comment = new PostComment();
-        comment.setAuthorId(person);
-        comment.setParentId(parentComment);
-        comment.setPostId(post);
+        comment.setAuthor(person);
+        comment.setParent(parentComment);
+        comment.setPost(post);
         comment.setCommentText(text);
         return commentRepository.save(comment);
     }
