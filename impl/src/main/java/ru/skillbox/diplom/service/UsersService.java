@@ -161,4 +161,16 @@ public class UsersService {
         LOGGER.info("finish createPost");
         return response;
     }
+
+    public CommonResponse<PersonDto> getPosts(Long id) {
+        LOGGER.info("start createPost id = {}", id);
+        Person person = personRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException(String.format("User %s not found", id)));
+        PersonDto responseData = personMapper.toPersonDTO(person);
+        CommonResponse<PersonDto> response = new CommonResponse<>();
+        response.setTimestamp(getCurrentTimestampUtc());
+        response.setData(responseData);
+        LOGGER.info("finish createPost");
+        return response;
+    }
 }
