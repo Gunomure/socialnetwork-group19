@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.mappers.ResponseMapper;
@@ -37,7 +38,7 @@ public class FeedService {
                         where(spec.contains("title", name).or(spec.contains("postText", name))).
                         and(spec.equals("isBlocked", false)).
                         and(spec.between("time", null, ZonedDateTime.now())),
-                        PageRequest.of(offset, itemPerPage))
+                        PageRequest.of(offset, itemPerPage,  Sort.by("time").descending()))
                 .getContent();
         FeedsResponse<List<PostDto>> response = responseMapper.convertToFeedsResponse(offset,itemPerPage);
         responseMapper.updateToFeedsResponse(feeds,response);
