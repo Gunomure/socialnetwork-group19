@@ -7,6 +7,7 @@ import ru.skillbox.diplom.model.enums.UserType;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -35,4 +36,6 @@ public class User extends BaseEntity {
     @ColumnDefault("USER")
     private UserType type;
 }
+
+
 

@@ -36,15 +36,19 @@ public class AccountService {
     private JavaMailSender emailSender;
     private PersonRepository personRepository;
     private PasswordEncoder passwordEncoder;
+    private  final LdapService ldapService;
 
     private static final String FROM = "noreply@javaprogroup19.com";
     private static final String EMAIL_MESSAGE_SUBJECT = "Restore password";
     private final static String EMAIL_MESSAGE_TEMPLATE = "<a href=\"http://%s:%d/%s?token=%s\">Click to restore your password</a>";
 
-    public AccountService(JavaMailSender emailSender, PersonRepository personRepository, PasswordEncoder passwordEncoder) {
+    public AccountService(JavaMailSender emailSender, PersonRepository personRepository,
+                          PasswordEncoder passwordEncoder,
+                          LdapService ldapService) {
         this.emailSender = emailSender;
         this.personRepository = personRepository;
         this.passwordEncoder = passwordEncoder;
+        this.ldapService = ldapService;
     }
 
     public void sendPasswordRecoveryEmail(String receiverEmail) {
@@ -100,6 +104,8 @@ public class AccountService {
             user.setConfirmationCode(registerRequest.getCode());
             user.setLastOnlineTime(ZonedDateTime.now());
             personRepository.save(user);
+            ldapService.newConnection();
+            ldapService.addUser(user.getEmail(), user.getPassword());
         } else {
             throw new BadRequestException(String.format("User with email %s already exists",
                     registerRequest.getEmail()));
