@@ -99,7 +99,7 @@ public class AuthService {
                 .map(RefreshToken::getUser)
                 .map(user -> {
                             String newJwtToken = jwtTokenProvider.generateTokenFromEmail(user.getEmail());
-                            refreshTokenService.deleteByUserId(user.getId());
+                            //refreshTokenService.deleteByUserId(user.getId());
                             String newRefreshToken = refreshTokenService.createRefreshToken(user.getId()).getToken();
                             return new TokenRefreshResponse(newJwtToken, newRefreshToken);
                         }

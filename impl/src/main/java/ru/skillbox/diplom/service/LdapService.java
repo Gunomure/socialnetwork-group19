@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.model.RefreshToken;
-import ru.skillbox.diplom.model.User;
 import ru.skillbox.diplom.repository.UserRepository;
 
 import javax.naming.AuthenticationException;
