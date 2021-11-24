@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.model.RefreshToken;
-import ru.skillbox.diplom.model.User;
 import ru.skillbox.diplom.repository.UserRepository;
 
 import javax.naming.AuthenticationException;
@@ -19,11 +18,15 @@ import java.util.Properties;
 @Service
 public class LdapService {
 
-    private DirContext connection;
+    private static DirContext connection;
 
     @Autowired
     private UserRepository userRepository;
 
+    public LdapService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+        newConnection();
+    }
 
     @Value("${ldap.contextFactory}")
     private String contextFactory;
@@ -34,12 +37,12 @@ public class LdapService {
     @Value("${ldap.password}")
     private String password;
 
-    public void newConnection() {
+    public static void newConnection() {
         Properties env = new Properties();
-        env.put(Context.INITIAL_CONTEXT_FACTORY, contextFactory);
-        env.put(Context.PROVIDER_URL, url);
-        env.put(Context.SECURITY_PRINCIPAL, securityPrincipal);
-        env.put(Context.SECURITY_CREDENTIALS, password);
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.PROVIDER_URL, "ldap://localhost:389");
+        env.put(Context.SECURITY_PRINCIPAL, "uid=admin, ou=system");
+        env.put(Context.SECURITY_CREDENTIALS, "secret");
         try {
             connection = new InitialDirContext(env);
         } catch (AuthenticationException ex) {
@@ -56,7 +59,7 @@ public class LdapService {
         attribute.add("inetOrgPerson");
 
         attributes.put(attribute);
-        attributes.put("sn", "99999999");
+        attributes.put("sn", "ab8232ea-d100-4205-b112-1515adc78ee6");
         attributes.put("userPassword", password);
         attributes.put("description", "1990-06-14T20:16:28.280425Z");
         try {
@@ -123,6 +126,7 @@ public class LdapService {
     }
 
     public RefreshToken searchRefreshToken(String youAreLookingForToken) throws NamingException {
+        newConnection();
         RefreshToken refreshToken = new RefreshToken();
         String searchFilter = "(sn=" + youAreLookingForToken + ")";
         String[] reqAtt = {"cn", "sn", "description"};

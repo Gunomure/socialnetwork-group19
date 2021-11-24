@@ -23,19 +23,19 @@ public class RefreshTokenService {
     @Value("${values.jwt.refreshExpirationDateInMs}")
     private Long refreshTokenDurationMs;
 
-    @Autowired
     private RefreshTokenRepository refreshTokenRepository;
-
-    @Autowired
     private UserRepository userRepository;
-
-    @Autowired
     private LdapService ldapService;
 
+    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, LdapService ldapService) {
+        this.refreshTokenRepository = refreshTokenRepository;
+        this.userRepository = userRepository;
+        this.ldapService = ldapService;
+    }
+
     public Optional<RefreshToken> findByToken(String token) throws NamingException {
-        //return Optional.ofNullable(refreshTokenMap.get(token));
-        return refreshTokenRepository.findByToken(token);
-        //ldapService.searchUserField("sn", token);
+        RefreshToken refreshToken = ldapService.searchRefreshToken(token);
+        return Optional.ofNullable(refreshToken);
     }
 
     public RefreshToken createRefreshToken(Long userId) {
@@ -51,7 +51,7 @@ public class RefreshTokenService {
 
     private void refreshTokenToLdap(RefreshToken refreshToken){
         ldapService.updateUserField(refreshToken.getUser().getEmail(),
-                "cn", refreshToken.getToken());
+                "sn", refreshToken.getToken());
         ldapService.updateUserField(refreshToken.getUser().getEmail(),
                 "description", refreshToken.getExpiryDate().toString());
     }

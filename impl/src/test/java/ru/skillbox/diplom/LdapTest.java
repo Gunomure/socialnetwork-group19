@@ -62,8 +62,8 @@ public class LdapTest {
 
     @Test
     public void testSearchRefreshToken() throws NamingException {
-        RefreshToken refreshToken = ldapService.searchRefreshToken("99999999");
-        Assertions.assertEquals("99999999", refreshToken.getToken());
+        RefreshToken refreshToken = ldapService.searchRefreshToken("ab8232ea-d100-4205-b112-1515adc78ee6");
+        Assertions.assertEquals("ab8232ea-d100-4205-b112-1515adc78ee6", refreshToken.getToken());
         Assertions.assertEquals(testUserEmail, refreshToken.getUser().getEmail());
         Assertions.assertEquals("1990-06-14T20:16:28.280425Z", refreshToken.getExpiryDate().toString());
     }
