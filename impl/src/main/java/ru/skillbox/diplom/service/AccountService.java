@@ -104,8 +104,7 @@ public class AccountService {
             user.setConfirmationCode(registerRequest.getCode());
             user.setLastOnlineTime(ZonedDateTime.now());
             personRepository.save(user);
-            ldapService.newConnection();
-            ldapService.addUser(user.getEmail(), registerRequest.getPasswd1());
+            ldapService.addUser(user.getEmail(), user.getPassword());
         } else {
             throw new BadRequestException(String.format("User with email %s already exists",
                     registerRequest.getEmail()));

@@ -1,6 +1,5 @@
 package ru.skillbox.diplom.service;
 
-import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -61,6 +60,7 @@ public class RefreshTokenService {
             ldapService.updateUserField(token.getUser().getEmail(), "sn", "0");
             throw new TokenRefreshException(token.getToken(), "Refresh token was expired. Please make a new signin request");
         }
+
         return token;
     }
 
