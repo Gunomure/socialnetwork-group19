@@ -74,7 +74,7 @@ public class LdapService {
     public static boolean authUser(String username, String password) {
         try {
             Properties env = new Properties();
-            env.put(Context.INITIAL_CONTEXT_FACTORY, securityPrincipal);
+            env.put(Context.INITIAL_CONTEXT_FACTORY, contextFactory);
             env.put(Context.PROVIDER_URL, url);
             env.put(Context.SECURITY_PRINCIPAL, ldapEmailFieldName + "=" + username + "," + usersPrincipal);
             env.put(Context.SECURITY_CREDENTIALS, password);
