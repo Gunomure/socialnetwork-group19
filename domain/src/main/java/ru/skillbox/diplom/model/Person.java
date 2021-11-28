@@ -16,7 +16,8 @@ import java.util.List;
 @Entity
 @Table(name = "persons")
 @Data
-public class Person extends User {
+public class
+Person extends User {
 
     @Column(name = "registration_date", nullable = false)
     private ZonedDateTime registrationDate;

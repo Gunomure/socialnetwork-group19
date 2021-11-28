@@ -7,13 +7,13 @@ import java.time.ZonedDateTime;
 
 @Data
 public class NotificationDto {
-    @JsonProperty("type_id")
+    @JsonProperty(value ="type_id")
     private Long typeId;
-    @JsonProperty("sent_time")
+    @JsonProperty(value ="sent_time")
     private ZonedDateTime sentTime;
-    @JsonProperty("person_id")
+    @JsonProperty(value ="person_id")
     private Long personId;
-    @JsonProperty("entity_id")
+    @JsonProperty(value ="entity_id")
     private Long entityId;
     private String contact;
 }

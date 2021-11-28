@@ -7,7 +7,7 @@
 
     <changeSet id="create-table-message" author="Stepan">
         <createTable tableName="message">
-            <column name="id" type="bigint" autoIncrement="true">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="time" type="timestamptz"/>
@@ -15,6 +15,7 @@
             <column name="recipient_id" type="bigint"/>
             <column name="message_text" type="text"/>
             <column name="read_status" type="varchar(50)"/>
+            <column name="is_deleted" type="TINYINT" defaultValue="0"/>
         </createTable>
     </changeSet>
 

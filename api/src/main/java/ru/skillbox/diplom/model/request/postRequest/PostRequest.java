@@ -18,6 +18,4 @@ public class PostRequest {
     @JsonProperty("date_to")
     private ZonedDateTime dateTo;
     private String author;
-//    private int offset = 0;
-//    private int itemPerPage = 20;
 }
