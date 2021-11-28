@@ -7,14 +7,12 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./config/grafana/provisioning:/etc/grafana/provisioning
+      - ./config-grafana/provisioning:/etc/grafana/provisioning
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=password
     networks:
-      monitoring:
-        aliases:
-          - grafana
+      - group19-net
   prometheus:
     image: prom/prometheus
     extra_hosts:
@@ -27,10 +25,10 @@ services:
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
     volumes:
-      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./config-prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
-      monitoring:
-        aliases:
-          - prometheus
+      - group19-net
 networks:
-  monitoring:
+  group19-net:
+    driver: bridge
+    external: true
