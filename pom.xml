@@ -29,10 +29,12 @@
 		<spring-boot-starter-data-jpa.version>2.5.5</spring-boot-starter-data-jpa.version>
 		<spring-boot-starter-security.version>2.5.5</spring-boot-starter-security.version>
 		<spring-boot-starter-test.version>2.5.5</spring-boot-starter-test.version>
+		<spring-boot-starter-actuator>2.5.5</spring-boot-starter-actuator>
 		<spring-security-test.version>5.5.2</spring-security-test.version>
 		<org.postgressql.version>42.2.24</org.postgressql.version>
 		<org.projectlombok.version>1.18.22</org.projectlombok.version>
 		<org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
+		<micrometer-registry-prometheus>1.8.0</micrometer-registry-prometheus>
 		<spring-boot-starter-web.version>2.5.5</spring-boot-starter-web.version>
 		<spring-boot-starter-log4j2.version>2.5.5</spring-boot-starter-log4j2.version>
 		<commons-io.version>2.11.0</commons-io.version>
@@ -127,6 +129,16 @@
 			<artifactId>spring-security-test</artifactId>
 			<version>${spring-security-test.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+			<version>${spring-boot-starter-actuator}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+			<version>${micrometer-registry-prometheus}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mapstruct</groupId>
