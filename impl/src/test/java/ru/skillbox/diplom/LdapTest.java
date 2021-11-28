@@ -18,7 +18,9 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.skillbox.diplom.model.RefreshToken;
+import ru.skillbox.diplom.model.request.RegisterRequest;
 import ru.skillbox.diplom.repository.UserRepository;
+import ru.skillbox.diplom.service.AccountService;
 import ru.skillbox.diplom.service.LdapService;
 
 import javax.annotation.Resource;
@@ -34,25 +36,34 @@ public class LdapTest {
 
     @Autowired
     LdapService ldapService;
+    @Autowired
+    AccountService accountService;
+    @Autowired
+    UserRepository userRepository;
 
-    String testUserEmail = "javaprogroup19@gmail.com";
+    String testUserEmail = "testJavaprogroup19@gmail.com";
     String testUserPassword = "12345678";
 
     @Before
     public void setUp() {
-        ldapService.newConnection();
-        ldapService.addUser(testUserEmail, testUserPassword);
+        LdapService.newConnection();
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setEmail(testUserEmail);
+        registerRequest.setPasswd1(testUserPassword);
+        registerRequest.setFirstName("testUserFirstName");
+        registerRequest.setLastName("testUserLastName");
+        accountService.registerAccount(registerRequest);
     }
 
     @Test
     public void testAuthUser() {
-        Assertions.assertTrue(LdapService.authUser(testUserEmail, testUserPassword));
+        Assertions. assertTrue(LdapService.authUser(testUserEmail, testUserPassword));
     }
 
     @Test
     public void testUpdateUserField() throws NamingException {
-        ldapService.updateUserField(testUserEmail, "sn", "1");
-        Assertions.assertTrue(ldapService.searchUserField("sn", "1"));
+        ldapService.updateUserField(testUserEmail, "refreshToken", "88888888");
+        Assertions.assertTrue(ldapService.searchUserField("refreshToken", "88888888"));
     }
 
     @Test
@@ -62,8 +73,9 @@ public class LdapTest {
 
     @Test
     public void testSearchRefreshToken() throws NamingException {
-        RefreshToken refreshToken = ldapService.searchRefreshToken("ab8232ea-d100-4205-b112-1515adc78ee6");
-        Assertions.assertEquals("ab8232ea-d100-4205-b112-1515adc78ee6", refreshToken.getToken());
+        ldapService.updateUserField(testUserEmail, "refreshToken", "898989");
+        RefreshToken refreshToken = ldapService.searchRefreshToken("898989");
+        Assertions.assertEquals("898989", refreshToken.getToken());
         Assertions.assertEquals(testUserEmail, refreshToken.getUser().getEmail());
         Assertions.assertEquals("1990-06-14T20:16:28.280425Z", refreshToken.getExpiryDate().toString());
     }
@@ -71,5 +83,7 @@ public class LdapTest {
     @After
     public void tearDown() throws Exception {
         ldapService.deleteUser(testUserEmail);
+        userRepository.deleteById(
+                userRepository.findByEmail(testUserEmail).get().getId());
     }
 }

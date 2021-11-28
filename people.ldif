@@ -1,0 +1,17 @@
+dn: ou=users,dc=diplom,dc=skillbox,dc=ru
+ou: users
+objectClass: organizationalUnit
+
+dn: cn=testUser1@mail.com,ou=users,dc=diplom,dc=skillbox,dc=ru
+refreshToken: Value2
+expiryDate: Value1
+sn: testUser1
+userPassword: 12345678
+objectClass: Skillbox
+
+dn: cn=testUser2@mail.com,ou=users,dc=diplom,dc=skillbox,dc=ru
+refreshToken: Value2
+expiryDate: Value1
+sn: testUser1
+userPassword: 12345678
+objectClass: Skillbox
