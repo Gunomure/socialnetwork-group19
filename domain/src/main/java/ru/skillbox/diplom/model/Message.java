@@ -1,15 +1,17 @@
 package ru.skillbox.diplom.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.Type;
 import ru.skillbox.diplom.model.enums.ReadStatus;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "message")
 public class Message extends BaseEntity {
     @Column(name = "time")
@@ -23,4 +25,9 @@ public class Message extends BaseEntity {
     @Column(name = "read_status", columnDefinition = "enum('SENT', 'READ')")
     @Enumerated(EnumType.STRING)
     private ReadStatus status;
+    @Column(name = "is_deleted", columnDefinition = "TINYINT")
+    @Type(type = "org.hibernate.type.NumericBooleanType")
+    private Boolean isDeleted;
+
+
 }

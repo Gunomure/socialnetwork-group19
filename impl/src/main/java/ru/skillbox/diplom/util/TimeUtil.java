@@ -4,7 +4,7 @@ import java.time.*;
 import java.util.Date;
 
 public class TimeUtil {
-    private static final ZoneId ZONE_UTC = ZoneId.of("UTC");
+    public static final ZoneId ZONE_UTC = ZoneId.of("UTC");
 
     public static long getCurrentTimestampUtc() {
         return zonedDateTimeToLong(ZonedDateTime.now());

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+    <changeSet id="messages_insert" author="maleikovich">
+        <insert tableName="message">
+<!--            <column name="id">1</column>-->
+            <column name="time">2010-11-09 12:52:47.719 +0200</column>
+            <column name="author_id">3</column>
+            <column name="recipient_id">1</column>
+            <column name="message_text">hello 1</column>
+            <column name="read_status">READ</column>
+        </insert>
+        <insert tableName="message">
+<!--            <column name="id">2</column>-->
+            <column name="time">2010-11-09 12:54:47.719 +0200</column>
+            <column name="author_id">1</column>
+            <column name="recipient_id">3</column>
+            <column name="message_text">hello 1</column>
+            <column name="read_status">READ</column>
+        </insert>
+        <insert tableName="message">
+<!--            <column name="id">3</column>-->
+            <column name="time">2010-11-09 12:56:47.719 +0200</column>
+            <column name="author_id">4</column>
+            <column name="recipient_id">3</column>
+            <column name="message_text">hello 3</column>
+            <column name="read_status">READ</column>
+        </insert>
+        <insert tableName="message">
+<!--            <column name="id">4</column>-->
+            <column name="time">2010-11-09 12:57:47.719 +0200</column>
+            <column name="author_id">2</column>
+            <column name="recipient_id">3</column>
+            <column name="message_text">hello 4</column>
+            <column name="read_status">READ</column>
+        </insert>
+        <insert tableName="message">
+<!--            <column name="id">5</column>-->
+            <column name="time">2010-11-09 12:58:47.719 +0200</column>
+            <column name="author_id">3</column>
+            <column name="recipient_id">2</column>
+            <column name="message_text">hello 5</column>
+            <column name="read_status">READ</column>
+        </insert>
+        <insert tableName="message">
+<!--            <column name="id">6</column>-->
+            <column name="time">2010-11-09 12:59:47.719 +0200</column>
+            <column name="author_id">1</column>
+            <column name="recipient_id">3</column>
+            <column name="message_text">hello 6</column>
+            <column name="read_status">READ</column>
+        </insert>
+        <insert tableName="message">
+<!--            <column name="id">7</column>-->
+            <column name="time">2010-11-09 13:01:47.719 +0200</column>
+            <column name="author_id">3</column>
+            <column name="recipient_id">4</column>
+            <column name="message_text">hello 7</column>
+            <column name="read_status">SENT</column>
+        </insert>
+        <insert tableName="message">
+<!--            <column name="id">8</column>-->
+            <column name="time">2010-11-09 13:03:47.719 +0200</column>
+            <column name="author_id">1</column>
+            <column name="recipient_id">3</column>
+            <column name="message_text">hello 8</column>
+            <column name="read_status">SENT</column>
+        </insert>
+        <insert tableName="message">
+<!--            <column name="id">9</column>-->
+            <column name="time">2010-11-09 13:05:47.719 +0200</column>
+            <column name="author_id">4</column>
+            <column name="recipient_id">3</column>
+            <column name="message_text">hello 9</column>
+            <column name="read_status">SENT</column>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

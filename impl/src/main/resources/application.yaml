@@ -1,6 +1,8 @@
 server:
   port: 8086
 spring:
+  main:
+    banner-mode: console
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:5432/group19?currentSchema=group19
     driver-class-name: org.postgresql.Driver
@@ -35,3 +37,6 @@ values:
     secretKey: secret
     expiration: 120
     refreshExpirationDateInMs: 9000000
+  socketio:
+    host: localhost
+    port: 9092

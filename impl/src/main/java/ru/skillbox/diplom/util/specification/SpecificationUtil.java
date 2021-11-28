@@ -10,6 +10,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 public class SpecificationUtil<T> {
@@ -36,8 +37,13 @@ public class SpecificationUtil<T> {
         return (root, query, builder) -> Objects.isNull(value) ? builder.conjunction() : builder.equal(key, value);
     }
 
+    public Specification<T> in(String key, List<Long> value) {
+        return (root, query, builder) -> Objects.isNull(value) ?
+                builder.conjunction() : builder.in(root.get(key)).value(value);
+    }
+
     public Specification<T> equals(String key, Boolean value) {
-        return (root, query, builder) -> builder.equal(root.get("isBlocked"), value);
+        return (root, query, builder) -> builder.equal(root.get(key), value);
     }
 
     public Specification<T> equals(String key, Long value) {
@@ -45,7 +51,6 @@ public class SpecificationUtil<T> {
     }
 
     private Specification<T> equals(Path<String> key, Long value) {
-        System.out.println(key);
         return (root, query, builder) -> Objects.isNull(value) ? builder.conjunction() : builder.equal(key, value);
     }
 
