@@ -21,16 +21,21 @@ http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd">
     <include file="db/changelog/create_table-persons.changelog.xml"/>
     <include file="db/changelog/create_table-blocks_history.changelog.xml"/>
     <include file="db/changelog/create_table-languages.changelog.xml"/>
+    <include file="db/changelog/create_table-friendship_status.changelog.xml"/>
+    <include file="db/changelog/create_table-friendship.changelog.xml"/>
     <include file="db/changelog/create_table-notification_type.changelog.xml"/>
     <include file="db/changelog/create_table-notification.changelog.xml"/>
     <include file="db/changelog/create_table-message.changelog.xml"/>
-    <include file="db/changelog/insert_into_table-User.changelog.xml"/>
-    <include file="db/changelog/insert_into_table-Person.changelog.xml"/>
+    <include file="db/changelog/insert_into_table-users.changelog.xml"/>
+    <include file="db/changelog/insert_into_table-persons.changelog.xml"/>
     <include file="db/changelog/insert_default_users.changelog.xml"/>
     <include file="db/changelog/insert_initial_data-posts.changelog.xml"/>
     <include file="db/changelog/insert_initial_data_post-comments.changelog.xml"/>
     <include file="db/changelog/insert_initial_data_postlike.changelog.xml"/>
     <include file="db/changelog/create_table-comment-reports.changelog.xml"/>
     <include file="db/changelog/insert_into_table-Message.changelog.xml"/>
+
+    <include file="db/changelog/insert_into_table-friendship_status.changelog.xml"/>
+    <include file="db/changelog/insert_into_table-friendship.changelog.xml"/>
 
 </databaseChangeLog>

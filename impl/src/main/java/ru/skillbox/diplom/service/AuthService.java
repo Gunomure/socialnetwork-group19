@@ -13,8 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.skillbox.diplom.config.security.jwt.JwtTokenProvider;
 import ru.skillbox.diplom.exception.TokenRefreshException;
+import ru.skillbox.diplom.exception.UnauthorizedException;
 import ru.skillbox.diplom.mappers.PersonMapper;
-import ru.skillbox.diplom.model.*;
+import ru.skillbox.diplom.model.CommonResponse;
+import ru.skillbox.diplom.model.Person;
+import ru.skillbox.diplom.model.PersonDto;
+import ru.skillbox.diplom.model.RefreshToken;
 import ru.skillbox.diplom.model.request.LoginRequest;
 import ru.skillbox.diplom.model.request.TokenRefreshRequest;
 import ru.skillbox.diplom.model.response.MessageResponse;
@@ -23,6 +27,8 @@ import ru.skillbox.diplom.repository.PersonRepository;
 import ru.skillbox.diplom.util.TimeUtil;
 
 import javax.naming.NamingException;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Service
 public class AuthService {
@@ -116,5 +122,18 @@ public class AuthService {
         return response;
     }
 
+    public Person getCurrentUser(HttpServletRequest request) {
+        return getCurrentUser(getCurrentUserEmail(request));
+    }
 
+    public Person getCurrentUser(String userEmail) {
+        return personRepository.findByEmail(userEmail).orElseThrow(
+                () -> new UnauthorizedException(String.format("User %s unauthorized", userEmail))
+        );
+    }
+
+    public String getCurrentUserEmail(HttpServletRequest request) {
+        String token = jwtTokenProvider.resolveToken(request);
+        return jwtTokenProvider.getUsername(token);
+    }
 }

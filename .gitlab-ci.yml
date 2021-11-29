@@ -22,13 +22,14 @@ build:
   except:
     - tags
   script:
-    - mvn $MAVEN_LOCAL_REPOSITORY compile
+    - mvn $MAVEN_LOCAL_REPOSITORY clean compile
   cache:
     paths:
       - ./impl/target
       - ./.m2
 
-test:
+# makes the stage hidden
+.test:
   stage: test
   only:
     - develop

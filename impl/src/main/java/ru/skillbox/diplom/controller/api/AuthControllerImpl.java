@@ -1,6 +1,7 @@
 package ru.skillbox.diplom.controller.api;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +16,7 @@ import ru.skillbox.diplom.service.AuthService;
 import ru.skillbox.diplom.service.RefreshTokenService;
 
 @RestController
+@Slf4j
 public class AuthControllerImpl implements AuthController {
 
     private final AuthService authService;
@@ -25,6 +27,7 @@ public class AuthControllerImpl implements AuthController {
 
     @Override
     public ResponseEntity<?> authenticate(@RequestBody LoginRequest request) {
+        log.info("controller authenticate: {}", request);
         return ResponseEntity.ok(authService.login(request));
     }
 

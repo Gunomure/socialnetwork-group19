@@ -42,6 +42,11 @@ public class SpecificationUtil<T> {
                 builder.conjunction() : builder.in(root.get(key)).value(value);
     }
 
+    public Specification<T> notIn(String key, List<Long> value) {
+        return (root, query, builder) -> Objects.isNull(value) ?
+                builder.conjunction() : builder.not(builder.in(root.get(key)).value(value));
+    }
+
     public Specification<T> equals(String key, Boolean value) {
         return (root, query, builder) -> builder.equal(root.get(key), value);
     }

@@ -1,17 +1,31 @@
+package ru.skillbox.diplom;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
+import org.springframework.transaction.annotation.Transactional;
 import ru.skillbox.diplom.mappers.PersonMapper;
 import ru.skillbox.diplom.model.Person;
 import ru.skillbox.diplom.model.PersonDto;
+import ru.skillbox.diplom.repository.PersonRepository;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
-public class TestDto {
+@Transactional
+@Profile("local")
+public class TestDto extends AbstractIntegrationTest {
+    @Value("${embedded-postgresql.password}")
+    private String password;
     private final PersonMapper personMapper = Mappers.getMapper(PersonMapper.class);
+    @Autowired
+    private PersonRepository personRepository;
 
     @Test
-    public void testPersonToPersonDto(){
+    void testPersonToPersonDtoTest() {
         Person person = new Person();
         person.setFirstName("Ivan");
         person.setLastName("Petrov");
@@ -29,5 +43,17 @@ public class TestDto {
         Assertions.assertEquals(PersonDto.getFirstName(), p.getFirstName());
         Assertions.assertEquals(PersonDto.getLastName(), p.getLastName());
         Assertions.assertEquals(PersonDto.getEmail(), p.getEmail());
+    }
+
+    @Test
+    void testDatabaseTest() throws Exception {
+        System.out.println("!!!!" + password);
+        loginAsUser();
+
+        Optional<Person> person = personRepository.findById(1L);
+        System.out.println(person.get());
+        System.out.println("test");
+        logout();
+        System.out.println("test2");
     }
 }
