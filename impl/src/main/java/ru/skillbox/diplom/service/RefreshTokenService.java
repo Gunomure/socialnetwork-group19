@@ -50,17 +50,16 @@ public class RefreshTokenService {
 
     private void refreshTokenToLdap(RefreshToken refreshToken){
         ldapService.updateUserField(refreshToken.getUser().getEmail(),
-                "sn", refreshToken.getToken());
+                "refreshToken", refreshToken.getToken());
         ldapService.updateUserField(refreshToken.getUser().getEmail(),
-                "description", refreshToken.getExpiryDate().toString());
+                "expiryDate", refreshToken.getExpiryDate().toString());
     }
 
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
-            ldapService.updateUserField(token.getUser().getEmail(), "sn", "0");
+            ldapService.updateUserField(token.getUser().getEmail(), "refreshToken", "0");
             throw new TokenRefreshException(token.getToken(), "Refresh token was expired. Please make a new signin request");
         }
-
         return token;
     }
 
