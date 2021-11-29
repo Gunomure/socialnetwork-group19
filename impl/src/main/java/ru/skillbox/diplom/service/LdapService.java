@@ -20,7 +20,7 @@ public class LdapService {
 
     private static DirContext connection;
     private static final String contextFactory = "com.sun.jndi.ldap.LdapCtxFactory";
-    private static final String url = "ldap://localhost:389";
+    private static final String url = "ldap://172.19.0.6:389";
     private static final String securityPrincipal = "cn=admin,dc=diplom,dc=skillbox,dc=ru";
     private static final String usersPrincipal = "ou=users,dc=diplom,dc=skillbox,dc=ru";
     private static final String password = "group19";
