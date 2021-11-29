@@ -101,7 +101,7 @@ deploy_prod_server:
     #rerun backend
     - ssh $PROD_USER@$PROD_HOST "if [[ $BACKEND_CONTAINER_STATUS == 'running' ]]; then docker stop $BACK_CONTAINER_NAME; fi"
     - ssh $PROD_USER@$PROD_HOST "docker pull $BACK_IMAGE"
-    - ssh $PROD_USER@$PROD_HOST "docker run --name $BACK_CONTAINER_NAME -d --rm -p $BACKEND_PORT:8086 -e POSTGRES_HOST=$POSTGRES_CONTAINER_NAME -e  MAIL_SERVICE_PASSWORD=$MAIL_SERVICE_PASSWORD -e WEBSITE_HOST=$PROD_HOST -e FRONTEND_PORT=8099 --network group19-net $BACK_IMAGE"
+    - ssh $PROD_USER@$PROD_HOST "docker run --name $BACK_CONTAINER_NAME -d --rm -p $BACKEND_PORT:8086 -p 9092:9092 -e POSTGRES_HOST=$POSTGRES_CONTAINER_NAME -e  MAIL_SERVICE_PASSWORD=$MAIL_SERVICE_PASSWORD -e WEBSITE_HOST=$PROD_HOST -e FRONTEND_PORT=8099 --network group19-net $BACK_IMAGE"
 
 #================================================================
 #===========RUN FOR DEVELOPMENT DEPLOY===========================
@@ -165,4 +165,4 @@ deploy_development:
     #rerun backend
     - ssh $PROD_USER@$PROD_HOST "if [[ $BACKEND_CONTAINER_STATUS == 'running' ]]; then docker stop $BACK_CONTAINER_NAME; fi"
     - ssh $PROD_USER@$PROD_HOST "docker pull $BACK_IMAGE"
-    - ssh $PROD_USER@$PROD_HOST "docker run --name $BACK_CONTAINER_NAME -d --rm -p $BACKEND_PORT:8086 -e POSTGRES_HOST=$POSTGRES_CONTAINER_NAME -e  MAIL_SERVICE_PASSWORD=$MAIL_SERVICE_PASSWORD -e WEBSITE_HOST=$PROD_HOST -e FRONTEND_PORT=8099 --network group19-net $BACK_IMAGE"
+    - ssh $PROD_USER@$PROD_HOST "docker run --name $BACK_CONTAINER_NAME -d --rm -p $BACKEND_PORT:8086 -p 9092:9092 -e POSTGRES_HOST=$POSTGRES_CONTAINER_NAME -e  MAIL_SERVICE_PASSWORD=$MAIL_SERVICE_PASSWORD -e WEBSITE_HOST=$PROD_HOST -e FRONTEND_PORT=8099 --network group19-net $BACK_IMAGE"
