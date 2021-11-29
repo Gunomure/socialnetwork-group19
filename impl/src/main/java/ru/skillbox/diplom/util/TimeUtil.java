@@ -13,8 +13,13 @@ public class TimeUtil {
     public static long zonedDateTimeToLong(ZonedDateTime zonedDateTime) {
         return ZonedDateTime.ofInstant(zonedDateTime.toInstant(), ZONE_UTC).toEpochSecond();
     }
+
+    public static ZonedDateTime now() {
+        return ZonedDateTime.now(ZONE_UTC);
+    }
+
     public static ZonedDateTime getZonedDateTimeFromMillis(Long millis) {
-        return millis == null ? null :  ZonedDateTime.ofInstant(Instant.ofEpochMilli(millis), ZONE_UTC);
+        return millis == null ? null : ZonedDateTime.ofInstant(Instant.ofEpochMilli(millis), ZONE_UTC);
     }
 
     public static LocalDateTime DateToLocalDateTime(Date date) {

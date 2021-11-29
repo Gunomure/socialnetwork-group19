@@ -22,7 +22,7 @@
 		<revision>1.0.0</revision>
 		<sha1/>
 		<changelist>-SNAPSHOT</changelist>
-		<sha1></sha1>
+		<sha1/>
 		<org.springframework.version>5.3.10</org.springframework.version>
 		<org.apache.maven.version>3.8.3</org.apache.maven.version>
 		<spring-boot-starter-data-jdbc.version>2.5.5</spring-boot-starter-data-jdbc.version>
@@ -47,7 +47,9 @@
 		<spring-boot-starter-mail.version>2.5.5</spring-boot-starter-mail.version>
 		<dockerhub.repository>javaprogroup19</dockerhub.repository>
 		<java.version>11</java.version>
-		<junit.version>4.13.2</junit.version>
+		<postgresql-embedded.version>2.10</postgresql-embedded.version>
+		<flapdoodle-embedded.version>2.0.5</flapdoodle-embedded.version>
+		<junit-jupiter.version>5.7.0</junit-jupiter.version>
 		<dockerhub.repository>javaprogroup19</dockerhub.repository>
 	</properties>
 
@@ -200,6 +202,36 @@
 			<groupId>org.glassfish</groupId>
 			<artifactId>javax.el</artifactId>
 			<version>3.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>ru.yandex.qatools.embed</groupId>
+			<artifactId>postgresql-embedded</artifactId>
+			<version>${postgresql-embedded.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>de.flapdoodle.embed.process</artifactId>
+					<groupId>de.flapdoodle.embed</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>de.flapdoodle.embed</groupId>
+			<artifactId>de.flapdoodle.embed.process</artifactId>
+			<version>${flapdoodle-embedded.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>${junit-jupiter.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>${junit-jupiter.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

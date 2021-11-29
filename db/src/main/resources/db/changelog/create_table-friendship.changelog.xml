@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="create-table-friendship" author="dtyunyaev">
+        <createTable tableName="friendship">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="status_id" type="bigint"/>
+            <column name="src_person_id" type="bigint"/>
+            <column name="dst_person_id" type="bigint"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="add_foreign_keys" author="dtyunyaev">
+        <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="friendship" constraintName="fk_friendship_status"
+                                 referencedColumnNames="id" referencedTableName="friendship_status"/>
+        <addForeignKeyConstraint baseColumnNames="src_person_id" baseTableName="friendship" constraintName="fk_person_id"
+                                 referencedColumnNames="id" referencedTableName="persons"/>
+        <addForeignKeyConstraint baseColumnNames="dst_person_id" baseTableName="friendship" constraintName="fk_dst_person_id"
+                                 referencedColumnNames="id" referencedTableName="persons"/>
+    </changeSet>
+
+</databaseChangeLog>

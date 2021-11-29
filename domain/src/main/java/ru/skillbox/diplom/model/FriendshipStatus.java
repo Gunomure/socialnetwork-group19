@@ -1,7 +1,6 @@
 package ru.skillbox.diplom.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import ru.skillbox.diplom.model.enums.FriendshipCode;
 
 import javax.persistence.*;
@@ -9,8 +8,12 @@ import java.time.ZonedDateTime;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
+@ToString
 @Table(name = "friendship_status")
+// It's a dictionary of statuses. One row for ona status
 public class FriendshipStatus extends BaseEntity {
     @Column(name = "time")
     private ZonedDateTime time;
@@ -20,5 +23,3 @@ public class FriendshipStatus extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private FriendshipCode code;
 }
-
-

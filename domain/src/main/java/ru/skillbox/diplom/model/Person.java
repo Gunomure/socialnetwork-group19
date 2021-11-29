@@ -10,6 +10,7 @@ import ru.skillbox.diplom.model.enums.UserType;
 import javax.persistence.*;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -59,6 +60,14 @@ Person extends User {
 
     @OneToMany(mappedBy = "authorId", cascade = CascadeType.ALL)
     private List<Post> posts;
+
+    @OneToMany(
+            mappedBy = "srcPerson",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Friendship> friends;
 
     @Override
     @Transient

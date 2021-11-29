@@ -1,8 +1,4 @@
-server:
-  port: 8086
 spring:
-  main:
-    banner-mode: console
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:5432/group19?currentSchema=group19
     driver-class-name: org.postgresql.Driver
@@ -14,7 +10,7 @@ spring:
     default-schema: group19
     drop-first: true
   jpa:
-    show-sql: false
+    show-sql: true
     hibernate:
       ddl-auto: none
   mail:
@@ -27,18 +23,6 @@ spring:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
       mail.smtp.timeout: 10000
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,prometheus
-  metrics:
-    export:
-      prometheus:
-        enabled: true
-    distribution:
-      percentiles-histogram:
-        "[http.server.requests]": true
 
 group19:
   passwordRecoveryPath: change-password
@@ -50,6 +34,10 @@ values:
     secretKey: secret
     expiration: 120
     refreshExpirationDateInMs: 9000000
-  socketio:
-    host: localhost
-    port: 9092
+embedded-postgresql:
+  host: localhost
+  port: 5432
+  database: group19
+  schema: group19
+  user: group19
+  password: group19

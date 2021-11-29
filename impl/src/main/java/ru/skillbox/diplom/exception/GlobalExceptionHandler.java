@@ -17,4 +17,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    protected ResponseEntity<CustomErrorResponse> handleUnauthorizedException(Exception ex) {
+        CustomErrorResponse error = new CustomErrorResponse();
+        error.setError(ErrorCommonType.UNAUTHORIZED.toString().toLowerCase());
+        error.setErrorDescription(ex.getMessage());
+
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
 }

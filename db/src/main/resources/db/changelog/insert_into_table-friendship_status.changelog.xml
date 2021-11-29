@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+    <!-- it's a dictionary, change it only to add or exclude statuses -->
+    <changeSet id="1" author="dtyunyaev">
+        <insert tableName="friendship_status">
+            <column name="time">2021-11-20 00:00:00.000000 +00:00</column>
+            <column name="name">One person asks friendship with another person</column>
+            <column name="code">REQUEST</column>
+        </insert>
+        <insert tableName="friendship_status">
+            <column name="time">2020-05-24 22:35:43.149000 +00:00</column>
+            <column name="name">Person accepts friendship with another person</column>
+            <column name="code">FRIEND</column>
+        </insert>
+        <insert tableName="friendship_status">
+            <column name="time">2020-05-24 22:35:43.149000 +00:00</column>
+            <column name="name">Person declines friendship with another person</column>
+            <column name="code">DECLINED</column>
+        </insert>
+        <insert tableName="friendship_status">
+            <column name="time">2020-05-24 22:35:43.149000 +00:00</column>
+            <column name="name">Person blocks another person if they were friends</column>
+            <column name="code">BLOCKED</column>
+        </insert>
+        <insert tableName="friendship_status">
+            <column name="time">2020-05-24 22:35:43.149000 +00:00</column>
+            <column name="name">Person sees the news of another person, but they are not friends</column>
+            <column name="code">SUBSCRIBED</column>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
