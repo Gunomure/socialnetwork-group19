@@ -1,10 +1,7 @@
 package ru.skillbox.diplom.mappers.converters;
 
 import org.mapstruct.Named;
-import ru.skillbox.diplom.model.Person;
-import ru.skillbox.diplom.model.Post;
-import ru.skillbox.diplom.model.PostComment;
-import ru.skillbox.diplom.model.PostLike;
+import ru.skillbox.diplom.model.*;
 import ru.skillbox.diplom.util.TimeUtil;
 
 import java.time.Instant;
@@ -35,6 +32,11 @@ public class Converters {
         return (long) likes.size();
     }
 
+    @Named("convertCommentLikesListToLikesSize")
+    public static Long convertCommentLikesListToLikesSize(List<CommentLike> likes) {
+        return (long) likes.size();
+    }
+
     @Named("convertCommentToId")
     public static Long convertCommentToId(PostComment comment) {
         return comment == null ? null : comment.getId();
@@ -54,5 +56,4 @@ public class Converters {
     public static Integer convertCollectionToSize(Collection<?> collection){
         return collection.size();
     }
-
 }

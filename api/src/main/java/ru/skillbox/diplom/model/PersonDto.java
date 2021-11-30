@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 public class PersonDto {
@@ -22,6 +25,7 @@ public class PersonDto {
     @JsonProperty(value = "birth_date")
     private Long birthDate;
 
+    @JsonProperty(value = "e_mail")
     private String email;
 
     private String phone;
@@ -49,4 +53,6 @@ public class PersonDto {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String refreshToken;
+
+    private List<PostDto> posts = new ArrayList<>();
 }

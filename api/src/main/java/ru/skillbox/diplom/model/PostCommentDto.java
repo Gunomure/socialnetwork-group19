@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 public class PostCommentDto {
 
@@ -24,6 +27,15 @@ public class PostCommentDto {
     @JsonProperty(value = "post_id")
     private Long postId;
 
-    @JsonProperty(value = "author_id")
-    private Long authorId;
+    @JsonProperty(value = "author")
+    private PersonDto authorId;
+
+    @JsonProperty(value = "sub_comments")
+    private List<PostCommentDto> comments = new ArrayList<>();
+
+    private Integer likes;
+
+    @JsonProperty("my_like")
+    private boolean myLike;
+
 }

@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -32,5 +33,9 @@ public class PostComment extends BaseEntity {
 
     @Column(name = "is_blocked")
     private Boolean isBlocked;
+
+    @OneToMany(mappedBy = "commentId", cascade = CascadeType.ALL)
+    private List<CommentLike> likes;
+
 }
 

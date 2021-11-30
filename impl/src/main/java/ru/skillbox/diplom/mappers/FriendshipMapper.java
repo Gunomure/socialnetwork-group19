@@ -34,6 +34,7 @@ public interface FriendshipMapper {
     @Mapping(target = "blocked", source = "friendship.dstPerson.isBlocked")
     @Mapping(target = "friendshipStatus", source = "friendship.statusId.code")
     @Mapping(target = "token", ignore = true)
+    @Mapping(target = "posts", ignore = true)
     FriendshipResponseDto dstToFriendship(Friendship friendship);
 
     List<FriendshipResponseDto> dstToFriendship(List<Friendship> friendships);
@@ -54,5 +55,6 @@ public interface FriendshipMapper {
     @Mapping(target = "blocked", source = "person.isBlocked")
     @Mapping(target = "friendshipStatus", source = "status.code")
     @Mapping(target = "token", ignore = true)
+    @Mapping(target = "posts", ignore = true)
     FriendshipResponseDto personToFriendship(Person person, FriendshipStatus status);
 }
