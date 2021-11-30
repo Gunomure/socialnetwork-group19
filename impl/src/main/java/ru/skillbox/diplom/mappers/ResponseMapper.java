@@ -26,19 +26,23 @@ public abstract class ResponseMapper {
     @Mapping(target = "likes", qualifiedByName = "convertLikesListToLikesSize")
     @Mapping(target = "time", qualifiedByName = "convertDateToLong")
     @Mapping(target = "author", source = "authorId")
+    @Mapping(target = "comments", ignore = true)
     public abstract PostDto convertToDto(Post post);
 
     @Mapping(target = "birthDate", qualifiedByName = "convertDateToLong")
     @Mapping(target = "registrationDate", qualifiedByName = "convertDateToLong")
     @Mapping(target = "lastOnlineTime", qualifiedByName = "convertDateToLong")
     @Mapping(target = "token", ignore = true)
+    @Mapping(target = "posts", ignore = true)
     public abstract PersonDto toPersonDTO(Person person);
 
     @Mapping(target = "time", qualifiedByName =  "convertDateToLong")
     @Mapping(target = "blocked", source = "isBlocked")
     @Mapping(target = "parentId", source = "parent", qualifiedByName = "convertCommentToId")
     @Mapping(target = "postId", source = "post", qualifiedByName = "convertPostToId")
-    @Mapping(target = "authorId", source = "author", qualifiedByName = "convertPersonToId")
+    @Mapping(target = "authorId", source = "author")
+    @Mapping(target = "comments", ignore = true)
+    @Mapping(target = "likes", ignore = true)
     public abstract PostCommentDto convertToDtoPostComment(PostComment postComment);
 
     public void updateToFeedsResponse(List<Post> list, FeedsResponse<List<PostDto>> response) {

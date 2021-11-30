@@ -10,10 +10,9 @@ http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd">
     <include file="db/changelog/create_table-post_comments.changelog.xml"/>
     <include file="db/changelog/create_table-post_file.changelog.xml"/>
     <include file="db/changelog/create_table-post_like.changelog.xml"/>
+    <include file="db/changelog/create_table-comment_like.changelog.xml"/>
     <include file="db/changelog/create_table-tags.changelog.xml"/>
     <include file="db/changelog/create_table-post2tag.changelog.xml"/>
-    <include file="db/changelog/create_table-post_file.changelog.xml"/>
-    <include file="db/changelog/create_table-post_like.changelog.xml"/>
     <include file="db/changelog/create_table-post2tag.changelog.xml"/>
     <include file="db/changelog/create_table-countries.changelog.xml"/>
     <include file="db/changelog/create_table-cities.changelog.xml"/>

@@ -20,7 +20,9 @@ public interface PostCommentMapper {
     @Mapping(target = "blocked", source = "isBlocked")
     @Mapping(target = "parentId", source = "parent", qualifiedByName = "convertCommentToId")
     @Mapping(target = "postId", source = "post", qualifiedByName = "convertPostToId")
-    @Mapping(target = "authorId", source = "author", qualifiedByName = "convertPersonToId")
+    @Mapping(target = "authorId", source = "author")
+    @Mapping(target = "comments", ignore = true)
+    @Mapping(target = "likes", qualifiedByName = "convertCommentLikesListToLikesSize")
     PostCommentDto convertToPostCommentDto(PostComment postComment);
 
     List<PostCommentDto> convertToPostCommentListDto(Collection<PostComment> comments);
@@ -32,6 +34,7 @@ public interface PostCommentMapper {
     @Mapping(target = "post", source = "post")
     @Mapping(target = "author", source = "author")
     @Mapping(target = "parent", source = "parent")
+    @Mapping(target = "likes", ignore = true)
     PostComment convertToPostCommentEntity(Post post, Person author, PostComment parent, String commentText);
 
 
@@ -54,5 +57,12 @@ public interface PostCommentMapper {
     @Mapping(target = "data", source = "idResponse")
     @Mapping(target = "error", ignore = true)
     CommonResponse<IdResponse> convertToCommonResponse(IdResponse idResponse);
+
+    @Mapping(target = "birthDate", qualifiedByName = "convertDateToLong")
+    @Mapping(target = "registrationDate", qualifiedByName = "convertDateToLong")
+    @Mapping(target = "lastOnlineTime", qualifiedByName = "convertDateToLong")
+    @Mapping(target = "token", ignore = true)
+    @Mapping(target = "posts", ignore = true)
+    PersonDto toPersonDTO(Person person);
 
 }

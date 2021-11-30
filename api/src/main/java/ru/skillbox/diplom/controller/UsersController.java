@@ -33,10 +33,10 @@ public interface UsersController {
     CommonResponse<PersonDto> searchUser(@PathVariable Long id);
 
     @PostMapping("/{id}/wall")
-    CommonResponse<PersonDto> createPost(@PathVariable Long id,
+    CommonResponse<?> createPost(@PathVariable Long id,
                                        @RequestParam(name = "publish_date", required = false) Long date,
                                        @RequestBody PostBodyRequest body);
 
     @GetMapping("/{id}/wall")
-    CommonResponse<PersonDto> getPosts(@PathVariable Long id);
+    CommonResponse<?> getPosts(@PathVariable Long id);
 }

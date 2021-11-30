@@ -21,6 +21,9 @@ public class PostDto {
     @JsonProperty("post_text")
     private String postText;
 
+    @JsonProperty("my_like")
+    private boolean myLike;
+
     @JsonProperty("is_blocked")
     private Boolean isBlocked;
 

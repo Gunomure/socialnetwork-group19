@@ -9,6 +9,7 @@ import ru.skillbox.diplom.model.PersonDto;
 import ru.skillbox.diplom.model.request.UpdateRequest;
 import ru.skillbox.diplom.model.request.postRequest.PostBodyRequest;
 import ru.skillbox.diplom.model.response.UsersSearchResponse;
+import ru.skillbox.diplom.service.PostService;
 import ru.skillbox.diplom.service.UsersService;
 
 @RestController
@@ -16,9 +17,11 @@ public class UsersControllerImpl implements UsersController {
     private final static Logger LOGGER = LogManager.getLogger(UsersControllerImpl.class);
 
     private final UsersService usersService;
+    private final PostService postService;
 
-    public UsersControllerImpl(UsersService usersService) {
+    public UsersControllerImpl(UsersService usersService, PostService postService) {
         this.usersService = usersService;
+        this.postService = postService;
     }
 
     @Override
@@ -49,12 +52,12 @@ public class UsersControllerImpl implements UsersController {
     }
 
     @Override
-    public CommonResponse<PersonDto> createPost(Long id, Long date, PostBodyRequest body) {
-        return usersService.createPost(id, date, body);
+    public CommonResponse<?> createPost(Long id, Long date, PostBodyRequest body) {
+        return postService.createPost(id, date, body);
     }
 
     @Override
-    public CommonResponse<PersonDto> getPosts(Long id) {
-        return usersService.getPosts(id);
+    public CommonResponse<?> getPosts(Long id) {
+        return postService.getPosts(id);
     }
 }

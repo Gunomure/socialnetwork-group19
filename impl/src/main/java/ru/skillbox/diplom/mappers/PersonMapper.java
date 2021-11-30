@@ -21,11 +21,13 @@ public interface PersonMapper {
     @Mapping(target = "registrationDate", qualifiedByName = "convertDateToLong")
     @Mapping(target = "lastOnlineTime", qualifiedByName = "convertDateToLong")
     @Mapping(target = "token", ignore = true)
+    @Mapping(target = "posts", ignore = true)
     PersonDto toPersonDTO(Person person);
 
     @Mapping(target = "birthDate", qualifiedByName = "convertLongToDate")
     @Mapping(target = "registrationDate", qualifiedByName = "convertLongToDate")
     @Mapping(target = "lastOnlineTime", qualifiedByName = "convertLongToDate")
+    @Mapping(target = "posts", ignore = true)
     Person toPersonEntity(PersonDto personDTO);
 
     List<PersonDto> toListPersonDTO(Collection<Person> persons);

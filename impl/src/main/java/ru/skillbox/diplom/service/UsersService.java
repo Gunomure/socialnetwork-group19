@@ -39,7 +39,6 @@ public class UsersService {
         this.personRepository = personRepository;
     }
 
-
     public CommonResponse<PersonDto> getProfileData() {
         LOGGER.info("start getProfileData");
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -135,42 +134,6 @@ public class UsersService {
         response.setTimestamp(getCurrentTimestampUtc());
         LOGGER.info("finish searchUser: id={}", id);
 
-        return response;
-    }
-
-    public CommonResponse<PersonDto> createPost(Long id, Long date, PostBodyRequest body) {
-        LOGGER.info("start createPost id = {}, body = {}", id, body.toString());
-
-        Person person = personRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException(String.format("User %s not found", id)));
-        List<Post> posts = person.getPosts();
-        Post post = new Post();
-        post.setAuthorId(person);
-        post.setTitle(body.getTitle());
-        post.setPostText(body.getPostText().replaceAll("\\<[^>]*>",""));
-        post.setIsBlocked(false);
-        post.setTime(getZonedDateTimeFromMillis(date == null ? System.currentTimeMillis() : date));
-        posts.add(post);
-        person.setPosts(posts);
-
-        Person newPerson = personRepository.save(person);
-        PersonDto responseData = personMapper.toPersonDTO(newPerson);
-        CommonResponse<PersonDto> response = new CommonResponse<>();
-        response.setTimestamp(getCurrentTimestampUtc());
-        response.setData(responseData);
-        LOGGER.info("finish createPost");
-        return response;
-    }
-
-    public CommonResponse<PersonDto> getPosts(Long id) {
-        LOGGER.info("start createPost id = {}", id);
-        Person person = personRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException(String.format("User %s not found", id)));
-        PersonDto responseData = personMapper.toPersonDTO(person);
-        CommonResponse<PersonDto> response = new CommonResponse<>();
-        response.setTimestamp(getCurrentTimestampUtc());
-        response.setData(responseData);
-        LOGGER.info("finish createPost");
         return response;
     }
 }

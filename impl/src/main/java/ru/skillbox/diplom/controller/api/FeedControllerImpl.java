@@ -3,14 +3,14 @@ package ru.skillbox.diplom.controller.api;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.skillbox.diplom.controller.FeedController;
-import ru.skillbox.diplom.service.FeedService;
+import ru.skillbox.diplom.service.PostService;
 
 @RestController
 public class FeedControllerImpl implements FeedController {
 
-    private final FeedService feedService;
+    private final PostService feedService;
 
-    public FeedControllerImpl(FeedService feedService) {
+    public FeedControllerImpl(PostService feedService) {
         this.feedService = feedService;
     }
 
