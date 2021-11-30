@@ -15,6 +15,7 @@ import ru.skillbox.diplom.model.enums.MessagePermission;
 import ru.skillbox.diplom.model.enums.UserType;
 import ru.skillbox.diplom.model.request.RegisterRequest;
 import ru.skillbox.diplom.repository.PersonRepository;
+import ru.skillbox.diplom.util.TimeUtil;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
@@ -103,6 +104,7 @@ public class AccountService {
             user.setType(UserType.USER);
             user.setConfirmationCode(registerRequest.getCode());
             user.setLastOnlineTime(ZonedDateTime.now());
+            user.setBirthDate(TimeUtil.now().minusYears(30)); //TODO repair it!
             personRepository.save(user);
             ldapService.addUser(user.getEmail(), registerRequest.getPasswd1());
         } else {
