@@ -108,9 +108,17 @@ public class FriendshipService {
                 .findBySrcPersonIdAndDstPersonId(currentUser.getId(), personToMakeFriend.getId());
 
         // мы уже отправляли запрос - сообщаем пользователю что уже есть запрос
-        if (friendshipFromCurrentUser.isPresent()) {
+        if (friendshipFromCurrentUser.isPresent() &&
+                friendshipFromCurrentUser.get().getStatusId().getCode().equals(FriendshipCode.FRIEND)) {
             throw new BadRequestException(String.format("Friendship between %s and %s has already been requested",
                     currentUser.getEmail(), personToMakeFriend.getEmail()));
+        } else if (friendshipFromCurrentUser.isPresent() &&
+                friendshipFromCurrentUser.get().getStatusId().getCode().equals(FriendshipCode.DECLINED)) {
+            log.info("Update friendship from {} to {} between {} and {}",
+                    friendshipFromCurrentUser.get().getStatusId(), FriendshipCode.REQUEST, currentUser.getEmail(), personToMakeFriend.getEmail());
+
+            friendshipFromCurrentUser.get().setStatusId(friendshipStatusService.getFriendshipStatus(FriendshipCode.FRIEND));
+            friendshipRepository.save(friendshipFromCurrentUser.get());
         }
         // никаких запросов от personToMakeFriend ранее не было - мы запрашиваем дружбу с ним
         else if (friendshipFromAnotherUser.isEmpty()) {
@@ -127,8 +135,13 @@ public class FriendshipService {
             // отклоняли запрос на дружбу, но теперь передумали и приняли запрос на дружбу
             friendshipFromAnotherUser.get().setStatusId(friendshipStatusService.getFriendshipStatus(FriendshipCode.FRIEND));
             friendshipRepository.save(friendshipFromAnotherUser.get());
-        }
-        else {
+        } else if (friendshipFromAnotherUser.get().getStatusId().getCode().equals(FriendshipCode.BLOCKED)) {
+            log.info("Update friendship from {} to {} between {} and {}",
+                    friendshipFromAnotherUser.get().getStatusId(), FriendshipCode.REQUEST, currentUser.getEmail(), personToMakeFriend.getEmail());
+
+            friendshipFromAnotherUser.get().setStatusId(friendshipStatusService.getFriendshipStatus(FriendshipCode.FRIEND));
+            friendshipRepository.save(friendshipFromAnotherUser.get());
+        } else {
             throw new BadRequestException(String.format("Got error while making friendship between %s and %s",
                     currentUser.getEmail(), personToMakeFriend.getEmail()));
         }
@@ -169,19 +182,25 @@ public class FriendshipService {
                     currentUser.getEmail(), personToDelete.getEmail());
 
             friendshipRepository.delete(friendshipFromCurrentUser.get().getId());
-        } else if ((friendshipFromCurrentUser.isPresent() &&
-                friendshipFromCurrentUser.get().getStatusId().getCode().equals(FriendshipCode.FRIEND))
-                || (friendshipFromAnotherUser.isPresent() &&
-                friendshipFromAnotherUser.get().getStatusId().getCode().equals(FriendshipCode.FRIEND))) {
-            // если текущий стутас FRIEND и не важно кто был инициатором, блокируем друга
+        } else if (friendshipFromCurrentUser.isPresent() &&
+                friendshipFromCurrentUser.get().getStatusId().getCode().equals(FriendshipCode.FRIEND)) {
+            // если текущий стутас FRIEND и не текущий пользователь был инициатором, блокируем друга
             log.info("User {} blocks user {}", currentUser.getEmail(), personToDelete.getEmail());
 
             FriendshipStatus friendship = friendshipStatusService.getFriendshipStatus(FriendshipCode.BLOCKED);
             friendshipFromCurrentUser.get().setStatusId(friendship);
             friendshipRepository.save(friendshipFromCurrentUser.get());
         } else if (friendshipFromAnotherUser.isPresent() &&
+                friendshipFromAnotherUser.get().getStatusId().getCode().equals(FriendshipCode.FRIEND)) {
+            // если текущий стутас FRIEND и другой пользователь был инициатором, блокируем друга
+            log.info("User {} blocks user {}", currentUser.getEmail(), personToDelete.getEmail());
+
+            FriendshipStatus friendship = friendshipStatusService.getFriendshipStatus(FriendshipCode.BLOCKED);
+            friendshipFromAnotherUser.get().setStatusId(friendship);
+            friendshipRepository.save(friendshipFromAnotherUser.get());
+        } else if (friendshipFromAnotherUser.isPresent() &&
                 friendshipFromAnotherUser.get().getStatusId().getCode().equals(FriendshipCode.REQUEST)) {
-            // отменяем запрос на дружбу
+            // другой пользователь запрашивал дружбу - отменяем запрос на дружбу
             log.info("User {} declines friendship request from {}", currentUser.getEmail(), personToDelete.getEmail());
             FriendshipStatus newFriendshipStatus = friendshipStatusService.getFriendshipStatus(FriendshipCode.DECLINED);
             friendshipFromAnotherUser.get().setStatusId(newFriendshipStatus);
