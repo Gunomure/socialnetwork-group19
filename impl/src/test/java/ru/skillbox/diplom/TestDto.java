@@ -1,11 +1,11 @@
 package ru.skillbox.diplom;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
 import ru.skillbox.diplom.mappers.PersonMapper;
 import ru.skillbox.diplom.model.Person;
@@ -16,7 +16,6 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 
 @Transactional
-@Profile("local")
 public class TestDto extends AbstractIntegrationTest {
     @Value("${embedded-postgresql.password}")
     private String password;
@@ -46,6 +45,7 @@ public class TestDto extends AbstractIntegrationTest {
     }
 
     @Test
+    @Disabled
     void testDatabaseTest() throws Exception {
         System.out.println("!!!!" + password);
         loginAsUser();
