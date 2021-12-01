@@ -8,6 +8,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import ru.yandex.qatools.embed.postgresql.EmbeddedPostgres;
 import ru.yandex.qatools.embed.postgresql.PostgresExecutable;
 import ru.yandex.qatools.embed.postgresql.PostgresProcess;
 import ru.yandex.qatools.embed.postgresql.PostgresStarter;
@@ -17,6 +18,7 @@ import ru.yandex.qatools.embed.postgresql.distribution.Version;
 
 import javax.sql.DataSource;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -26,6 +28,7 @@ import java.util.List;
 import static de.flapdoodle.embed.process.runtime.Network.getFreeServerPort;
 import static java.lang.String.format;
 import static java.net.InetAddress.getLocalHost;
+import static ru.yandex.qatools.embed.postgresql.EmbeddedPostgres.cachedRuntimeConfig;
 
 /**
  * Only for local run and tests
@@ -45,7 +48,7 @@ public class DbConfig {
     private String password;
 
     private static final List<String> DEFAULT_ADDITIONAL_INIT_DB_PARAMS = Arrays
-            .asList("--nosync", "--locale=en_US.UTF-8");
+            .asList("--nosync");
 
     @Bean
     @DependsOn("postgresProcess")
@@ -71,7 +74,7 @@ public class DbConfig {
     public PostgresConfig postgresConfig() throws IOException {
 
         final PostgresConfig postgresConfig = new PostgresConfig(Version.V9_6_11,
-                new AbstractPostgresConfig.Net(getLocalHost().getHostAddress(), getFreeServerPort()),
+                new AbstractPostgresConfig.Net("localhost", getFreeServerPort()), //getLocalHost().getHostAddress()
                 new AbstractPostgresConfig.Storage(database),
                 new AbstractPostgresConfig.Timeout(),
                 new AbstractPostgresConfig.Credentials(user, password)

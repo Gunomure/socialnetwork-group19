@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,14 +21,14 @@ import ru.skillbox.diplom.model.request.LoginRequest;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(classes = Application.class)
+@SpringBootTest
 @ContextConfiguration(classes = {
         DbConfig.class
 })
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @EnableAutoConfiguration
 @ExtendWith(SpringExtension.class)
-@Profile("local")
+@ActiveProfiles("local")
 public abstract class AbstractIntegrationTest {
     /**
      * Web application context.
@@ -65,9 +65,9 @@ public abstract class AbstractIntegrationTest {
         String loginJson = mapper.writeValueAsString(loginData);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(loginJson)
-                ).andDo(print())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(loginJson)
+        ).andDo(print())
                 .andExpect(status().isOk());
     }
 
@@ -78,16 +78,16 @@ public abstract class AbstractIntegrationTest {
         String loginJson = mapper.writeValueAsString(loginData);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(loginJson)
-                ).andDo(print())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(loginJson)
+        ).andDo(print())
                 .andExpect(status().isOk());
     }
 
     void logout() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/logout")
-                        .contentType(MediaType.APPLICATION_JSON)
-                ).andDo(print())
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andDo(print())
                 .andExpect(status().isOk());
     }
 }
