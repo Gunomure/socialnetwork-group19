@@ -6,45 +6,45 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
     <changeSet id="insert_posts" author="eduard">
         <insert tableName="posts">
-            <column name="time">2010-11-09 10:52:47.719000 +00:00</column>
-            <column name="title">some title</column>
+            <column name="time">2018-11-09 10:52:47.719000 +00:00</column>
+            <column name="title">Основные концепции ООП</column>
             <column name="author_id">1</column>
-            <column name="post_text">some text some text some text some text some text some text </column>
+            <column name="post_text">Объектно-ориентированное программирование или ООП — это стиль программирования, связанный с такими понятиями, как: Наследование: это процесс, при котором один класс приобретает свойства другого. Инкапсуляция: это механизм объединения данных и кода в единое целое. Абстракция: это методология сокрытия деталей реализации от пользователя и предоставления им функциональности. Полиморфизм: способность переменной, функции или объекта принимать несколько форм.</column>
             <column name="is_blocked">false</column>
         </insert>
         <insert tableName="posts">
-            <column name="time">2011-11-09 10:52:47.719000 +00:00</column>
-            <column name="title">another title</column>
+            <column name="time">2019-11-09 10:52:47.719000 +00:00</column>
+            <column name="title">Какие существуют типы наследования в Java?</column>
             <column name="author_id">2</column>
-            <column name="post_text">some text some text some text some text some text some text </column>
+            <column name="post_text">Java поддерживает четыре типа наследования: Одиночное наследование: приодиночном наследовании один класс наследует свойства другого, то есть будет только один родительский и один дочерний класс. Многоуровневое наследование:когда класс является производным от класса, который также является производным от другого класса, то есть класса, имеющего более одного родительского класса, но на разных уровнях, такой тип наследования называется многоуровневым наследованием. Иерархическое наследование:когда класс имеет несколько дочерних классов (подклассов) или, другими словами, несколько дочерних классов имеют один и тот же родительский класс, тогда такой вид наследования называется иерархическим. Гибридное наследование.Гибридное наследование — это комбинация двух или более типов наследования.</column>
             <column name="is_blocked">false</column>
         </insert>
         <insert tableName="posts">
-            <column name="time">2012-11-09 10:52:47.719000 +00:00</column>
-            <column name="title">Docker</column>
+            <column name="time">2018-11-09 10:52:47.719000 +00:00</column>
+            <column name="title">What is Docker?</column>
             <column name="author_id">3</column>
-            <column name="post_text">Docker is docker</column>
+            <column name="post_text">Программное обеспечение для автоматизации развёртывания и управления приложениями в средах с поддержкой контейнеризации, контейнеризатор приложений. Позволяет «упаковать» приложение со всем его окружением и зависимостями в контейнер, который может быть развёрнут на любой Linux-системе с поддержкой cgroups в ядре, а также предоставляет набор команд для управления этими контейнерами. Изначально использовал возможности LXC, с 2015 года начал использовать собственную библиотеку, абстрагирующую виртуализационные возможности ядра Linux — libcontainer. С появлением Open Container Initiative начался переход от монолитной к модульной архитектуре.</column>
             <column name="is_blocked">false</column>
         </insert>
         <insert tableName="posts">
-            <column name="time">2010-11-09 11:52:47.719000 +00:00</column>
-            <column name="title">Git</column>
-            <column name="author_id">1</column>
-            <column name="post_text">Git - system of versions control</column>
+            <column name="time">2017-11-09 11:52:47.719000 +00:00</column>
+            <column name="title">Git commit</column>
+            <column name="author_id">2</column>
+            <column name="post_text">Коммиты — базовое понятие во всех системах контроля версий, поэтому совершатся он должен легко и по возможности быстро. В самом своем простом виде достаточно после индексации набрать: git commit Если индекс не пустой, то на его основе будет совершен коммит, после чего пользователя попросят прокомментировать вносимые изменения вызовом команды edit(например, в Ubuntu обычно вызывается простенький текстовый редактор nano, у меня же — emacs). Сохраняемся, и вуала! Коммит готов. Есть несколько ключей, упрощающих работу с git commit: git commit -a — совершит коммит, автоматически индексируя изменения в файлах проекта. Новые файлы при этом индексироваться не будут! Удаление же файлов будет учтено. git commit -m «commit comment» — комментируем коммит прямо из командной строки вместо текстового редактора. git commit FILENAME — внесет в индекс и создаст коммит на основе изменений единственного файла.</column>
             <column name="is_blocked">false</column>
         </insert>
         <insert tableName="posts">
             <column name="time">2013-11-09 10:52:47.719000 +00:00</column>
             <column name="title">What is Java?</column>
             <column name="author_id">2</column>
-            <column name="post_text">Java isn't JavaScript</column>
+            <column name="post_text">Java is a programming language and computing platform first released by Sun Microsystems in 1995. It has evolved from humble beginnings to power a large share of today’s digital world, by providing the reliable platform upon which many services and applications are built. New, innovative products and digital services designed for the future continue to rely on Java, as well.</column>
             <column name="is_blocked">false</column>
         </insert>
         <insert tableName="posts">
             <column name="time">2014-11-09 10:52:47.719000 +00:00</column>
             <column name="title">What is Java? Part 2</column>
             <column name="author_id">2</column>
-            <column name="post_text">Java is object oriented programming language </column>
+            <column name="post_text">Java is a widely used object-oriented programming language and software platform that runs on billions of devices, including notebook computers, mobile devices, gaming consoles, medical devices and many others. The rules and syntax of Java are based on the C and C++ languages.</column>
             <column name="is_blocked">false</column>
         </insert>
         <insert tableName="posts">
@@ -60,6 +60,34 @@
             <column name="author_id">3</column>
             <column name="post_text">this post shouldn't be included in response</column>
             <column name="is_blocked">true</column>
+        </insert>
+        <insert tableName="posts">
+            <column name="time">2020-11-09 10:53:47.719000 +00:00</column>
+            <column name="title">Что такое конструкторы?</column>
+            <column name="author_id">4</column>
+            <column name="post_text">Относится к блоку кода, который используется для инициализации объекта. Он должен иметь то же имя, что и класс. Кроме того, он не имеет возвращаемого типа и автоматически вызывается при создании объекта. Есть два типа конструкторов: Конструктор по умолчанию: тот, который не принимает никаких входных данных. Другими словами, конструкторы по умолчанию — это конструкторы без аргументов, которые будут созданы по умолчанию, если пользователь не определил другой конструктор. Его основная цель — инициализировать переменные экземпляра значениями по умолчанию. Кроме того, он в основном используется для создания объектов. Параметризованный конструктор: конструктор, способный инициализировать переменные экземпляра с предоставленными значениями. Другими словами, конструкторы, принимающие аргументы, называются параметризованными конструкторами. </column>
+            <column name="is_blocked">false</column>
+        </insert>
+        <insert tableName="posts">
+            <column name="time">2021-11-09 10:53:47.719000 +00:00</column>
+            <column name="title">Разница между git pull и git fetch</column>
+            <column name="author_id">3</column>
+            <column name="post_text">Разберёмся, чем отличаются команды git pull и git fetch. При использовании pull, git пытается сделать всё за вас. Он сливает любые внесённые коммиты в ветку, в которой вы сейчас работаете. Команда pull автоматически сливает коммиты, не давая вам сначала просмотреть их. Если вы не пристально следите за ветками, выполнение этой команды может привести к частым конфликтам. При использовании fetch, git собирает все коммиты из целевой ветки, которых нет в текущей ветке, и сохраняет их в локальном репозитории. Однако он не сливает их в текущую ветку. Это особенно полезно, если вам нужно постоянно обновлять свой репозиторий, но вы работаете над функциональностью, неправильная реализация которой может негативно сказаться на проекте в целом. Чтобы слить коммиты в основную ветвь, нужно использовать merge. Грубо говоря, по дефолту git pull — это шоткод для последовательности двух команд: git fetch (получение изменений с сервера) и git merge (сливание в локальную копию).</column>
+            <column name="is_blocked">false</column>
+        </insert>
+        <insert tableName="posts">
+            <column name="time">2016-08-09 10:53:47.719000 +00:00</column>
+            <column name="title">Что означает пространство имен?</column>
+            <column name="author_id">5</column>
+            <column name="post_text">Пространство имен представляет собой систему имен, которая используется для обеспечения уникальности наименования всех объектов в программе, чтобы избежать возможных конфликтов. В Python эти пространства имен реализованы как словари с именем в качестве ключа и объектом в качестве значения. В результате разные пространства могут давать своим объектам одинаковые имена. Ниже приведены три типа пространств имен в Python: Локальное пространство имен — включает локальные имена внутри функции. Локальное пространство имен временно создается во время вызова функции и очищается при возврате из нее. Глобальное пространство имен — состоит из имен различных импортированных пакетов/модулей, которые в настоящее время используются в проекте. Глобальное пространство имен создается при импорте пакета в скрипт, и оно доступно до тех пор, пока скрипт не закончит выполнение. Встроенное пространство имен — оно включает встроенные функции Python и встроенные имена для различных типов исключений.</column>
+            <column name="is_blocked">false</column>
+        </insert>
+        <insert tableName="posts">
+            <column name="time">2020-11-09 10:53:47.719000 +00:00</column>
+            <column name="title">Основные концепции ООП</column>
+            <column name="author_id">6</column>
+            <column name="post_text">Объектно-ориентированное программирование или ООП — это стиль программирования, связанный с такими понятиями, как: Наследование: это процесс, при котором один класс приобретает свойства другого. Инкапсуляция: это механизм объединения данных и кода в единое целое. Абстракция: это методология сокрытия деталей реализации от пользователя и предоставления им функциональности. Полиморфизм: способность переменной, функции или объекта принимать несколько форм.</column>
+            <column name="is_blocked">false</column>
         </insert>
     </changeSet>
 </databaseChangeLog>

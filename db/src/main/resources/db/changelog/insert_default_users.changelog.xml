@@ -104,7 +104,17 @@
             <column name="is_approved" value="true"/>
             <column name="message_permission" value="FRIEND"/>
             <column name="is_blocked" value="false"/>
-
+        </insert>
+        <insert tableName="persons">
+            <column name="id" valueNumeric="6"/>
+            <column name="phone" value="+7(999)777-77-77"/>
+            <column name="description" value="Hi, im test user number 6!"/>
+            <column name="city_id" value="1"/>
+            <column name="confirmation_code" value="3655"/>
+            <column name="registration_date" value="2021-10-28 11:31:04.812073 +00:00"/>
+            <column name="is_approved" value="true"/>
+            <column name="message_permission" value="FRIEND"/>
+            <column name="is_blocked" value="false"/>
         </insert>
     </changeSet>
 </databaseChangeLog>
