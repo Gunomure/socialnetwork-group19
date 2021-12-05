@@ -4,12 +4,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.exception.EntityNotFoundException;
 import ru.skillbox.diplom.mappers.*;
 import ru.skillbox.diplom.model.*;
+import ru.skillbox.diplom.model.enums.FriendshipCode;
 import ru.skillbox.diplom.model.request.LikeBodyRequest;
 import ru.skillbox.diplom.model.request.postRequest.CommentBodyRequest;
 import ru.skillbox.diplom.model.request.postRequest.PostBodyRequest;
@@ -24,6 +26,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static ru.skillbox.diplom.util.TimeUtil.getCurrentTimestampUtc;
 
@@ -49,25 +52,42 @@ public class PostService {
     private final ReportCommentRepository reportCommentRepository;
     private final PostLikeRepository postLikeRepository;
     private final CommentLikeRepository commentLikeRepository;
+    private final FriendshipRepository friendshipRepository;
 
-    public PostService(PersonRepository personRepository, PostRepository postRepository, PostCommentRepository commentRepository, ReportCommentRepository reportCommentRepository, PostLikeRepository postLikeRepository, CommentLikeRepository commentLikeRepository) {
+    public PostService(PersonRepository personRepository,
+                       PostRepository postRepository,
+                       PostCommentRepository commentRepository,
+                       ReportCommentRepository reportCommentRepository,
+                       PostLikeRepository postLikeRepository,
+                       CommentLikeRepository commentLikeRepository,
+                       FriendshipRepository friendshipRepository) {
         this.personRepository = personRepository;
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
         this.reportCommentRepository = reportCommentRepository;
         this.postLikeRepository = postLikeRepository;
         this.commentLikeRepository = commentLikeRepository;
+        this.friendshipRepository = friendshipRepository;
     }
 
     public FeedsResponse<List<PostDto>> getFeeds(String name, Integer offset, Integer itemPerPage){
         LOGGER.debug("getFeeds: text = {}, offset = {}, itemPerPage = {}", name, offset, itemPerPage);
+        SpecificationUtil<Friendship> personSpec = new SpecificationUtil<>();
+        List<Person> subscriptions = friendshipRepository.findAll(
+                        Specification.
+                                where(personSpec.equals("srcPerson.email", getAuthenticatedUser().getEmail())
+                                        .and(personSpec.equals("statusId.code", FriendshipCode.FRIEND)
+                                                .or(personSpec.equals("statusId.code", FriendshipCode.SUBSCRIBED)))),
+                        PageRequest.of(offset, itemPerPage))
+                .getContent().stream().map(Friendship::getDstPerson).collect(Collectors.toList());;
         SpecificationUtil<Post> spec = new SpecificationUtil<>();
         List<Post> feeds = postRepository.findAll(
                         Specification.
                                 where(spec.contains("title", name).or(spec.contains("postText", name))).
+                                and(spec.belongsToCollection("authorId", subscriptions)).
                                 and(spec.equals("isBlocked", false)).
                                 and(spec.between("time", null, ZonedDateTime.now())),
-                        PageRequest.of(offset, itemPerPage))
+                        PageRequest.of(offset, itemPerPage, Sort.by("time").descending()))
                 .getContent();
         FeedsResponse<List<PostDto>> response = feedsResponseMapper.convertToFeedsResponse(offset,itemPerPage);
         feedsResponseMapper.updateToFeedsResponse(feeds,response);

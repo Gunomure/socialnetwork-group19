@@ -8,6 +8,41 @@
         <insert tableName="friendship">
             <column name="status_id">1</column>
             <column name="src_person_id">1</column>
+            <column name="dst_person_id">4</column>
+        </insert>
+        <insert tableName="friendship">
+            <column name="status_id">2</column>
+            <column name="src_person_id">1</column>
+            <column name="dst_person_id">2</column>
+        </insert>
+        <insert tableName="friendship">
+            <column name="status_id">2</column>
+            <column name="src_person_id">2</column>
+            <column name="dst_person_id">1</column>
+        </insert>
+        <insert tableName="friendship">
+            <column name="status_id">5</column>
+            <column name="src_person_id">1</column>
+            <column name="dst_person_id">3</column>
+        </insert>
+        <insert tableName="friendship">
+            <column name="status_id">3</column>
+            <column name="src_person_id">1</column>
+            <column name="dst_person_id">5</column>
+        </insert>
+        <insert tableName="friendship">
+            <column name="status_id">4</column>
+            <column name="src_person_id">1</column>
+            <column name="dst_person_id">6</column>
+        </insert>
+        <insert tableName="friendship">
+            <column name="status_id">1</column>
+            <column name="src_person_id">3</column>
+            <column name="dst_person_id">1</column>
+        </insert>
+        <insert tableName="friendship">
+            <column name="status_id">2</column>
+            <column name="src_person_id">3</column>
             <column name="dst_person_id">2</column>
         </insert>
         <insert tableName="friendship">
@@ -16,9 +51,9 @@
             <column name="dst_person_id">3</column>
         </insert>
         <insert tableName="friendship">
-            <column name="status_id">3</column>
-            <column name="src_person_id">1</column>
-            <column name="dst_person_id">3</column>
+            <column name="status_id">5</column>
+            <column name="src_person_id">4</column>
+            <column name="dst_person_id">1</column>
         </insert>
     </changeSet>
 </databaseChangeLog>
