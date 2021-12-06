@@ -51,5 +51,5 @@ values:
     expiration: 120
     refreshExpirationDateInMs: 9000000
   socketio:
-    host: localhost
+    host: 0.0.0.0
     port: 9092
