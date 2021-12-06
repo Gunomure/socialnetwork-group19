@@ -91,8 +91,10 @@ public class PostService {
                 .getContent();
         FeedsResponse<List<PostDto>> response = feedsResponseMapper.convertToFeedsResponse(offset,itemPerPage);
         feedsResponseMapper.updateToFeedsResponse(feeds,response);
-        checkResponsePostLike(feeds, response.getData());
-        createPostCommentDTOs(response.getData());
+        if (!feeds.isEmpty()) {
+            checkResponsePostLike(feeds, response.getData());
+            createPostCommentDTOs(response.getData());
+        }
         return response;
     }
 
