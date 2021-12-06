@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -36,4 +37,6 @@ public class Post extends BaseEntity{
     @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL)
     private List<PostFile> files;
 
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL)
+    private List<PostToTag> postToTags = new ArrayList<>();
 }

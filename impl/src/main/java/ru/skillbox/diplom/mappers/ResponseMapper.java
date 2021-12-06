@@ -27,6 +27,7 @@ public abstract class ResponseMapper {
     @Mapping(target = "time", qualifiedByName = "convertDateToLong")
     @Mapping(target = "author", source = "authorId")
     @Mapping(target = "comments", ignore = true)
+    @Mapping(target = "tags", source = "postToTags")
     public abstract PostDto convertToDto(Post post);
 
     @Mapping(target = "birthDate", qualifiedByName = "convertDateToLong")
@@ -44,6 +45,12 @@ public abstract class ResponseMapper {
     @Mapping(target = "comments", ignore = true)
     @Mapping(target = "likes", ignore = true)
     public abstract PostCommentDto convertToDtoPostComment(PostComment postComment);
+
+    @Mapping(target = "tag", source = "postToTag.tagId.tag")
+    @Mapping(target = "id", source = "postToTag.tagId.id")
+    public abstract TagDto convertToTagDto(PostToTag postToTag);
+
+    public abstract List<TagDto> convertToTagDtoList(List<PostToTag> postToTags);
 
     public void updateToFeedsResponse(List<Post> list, FeedsResponse<List<PostDto>> response) {
         response.setTotal(list.size());

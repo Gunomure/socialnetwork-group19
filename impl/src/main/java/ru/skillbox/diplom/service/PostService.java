@@ -27,6 +27,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static ru.skillbox.diplom.util.TimeUtil.getCurrentTimestampUtc;
@@ -55,6 +56,8 @@ public class PostService {
     private final PostLikeRepository postLikeRepository;
     private final CommentLikeRepository commentLikeRepository;
     private final FriendshipRepository friendshipRepository;
+    private final TagRepository tagRepository;
+    private final PostToTagRepository postToTagRepository;
 
     public PostService(PersonRepository personRepository,
                        PostRepository postRepository,
@@ -62,7 +65,9 @@ public class PostService {
                        ReportCommentRepository reportCommentRepository,
                        PostLikeRepository postLikeRepository,
                        CommentLikeRepository commentLikeRepository,
-                       FriendshipRepository friendshipRepository) {
+                       FriendshipRepository friendshipRepository,
+                       TagRepository tagRepository,
+                       PostToTagRepository postToTagRepository) {
         this.personRepository = personRepository;
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
@@ -70,6 +75,8 @@ public class PostService {
         this.postLikeRepository = postLikeRepository;
         this.commentLikeRepository = commentLikeRepository;
         this.friendshipRepository = friendshipRepository;
+        this.tagRepository = tagRepository;
+        this.postToTagRepository = postToTagRepository;
     }
 
     public FeedsResponse<List<PostDto>> getFeeds(String name, Integer offset, Integer itemPerPage){
@@ -81,7 +88,7 @@ public class PostService {
                                         .and(personSpec.equals("statusId.code", FriendshipCode.FRIEND)
                                                 .or(personSpec.equals("statusId.code", FriendshipCode.SUBSCRIBED)))),
                         PageRequest.of(offset, itemPerPage))
-                .getContent().stream().map(Friendship::getDstPerson).collect(Collectors.toList());;
+                .getContent().stream().map(Friendship::getDstPerson).collect(Collectors.toList());
         SpecificationUtil<Post> spec = new SpecificationUtil<>();
         List<Post> feeds = postRepository.findAll(
                         Specification.
@@ -156,16 +163,27 @@ public class PostService {
         LOGGER.info("start createPost id = {}, body = {}", id, body.toString());
         Person person = personRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException(String.format("User %s not found", id)));
-
         Post post = new Post();
         post.setAuthorId(person);
         post.setTitle(body.getTitle());
         post.setPostText(body.getPostText().replaceAll("<[^>]*>",""));
         post.setIsBlocked(false);
         post.setTime(publishDate != null ? TimeUtil.getZonedDateTimeFromMillis(publishDate) : ZonedDateTime.now());
-        Post savedPost = postRepository.save(post);
-
-        CommonResponse<PostDto> response = postMapper.convertToCommonResponse(savedPost);
+        SpecificationUtil<Tag> spec = new SpecificationUtil<>();
+        postRepository.save(post);
+        for (String tagName: body.getTags()){
+            Optional<Tag> tagOptional = tagRepository.findOne(Specification.where(spec.contains("tag", tagName)));
+            if (tagOptional.isEmpty()){
+                Tag tag = new Tag(tagName);
+                tagRepository.save(tag);
+                PostToTag postToTag = new PostToTag();
+                postToTag.setPostId(post);
+                postToTag.setTagId(tag);
+                post.getPostToTags().add(postToTag);
+                postToTagRepository.save(postToTag);
+            }
+        }
+        CommonResponse<PostDto> response = postMapper.convertToCommonResponse(post);
         response.getData().setMyLike(checkLike(post, person));
         createPostCommentDTOs(Arrays.asList(response.getData()));
         return response;
@@ -367,6 +385,7 @@ public class PostService {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return personRepository.findByEmail(email).orElseThrow(
                 () -> new EntityNotFoundException(String.format("User %s not found", email)));
+//        return personRepository.findByEmail("javaprogroup19@gmail.com").get();
     }
 
     private void createPostCommentDTOs(List<PostDto> posts){
