@@ -125,6 +125,7 @@ package_dev:
     policy: pull
     paths:
       - ./impl/target
+      - ./domain/target
       - ./.m2
 
 build_and_push_image_dev:
