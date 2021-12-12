@@ -6,6 +6,7 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -107,26 +108,34 @@ public class PostService {
         return response;
     }
 
-    public CommonResponse<?> getPosts(String text, Long dateFrom, Long dateTo, String author) {
+    public CommonResponse<?> getPosts(String text, Long dateFrom, Long dateTo, String author, String tag, Integer offset, Integer itemPerPage) {
         LOGGER.debug("start getPosts: text = {}, dateFrom = {}, dateTo = {}, author = {}",
                 text, dateFrom, dateTo, author);
-        SpecificationUtil<Post> postSpec = new SpecificationUtil<>();
-        Specification<Post> s1 = postSpec.between("time",
+        SpecificationUtil<Post> spec = new SpecificationUtil<>();
+        Specification<Post> s1 = spec.between("time",
                 TimeUtil.getZonedDateTimeFromMillis(dateFrom),
                 TimeUtil.getZonedDateTimeFromMillis(dateTo));
-        Specification<Post> s2 = postSpec.contains("title", text);
-        Specification<Post> s3 = postSpec.contains("postText", text);
-        Specification<Post> s4 = postSpec.equals("isBlocked", false);
-        Specification<Post> s5 = postSpec.contains("authorId.firstName", author);
-        Specification<Post> s6 = postSpec.contains("authorId.lastName", author);
+        Specification<Post> s2 = spec.contains("title", text);
+        Specification<Post> s3 = spec.contains("postText", text);
+        Specification<Post> s4 = spec.equals("isBlocked", false);
+        Specification<Post> s5 = spec.contains("authorId.firstName", author);
+        Specification<Post> s6 = spec.contains("authorId.lastName", author);
+        Specification<Post> s7 = spec.containsTag(tag);
 
         List<Post> postList = postRepository.findAll(
-                Specification.where(s1).and(s2.or(s3)).and(s4).and(s5.or(s6)));
-        CommonResponse<List<PostDto>> response = new CommonResponse<>();
-        response.setData(postMapper.convertToListPostDto(postList));
-        response.setTimestamp(ZonedDateTime.now().toEpochSecond());
-        checkResponsePostLike(postList, response.getData());
-        createPostCommentDTOs(response.getData());
+                Specification.
+                        where(s1).
+                        and(s2.or(s3)).
+                        and(s7).
+                        and(s4).
+                        and(s5.or(s6)),
+                PageRequest.of(offset, itemPerPage, Sort.by("time").descending())).getContent();
+        FeedsResponse<List<PostDto>> response = feedsResponseMapper.convertToFeedsResponse(offset,itemPerPage);
+        feedsResponseMapper.updateToFeedsResponse(postList,response);
+        if (!postList.isEmpty()) {
+            checkResponsePostLike(postList, response.getData());
+            createPostCommentDTOs(response.getData());
+        }
         return response;
     }
 

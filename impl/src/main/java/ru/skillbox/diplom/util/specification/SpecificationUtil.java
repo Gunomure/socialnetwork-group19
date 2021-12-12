@@ -2,11 +2,12 @@ package ru.skillbox.diplom.util.specification;
 
 import org.springframework.data.jpa.domain.Specification;
 import ru.skillbox.diplom.model.BaseEntity;
+import ru.skillbox.diplom.model.PostToTag;
+import ru.skillbox.diplom.model.Tag;
 import ru.skillbox.diplom.model.enums.FriendshipCode;
 
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -46,6 +47,15 @@ public class SpecificationUtil<T> {
 
     public Specification<T> belongsToCollection(String key, Collection<? extends BaseEntity> collection){
         return (root, query, criteriaBuilder) -> criteriaBuilder.in(root.get(key)).value(collection);
+    }
+
+    public Specification<T> containsTag(String value){
+        return (root, query, builder) -> {
+            if (value == null) return builder.conjunction();
+            Join<T, PostToTag> join = root.join("postToTags");
+            Join<PostToTag, Tag> secondJoin = join.join("tagId");
+            return builder.equal(secondJoin.get("tag"), value);
+        };
     }
 
     public Specification<T> notIn(String key, List<Long> value) {

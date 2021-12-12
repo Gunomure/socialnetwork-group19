@@ -1,6 +1,7 @@
 package ru.skillbox.diplom.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.model.request.postRequest.CommentBodyRequest;
 import ru.skillbox.diplom.model.request.postRequest.PostBodyRequest;
@@ -12,9 +13,13 @@ public interface PostController {
 
     @GetMapping
     ResponseEntity<?> getPosts(@RequestParam(name = "text", required = false) String text,
-                           @RequestParam(name = "date_from", required = false) Long dateFrom,
-                           @RequestParam(name = "date_to", required = false) Long dateTo,
-                           @RequestParam(name = "autor", required = false) String author);
+                               @RequestParam(name = "date_from", required = false) Long dateFrom,
+                               @RequestParam(name = "date_to", required = false) Long dateTo,
+                               @RequestParam(name = "autor", required = false) String author,
+                               @RequestParam(name = "tag", required = false) String tag,
+                               @RequestParam (defaultValue = "0", required = false) Integer offset,
+                               @RequestParam (defaultValue = "10", required = false) Integer itemPerPage);
+
     @GetMapping(value = "/{id}")
     ResponseEntity<?> getPostById(@PathVariable Long id);
 
