@@ -26,6 +26,7 @@ build:
   cache:
     paths:
       - ./impl/target
+      - ./domain/target
       - ./.m2
 
 # makes the stage hidden
@@ -59,6 +60,7 @@ package:
 #    policy: pull
     paths:
       - ./impl/target
+      - ./domain/target
       - ./.m2
 
 build_and_push_image:
