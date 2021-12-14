@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.skillbox.diplom.exception.EntityNotFoundException;
 import ru.skillbox.diplom.mappers.*;
 import ru.skillbox.diplom.model.*;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 import static ru.skillbox.diplom.util.TimeUtil.getCurrentTimestampUtc;
 
 @Service
+@Transactional
 public class PostService {
 
     private final static Logger LOGGER = LogManager.getLogger(PostService.class);

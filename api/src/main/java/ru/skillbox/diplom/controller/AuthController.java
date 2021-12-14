@@ -13,7 +13,7 @@ import ru.skillbox.diplom.model.request.TokenRefreshRequest;
 public interface AuthController {
 
     @PostMapping("/login")
-    ResponseEntity<?> authenticate(@RequestBody LoginRequest request);
+    ResponseEntity<?> login(@RequestBody LoginRequest request);
 
     @PostMapping("/logout")
     ResponseEntity<?> logout();
