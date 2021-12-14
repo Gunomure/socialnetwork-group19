@@ -83,9 +83,10 @@ public class PostService {
     public FeedsResponse<List<PostDto>> getFeeds(String name, Integer offset, Integer itemPerPage){
         LOGGER.debug("getFeeds: text = {}, offset = {}, itemPerPage = {}", name, offset, itemPerPage);
         SpecificationUtil<Friendship> personSpec = new SpecificationUtil<>();
+        String email = getAuthenticatedUser().getEmail();
         List<Person> subscriptions = friendshipRepository.findAll(
                         Specification.
-                                where(personSpec.equals(Friendship_.SRC_PERSON, Person_.EMAIL, getAuthenticatedUser().getEmail())
+                                where(personSpec.equals(Friendship_.SRC_PERSON, Person_.EMAIL, email)
                                         .and(personSpec.equals(Friendship_.STATUS_ID, FriendshipStatus_.CODE, FriendshipCode.FRIEND)
                                                 .or(personSpec.equals(Friendship_.STATUS_ID, FriendshipStatus_.CODE, FriendshipCode.SUBSCRIBED)))),
                         PageRequest.of(offset, itemPerPage))
@@ -94,7 +95,8 @@ public class PostService {
         List<Post> feeds = postRepository.findAll(
                         Specification.
                                 where(spec.contains(Post_.TITLE, name).or(spec.contains(Post_.POST_TEXT, name))).
-                                and(spec.belongsToCollection(Post_.AUTHOR_ID, subscriptions)).
+                                and(spec.belongsToCollection(Post_.AUTHOR_ID, subscriptions).
+                                                or(spec.equals(Post_.AUTHOR_ID, Person_.EMAIL, email))).
                                 and(spec.equals(Post_.IS_BLOCKED, false)).
                                 and(spec.between(Post_.TIME, null, ZonedDateTime.now())),
                         PageRequest.of(offset, itemPerPage, Sort.by("time").descending()))

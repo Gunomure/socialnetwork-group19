@@ -1,9 +1,7 @@
 package ru.skillbox.diplom.util.specification;
 
 import org.springframework.data.jpa.domain.Specification;
-import ru.skillbox.diplom.model.BaseEntity;
-import ru.skillbox.diplom.model.PostToTag;
-import ru.skillbox.diplom.model.Tag;
+import ru.skillbox.diplom.model.*;
 import ru.skillbox.diplom.model.enums.FriendshipCode;
 
 import javax.persistence.criteria.*;

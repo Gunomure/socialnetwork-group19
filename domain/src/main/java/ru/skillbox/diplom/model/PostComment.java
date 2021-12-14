@@ -2,6 +2,7 @@ package ru.skillbox.diplom.model;
 
 import com.sun.istack.NotNull;
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
@@ -34,6 +35,7 @@ public class PostComment extends BaseEntity {
     @Column(name = "is_blocked")
     private Boolean isBlocked;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "commentId", cascade = CascadeType.ALL)
     private List<CommentLike> likes;
 
