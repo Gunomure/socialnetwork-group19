@@ -9,10 +9,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.exception.BadRequestException;
 import ru.skillbox.diplom.exception.EntityNotFoundException;
-import ru.skillbox.diplom.model.request.PasswordSetRequest;
 import ru.skillbox.diplom.model.Person;
 import ru.skillbox.diplom.model.enums.MessagePermission;
 import ru.skillbox.diplom.model.enums.UserType;
+import ru.skillbox.diplom.model.request.PasswordSetRequest;
 import ru.skillbox.diplom.model.request.RegisterRequest;
 import ru.skillbox.diplom.repository.PersonRepository;
 import ru.skillbox.diplom.util.TimeUtil;
@@ -34,22 +34,19 @@ public class AccountService {
     @Value("${group19.websiteHost}")
     private String WEBSITE_HOST;
 
-    private JavaMailSender emailSender;
-    private PersonRepository personRepository;
-    private PasswordEncoder passwordEncoder;
-    private  final LdapService ldapService;
+    private final JavaMailSender emailSender;
+    private final PersonRepository personRepository;
+    private final PasswordEncoder passwordEncoder;
 
     private static final String FROM = "noreply@javaprogroup19.com";
     private static final String EMAIL_MESSAGE_SUBJECT = "Restore password";
     private final static String EMAIL_MESSAGE_TEMPLATE = "<a href=\"http://%s:%d/%s?token=%s\">Click to restore your password</a>";
 
     public AccountService(JavaMailSender emailSender, PersonRepository personRepository,
-                          PasswordEncoder passwordEncoder,
-                          LdapService ldapService) {
+                          PasswordEncoder passwordEncoder) {
         this.emailSender = emailSender;
         this.personRepository = personRepository;
         this.passwordEncoder = passwordEncoder;
-        this.ldapService = ldapService;
     }
 
     public void sendPasswordRecoveryEmail(String receiverEmail) {
@@ -106,7 +103,6 @@ public class AccountService {
             user.setLastOnlineTime(ZonedDateTime.now());
             user.setBirthDate(TimeUtil.now().minusYears(30)); //TODO repair it!
             personRepository.save(user);
-            ldapService.addUser(user.getEmail(), registerRequest.getPasswd1());
         } else {
             throw new BadRequestException(String.format("User with email %s already exists",
                     registerRequest.getEmail()));

@@ -27,7 +27,6 @@ import ru.skillbox.diplom.repository.PersonRepository;
 import ru.skillbox.diplom.util.TimeUtil;
 
 import javax.naming.NamingException;
-
 import javax.servlet.http.HttpServletRequest;
 
 @Service
@@ -39,51 +38,46 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
-    private final LdapService ldapService;
     private final PasswordEncoder passwordEncoder;
+
 
     public AuthService(PersonRepository personRepository,
                        AuthenticationManager authenticationManager,
                        JwtTokenProvider jwtTokenProvider,
-                       RefreshTokenService refreshTokenService, LdapService ldapService, PasswordEncoder passwordEncoder) {
+                       RefreshTokenService refreshTokenService, PasswordEncoder passwordEncoder) {
         this.personRepository = personRepository;
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.refreshTokenService = refreshTokenService;
-        this.ldapService = ldapService;
         this.passwordEncoder = passwordEncoder;
     }
 
     public CommonResponse<PersonDto> login(LoginRequest request) {
 
-        if (ldapService.authUser(request.getEmail(), request.getPassword())){
-            String email = request.getEmail();
-            String password = request.getPassword();
-            LOGGER.info("login data: email={}, password={}", email, password);
-            Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
-            SecurityContextHolder.getContext().setAuthentication(auth);
-            Person person = personRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User doesn't exists"));
-            String token = jwtTokenProvider.createToken(email, person.getType().name());
-            RefreshToken refreshToken = refreshTokenService.createRefreshToken(person.getId());
+        String email = request.getEmail();
+        String password = request.getPassword();
+        LOGGER.info("AuthService: Start login get data: email={}, password=ХренПокажем", email);
+        Person person = personRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User doesn't exists"));
+        checkUser(person.getPassword(), password);
+        Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        String token = jwtTokenProvider.createToken(email, person.getType().name());
+        String refreshToken = refreshTokenService.createRefreshToken(person.getId());
+        PersonDto personDTO = personMapper.toPersonDTO(person).setToken(token).setRefreshToken(refreshToken);
+        CommonResponse<PersonDto> response = new CommonResponse<>("",TimeUtil.getCurrentTimestampUtc(), personDTO);
+        LOGGER.info("AuthService: Finish successful login: email={}, token=ХренПокажем", email);
 
-            LOGGER.info("start login: email={}, token={}", email, token);
+        return response;
+    }
 
-            PersonDto personDTO = personMapper.toPersonDTO(person);
-            personDTO.setToken(token);
-            personDTO.setRefreshToken(refreshToken.getToken());
-            CommonResponse<PersonDto> response = new CommonResponse<>();
-            response.setData(personDTO);
-            response.setTimestamp(TimeUtil.getCurrentTimestampUtc());
-            LOGGER.info("finish getProfileData");
-
-            return response;
+    private void checkUser(String userPass, String password) {
+        LOGGER.info("AuthService: start checkUser()");
+        if(passwordEncoder.matches(password, userPass)){
+            LOGGER.info("AuthService: checkUser() successful check");
+        } else {
+            throw new UsernameNotFoundException("Password is incorrect");
         }
-        else {
-            CommonResponse<PersonDto> response = new CommonResponse<>();
-            response.setTimestamp(TimeUtil.getCurrentTimestampUtc());
-            response.setError("no successful login");
-            return response;
-        }
+
     }
 
     public CommonResponse<TokenRefreshResponse> refreshToken(@RequestBody TokenRefreshRequest request) {
@@ -106,14 +100,14 @@ public class AuthService {
                 .map(user -> {
                             String newJwtToken = jwtTokenProvider.generateTokenFromEmail(user.getEmail());
                             //refreshTokenService.deleteByUserId(user.getId());
-                            String newRefreshToken = refreshTokenService.createRefreshToken(user.getId()).getToken();
+                            String newRefreshToken = refreshTokenService.createRefreshToken(user.getId());
                             return new TokenRefreshResponse(newJwtToken, newRefreshToken);
                         }
                 ).orElseThrow(() -> new TokenRefreshException(refreshToken,
                         "Refresh token is not in database!"));
     }
 
-    public CommonResponse<MessageResponse> logout(){
+    public CommonResponse<MessageResponse> logout() {
         SecurityContextHolder.clearContext();
         CommonResponse<MessageResponse> response = new CommonResponse<>();
         response.setTimestamp(TimeUtil.getCurrentTimestampUtc());

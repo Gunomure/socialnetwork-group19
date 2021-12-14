@@ -5,15 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import ru.skillbox.diplom.config.security.jwt.JwtTokenProvider;
 import ru.skillbox.diplom.controller.AuthController;
-import ru.skillbox.diplom.exception.TokenRefreshException;
-import ru.skillbox.diplom.model.RefreshToken;
 import ru.skillbox.diplom.model.request.LoginRequest;
 import ru.skillbox.diplom.model.request.TokenRefreshRequest;
-import ru.skillbox.diplom.model.response.TokenRefreshResponse;
 import ru.skillbox.diplom.service.AuthService;
-import ru.skillbox.diplom.service.RefreshTokenService;
 
 @RestController
 @Slf4j
@@ -26,7 +21,7 @@ public class AuthControllerImpl implements AuthController {
     }
 
     @Override
-    public ResponseEntity<?> authenticate(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         log.info("controller authenticate: {}", request);
         return ResponseEntity.ok(authService.login(request));
     }

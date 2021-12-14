@@ -55,4 +55,14 @@ public class PersonDto {
     private String refreshToken;
 
     private List<PostDto> posts = new ArrayList<>();
+
+    public PersonDto setToken(String token) {
+        this.token = token;
+        return this;
+    }
+
+    public PersonDto setRefreshToken(String token){
+        this.refreshToken = token;
+        return this;
+    }
 }
