@@ -8,17 +8,16 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.skillbox.diplom.exception.BadRequestException;
 import ru.skillbox.diplom.exception.EntityNotFoundException;
 import ru.skillbox.diplom.mappers.PersonMapper;
-import ru.skillbox.diplom.model.CommonResponse;
-import ru.skillbox.diplom.model.Person;
-import ru.skillbox.diplom.model.PersonDto;
-import ru.skillbox.diplom.model.Post;
+import ru.skillbox.diplom.mappers.PostMapper;
+import ru.skillbox.diplom.model.*;
 import ru.skillbox.diplom.model.request.UpdateRequest;
-import ru.skillbox.diplom.model.request.postRequest.PostBodyRequest;
 import ru.skillbox.diplom.model.response.UsersSearchResponse;
 import ru.skillbox.diplom.repository.PersonRepository;
+import ru.skillbox.diplom.repository.PostRepository;
 import ru.skillbox.diplom.util.specification.SpecificationUtil;
 
 import java.time.ZoneId;
@@ -26,17 +25,21 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import static ru.skillbox.diplom.util.TimeUtil.getCurrentTimestampUtc;
-import static ru.skillbox.diplom.util.TimeUtil.getZonedDateTimeFromMillis;
 
 @Service
+@Transactional
 public class UsersService {
     private final static Logger LOGGER = LogManager.getLogger(UsersService.class);
 
     private final PersonRepository personRepository;
+    private final PostRepository postRepository;
     private final PersonMapper personMapper = Mappers.getMapper(PersonMapper.class);
+    private final PostMapper postMapper = Mappers.getMapper(PostMapper.class);
 
-    public UsersService(PersonRepository personRepository) {
+    public UsersService(PersonRepository personRepository,
+                        PostRepository postRepository) {
         this.personRepository = personRepository;
+        this.postRepository = postRepository;
     }
 
     public CommonResponse<PersonDto> getProfileData() {
@@ -47,6 +50,8 @@ public class UsersService {
         );
 
         PersonDto personDTO = personMapper.toPersonDTO(person);
+        List<PostDto> postDtos = postMapper.convertToListPostDto(postRepository.findByAuthorId(person));
+        personDTO.setPosts(postDtos);
         CommonResponse<PersonDto> response = new CommonResponse<>();
         response.setData(personDTO);
         response.setTimestamp(getCurrentTimestampUtc());
@@ -93,12 +98,12 @@ public class UsersService {
                 firstName, lastName, ageFrom, ageTo, country, city, offset, itemPerPage);
 
         SpecificationUtil<Person> spec = new SpecificationUtil<>();
-        Specification<Person> s1 = spec.contains("firstName", firstName);
-        Specification<Person> s2 = spec.contains("lastName", lastName);
-        Specification<Person> s3 = spec.between("birthDate", ZonedDateTime.now().minusYears(ageTo),
+        Specification<Person> s1 = spec.contains(Person_.FIRST_NAME, firstName);
+        Specification<Person> s2 = spec.contains(Person_.LAST_NAME, lastName);
+        Specification<Person> s3 = spec.between(Person_.BIRTH_DATE, ZonedDateTime.now().minusYears(ageTo),
                 ZonedDateTime.now().minusYears(ageFrom));
-        Specification<Person> s4 = spec.equals("country.title", country);
-        Specification<Person> s5 = spec.equals("city.title", city);
+        Specification<Person> s4 = spec.equals(Person_.COUNTRY, Country_.TITLE, country);
+        Specification<Person> s5 = spec.equals(Person_.CITY, City_.TITLE, city);
         PageRequest pageRequest = PageRequest.of(offset, itemPerPage, Sort.by("firstName").ascending());
 
         List<Person> personEntities = personRepository.findAll(Specification.where(s1)
@@ -128,7 +133,8 @@ public class UsersService {
                 () -> new BadRequestException("User not found")
         );
         PersonDto personDto = personMapper.toPersonDTO(personEntity);
-
+        List<PostDto> postDtos = postMapper.convertToListPostDto(postRepository.findByAuthorId(personEntity));
+        personDto.setPosts(postDtos);
         CommonResponse<PersonDto> response = new CommonResponse<>();
         response.setData(personDto);
         response.setTimestamp(getCurrentTimestampUtc());

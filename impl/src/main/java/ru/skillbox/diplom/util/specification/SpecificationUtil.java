@@ -1,12 +1,10 @@
 package ru.skillbox.diplom.util.specification;
 
 import org.springframework.data.jpa.domain.Specification;
-import ru.skillbox.diplom.model.BaseEntity;
+import ru.skillbox.diplom.model.*;
 import ru.skillbox.diplom.model.enums.FriendshipCode;
 
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -48,6 +46,15 @@ public class SpecificationUtil<T> {
         return (root, query, criteriaBuilder) -> criteriaBuilder.in(root.get(key)).value(collection);
     }
 
+    public Specification<T> containsTag(String[] tags){
+        return (root, query, builder) -> {
+            if (tags == null) return builder.conjunction();
+            Join<T, PostToTag> join = root.join(Post_.POST_TO_TAGS);
+            Join<PostToTag, Tag> secondJoin = join.join(PostToTag_.TAG_ID);
+            return builder.in(secondJoin.get(Tag_.TAG)).value(Arrays.asList(tags));
+        };
+    }
+
     public Specification<T> notIn(String key, List<Long> value) {
         return (root, query, builder) -> Objects.isNull(value) ?
                 builder.conjunction() : builder.not(builder.in(root.get(key)).value(value));
@@ -57,8 +64,12 @@ public class SpecificationUtil<T> {
         return (root, query, builder) -> builder.equal(root.get(key), value);
     }
 
-    public Specification<T> equals(String key, FriendshipCode status) {
-        return (root, query, builder) -> builder.equal(makePath(root, key), status);
+    public Specification<T> equals(String field, String key, FriendshipCode status) {
+        return (root, query, builder) -> builder.equal(root.get(field).get(key), status);
+    }
+
+    public Specification<T> equals(String field, String key, String value) {
+        return (root, query, builder) -> equals(root.get(field).get(key), value).toPredicate(root, query, builder);
     }
 
     public Specification<T> equals(String key, Long value) {
@@ -71,6 +82,10 @@ public class SpecificationUtil<T> {
 
     public Specification<T> contains(String key, String value) {
         return (root, query, builder) -> contains(makePath(root, key), value).toPredicate(root, query, builder);
+    }
+
+    public Specification<T> contains(String field, String key, String value) {
+        return (root, query, builder) -> contains(root.get(field).get(key), value).toPredicate(root, query, builder);
     }
 
     public Specification<T> contains(String key, Predicate.BooleanOperator booleanOperator, String... values) {

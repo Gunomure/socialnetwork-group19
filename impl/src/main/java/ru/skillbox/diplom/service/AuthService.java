@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.skillbox.diplom.config.security.jwt.JwtTokenProvider;
 import ru.skillbox.diplom.exception.TokenRefreshException;
@@ -30,6 +31,7 @@ import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
 @Service
+@Transactional
 public class AuthService {
     private final static Logger LOGGER = LogManager.getLogger(AuthService.class);
 

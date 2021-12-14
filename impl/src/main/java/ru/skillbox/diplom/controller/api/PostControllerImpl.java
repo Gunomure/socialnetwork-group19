@@ -18,8 +18,20 @@ public class PostControllerImpl implements PostController {
     }
 
     @Override
-    public ResponseEntity<?> getPosts(String text, Long dateFrom, Long dateTo, String author){
-        return ResponseEntity.ok(postService.getPosts(text, dateFrom, dateTo, author));
+    public ResponseEntity<?> getPosts(String text,
+                                      Long dateFrom,
+                                      Long dateTo,
+                                      String author,
+                                      String tagQuery,
+                                      Integer offset,
+                                      Integer itemPerPage){
+        return ResponseEntity.ok(postService.getPosts(text,
+                dateFrom,
+                dateTo,
+                author,
+                tagQuery,
+                offset,
+                itemPerPage));
     }
 
     @Override

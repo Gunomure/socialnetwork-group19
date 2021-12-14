@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+    <changeSet id="1" author="eduard">
+        <insert tableName="post2tag">
+            <column name="post_id">10</column>
+            <column name="tag_id">1</column>
+        </insert>
+        <insert tableName="post2tag">
+            <column name="post_id">10</column>
+            <column name="tag_id">2</column>
+        </insert>
+        <insert tableName="post2tag">
+            <column name="post_id">10</column>
+            <column name="tag_id">3</column>
+        </insert>
+        <insert tableName="post2tag">
+            <column name="post_id">9</column>
+            <column name="tag_id">4</column>
+        </insert>
+        <insert tableName="post2tag">
+            <column name="post_id">9</column>
+            <column name="tag_id">5</column>
+        </insert>
+        <insert tableName="post2tag">
+            <column name="post_id">8</column>
+            <column name="tag_id">1</column>
+        </insert>
+        <insert tableName="post2tag">
+            <column name="post_id">8</column>
+            <column name="tag_id">2</column>
+        </insert>
+        <insert tableName="post2tag">
+            <column name="post_id">8</column>
+            <column name="tag_id">3</column>
+        </insert>
+        <insert tableName="post2tag">
+            <column name="post_id">7</column>
+            <column name="tag_id">4</column>
+        </insert>
+        <insert tableName="post2tag">
+            <column name="post_id">7</column>
+            <column name="tag_id">5</column>
+        </insert>
+        <insert tableName="post2tag">
+            <column name="post_id">6</column>
+            <column name="tag_id">1</column>
+        </insert>
+        <insert tableName="post2tag">
+            <column name="post_id">6</column>
+            <column name="tag_id">2</column>
+        </insert>
+        <insert tableName="post2tag">
+            <column name="post_id">6</column>
+            <column name="tag_id">3</column>
+        </insert>
+        <insert tableName="post2tag">
+            <column name="post_id">5</column>
+            <column name="tag_id">4</column>
+        </insert>
+        <insert tableName="post2tag">
+            <column name="post_id">5</column>
+            <column name="tag_id">5</column>
+        </insert>
+        <insert tableName="post2tag">
+            <column name="post_id">4</column>
+            <column name="tag_id">1</column>
+        </insert>
+        <insert tableName="post2tag">
+            <column name="post_id">3</column>
+            <column name="tag_id">4</column>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

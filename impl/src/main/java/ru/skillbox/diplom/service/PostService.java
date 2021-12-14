@@ -6,6 +6,7 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static ru.skillbox.diplom.util.TimeUtil.getCurrentTimestampUtc;
@@ -55,6 +57,8 @@ public class PostService {
     private final PostLikeRepository postLikeRepository;
     private final CommentLikeRepository commentLikeRepository;
     private final FriendshipRepository friendshipRepository;
+    private final TagRepository tagRepository;
+    private final PostToTagRepository postToTagRepository;
 
     public PostService(PersonRepository personRepository,
                        PostRepository postRepository,
@@ -62,7 +66,9 @@ public class PostService {
                        ReportCommentRepository reportCommentRepository,
                        PostLikeRepository postLikeRepository,
                        CommentLikeRepository commentLikeRepository,
-                       FriendshipRepository friendshipRepository) {
+                       FriendshipRepository friendshipRepository,
+                       TagRepository tagRepository,
+                       PostToTagRepository postToTagRepository) {
         this.personRepository = personRepository;
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
@@ -70,25 +76,29 @@ public class PostService {
         this.postLikeRepository = postLikeRepository;
         this.commentLikeRepository = commentLikeRepository;
         this.friendshipRepository = friendshipRepository;
+        this.tagRepository = tagRepository;
+        this.postToTagRepository = postToTagRepository;
     }
 
     public FeedsResponse<List<PostDto>> getFeeds(String name, Integer offset, Integer itemPerPage){
         LOGGER.debug("getFeeds: text = {}, offset = {}, itemPerPage = {}", name, offset, itemPerPage);
         SpecificationUtil<Friendship> personSpec = new SpecificationUtil<>();
+        String email = getAuthenticatedUser().getEmail();
         List<Person> subscriptions = friendshipRepository.findAll(
                         Specification.
-                                where(personSpec.equals("srcPerson.email", getAuthenticatedUser().getEmail())
-                                        .and(personSpec.equals("statusId.code", FriendshipCode.FRIEND)
-                                                .or(personSpec.equals("statusId.code", FriendshipCode.SUBSCRIBED)))),
+                                where(personSpec.equals(Friendship_.SRC_PERSON, Person_.EMAIL, email)
+                                        .and(personSpec.equals(Friendship_.STATUS_ID, FriendshipStatus_.CODE, FriendshipCode.FRIEND)
+                                                .or(personSpec.equals(Friendship_.STATUS_ID, FriendshipStatus_.CODE, FriendshipCode.SUBSCRIBED)))),
                         PageRequest.of(offset, itemPerPage))
-                .getContent().stream().map(Friendship::getDstPerson).collect(Collectors.toList());;
+                .getContent().stream().map(Friendship::getDstPerson).collect(Collectors.toList());
         SpecificationUtil<Post> spec = new SpecificationUtil<>();
         List<Post> feeds = postRepository.findAll(
                         Specification.
-                                where(spec.contains("title", name).or(spec.contains("postText", name))).
-                                and(spec.belongsToCollection("authorId", subscriptions)).
-                                and(spec.equals("isBlocked", false)).
-                                and(spec.between("time", null, ZonedDateTime.now())),
+                                where(spec.contains(Post_.TITLE, name).or(spec.contains(Post_.POST_TEXT, name))).
+                                and(spec.belongsToCollection(Post_.AUTHOR_ID, subscriptions).
+                                                or(spec.equals(Post_.AUTHOR_ID, Person_.EMAIL, email))).
+                                and(spec.equals(Post_.IS_BLOCKED, false)).
+                                and(spec.between(Post_.TIME, null, ZonedDateTime.now())),
                         PageRequest.of(offset, itemPerPage, Sort.by("time").descending()))
                 .getContent();
         FeedsResponse<List<PostDto>> response = feedsResponseMapper.convertToFeedsResponse(offset,itemPerPage);
@@ -100,26 +110,35 @@ public class PostService {
         return response;
     }
 
-    public CommonResponse<?> getPosts(String text, Long dateFrom, Long dateTo, String author) {
+    public CommonResponse<?> getPosts(String text, Long dateFrom, Long dateTo, String author, String tagQuery, Integer offset, Integer itemPerPage) {
         LOGGER.debug("start getPosts: text = {}, dateFrom = {}, dateTo = {}, author = {}",
                 text, dateFrom, dateTo, author);
-        SpecificationUtil<Post> postSpec = new SpecificationUtil<>();
-        Specification<Post> s1 = postSpec.between("time",
+        SpecificationUtil<Post> spec = new SpecificationUtil<>();
+        Specification<Post> s1 = spec.between("time",
                 TimeUtil.getZonedDateTimeFromMillis(dateFrom),
                 TimeUtil.getZonedDateTimeFromMillis(dateTo));
-        Specification<Post> s2 = postSpec.contains("title", text);
-        Specification<Post> s3 = postSpec.contains("postText", text);
-        Specification<Post> s4 = postSpec.equals("isBlocked", false);
-        Specification<Post> s5 = postSpec.contains("authorId.firstName", author);
-        Specification<Post> s6 = postSpec.contains("authorId.lastName", author);
+        Specification<Post> s2 = spec.contains(Post_.TITLE, text);
+        Specification<Post> s3 = spec.contains(Post_.POST_TEXT, text);
+        Specification<Post> s4 = spec.equals(Post_.IS_BLOCKED, false);
+        Specification<Post> s5 = spec.contains(Post_.AUTHOR_ID, Person_.FIRST_NAME, author);
+        Specification<Post> s6 = spec.contains(Post_.AUTHOR_ID, Person_.LAST_NAME, author);
+        String[] tags = tagQuery == null || tagQuery.isEmpty() ? null : tagQuery.split(",");
+        Specification<Post> s7 = spec.containsTag(tags);
 
         List<Post> postList = postRepository.findAll(
-                Specification.where(s1).and(s2.or(s3)).and(s4).and(s5.or(s6)));
-        CommonResponse<List<PostDto>> response = new CommonResponse<>();
-        response.setData(postMapper.convertToListPostDto(postList));
-        response.setTimestamp(ZonedDateTime.now().toEpochSecond());
-        checkResponsePostLike(postList, response.getData());
-        createPostCommentDTOs(response.getData());
+                Specification.
+                        where(s1).
+                        and(s2.or(s3)).
+                        and(s7).
+                        and(s4).
+                        and(s5.or(s6)),
+                PageRequest.of(offset, itemPerPage, Sort.by("time").descending())).getContent().stream().distinct().collect(Collectors.toList());
+        FeedsResponse<List<PostDto>> response = feedsResponseMapper.convertToFeedsResponse(offset,itemPerPage);
+        feedsResponseMapper.updateToFeedsResponse(postList,response);
+        if (!postList.isEmpty()) {
+            checkResponsePostLike(postList, response.getData());
+            createPostCommentDTOs(response.getData());
+        }
         return response;
     }
 
@@ -156,16 +175,27 @@ public class PostService {
         LOGGER.info("start createPost id = {}, body = {}", id, body.toString());
         Person person = personRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException(String.format("User %s not found", id)));
-
         Post post = new Post();
         post.setAuthorId(person);
         post.setTitle(body.getTitle());
         post.setPostText(body.getPostText().replaceAll("<[^>]*>",""));
         post.setIsBlocked(false);
         post.setTime(publishDate != null ? TimeUtil.getZonedDateTimeFromMillis(publishDate) : ZonedDateTime.now());
-        Post savedPost = postRepository.save(post);
-
-        CommonResponse<PostDto> response = postMapper.convertToCommonResponse(savedPost);
+        SpecificationUtil<Tag> spec = new SpecificationUtil<>();
+        postRepository.save(post);
+        for (String tagName: body.getTags()){
+            Optional<Tag> tagOptional = tagRepository.findOne(Specification.where(spec.contains("tag", tagName)));
+            if (tagOptional.isEmpty()){
+                Tag tag = new Tag(tagName);
+                tagRepository.save(tag);
+                PostToTag postToTag = new PostToTag();
+                postToTag.setPostId(post);
+                postToTag.setTagId(tag);
+                post.getPostToTags().add(postToTag);
+                postToTagRepository.save(postToTag);
+            }
+        }
+        CommonResponse<PostDto> response = postMapper.convertToCommonResponse(post);
         response.getData().setMyLike(checkLike(post, person));
         createPostCommentDTOs(Arrays.asList(response.getData()));
         return response;

@@ -15,5 +15,4 @@
     <groupId>ru.skillbox.diplom.domain</groupId>
     <artifactId>domain</artifactId>
     <packaging>jar</packaging>
-
 </project>

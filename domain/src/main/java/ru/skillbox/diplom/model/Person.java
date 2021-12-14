@@ -3,6 +3,7 @@ package ru.skillbox.diplom.model;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 import ru.skillbox.diplom.model.enums.MessagePermission;
 import ru.skillbox.diplom.model.enums.UserType;
@@ -59,14 +60,15 @@ Person extends User {
     private Boolean isBlocked;
 
     @OneToMany(mappedBy = "authorId", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Post> posts;
 
     @OneToMany(
             mappedBy = "srcPerson",
-            fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+    @ToString.Exclude
     private List<Friendship> friends;
 
     @Override

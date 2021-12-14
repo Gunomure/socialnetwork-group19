@@ -2,9 +2,11 @@ package ru.skillbox.diplom.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -27,13 +29,19 @@ public class Post extends BaseEntity{
     @Column(name = "is_blocked")
     private Boolean isBlocked;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<PostComment> comments;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL)
     private List<PostLike> likes;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL)
     private List<PostFile> files;
 
+    @ToString.Exclude
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL)
+    private List<PostToTag> postToTags = new ArrayList<>();
 }
