@@ -85,18 +85,18 @@ public class PostService {
         SpecificationUtil<Friendship> personSpec = new SpecificationUtil<>();
         List<Person> subscriptions = friendshipRepository.findAll(
                         Specification.
-                                where(personSpec.equals("srcPerson.email", getAuthenticatedUser().getEmail())
-                                        .and(personSpec.equals("statusId.code", FriendshipCode.FRIEND)
-                                                .or(personSpec.equals("statusId.code", FriendshipCode.SUBSCRIBED)))),
+                                where(personSpec.equals(Friendship_.SRC_PERSON, Person_.EMAIL, getAuthenticatedUser().getEmail())
+                                        .and(personSpec.equals(Friendship_.STATUS_ID, FriendshipStatus_.CODE, FriendshipCode.FRIEND)
+                                                .or(personSpec.equals(Friendship_.STATUS_ID, FriendshipStatus_.CODE, FriendshipCode.SUBSCRIBED)))),
                         PageRequest.of(offset, itemPerPage))
                 .getContent().stream().map(Friendship::getDstPerson).collect(Collectors.toList());
         SpecificationUtil<Post> spec = new SpecificationUtil<>();
         List<Post> feeds = postRepository.findAll(
                         Specification.
-                                where(spec.contains("title", name).or(spec.contains("postText", name))).
-                                and(spec.belongsToCollection("authorId", subscriptions)).
-                                and(spec.equals("isBlocked", false)).
-                                and(spec.between("time", null, ZonedDateTime.now())),
+                                where(spec.contains(Post_.TITLE, name).or(spec.contains(Post_.POST_TEXT, name))).
+                                and(spec.belongsToCollection(Post_.AUTHOR_ID, subscriptions)).
+                                and(spec.equals(Post_.IS_BLOCKED, false)).
+                                and(spec.between(Post_.TIME, null, ZonedDateTime.now())),
                         PageRequest.of(offset, itemPerPage, Sort.by("time").descending()))
                 .getContent();
         FeedsResponse<List<PostDto>> response = feedsResponseMapper.convertToFeedsResponse(offset,itemPerPage);
@@ -108,19 +108,20 @@ public class PostService {
         return response;
     }
 
-    public CommonResponse<?> getPosts(String text, Long dateFrom, Long dateTo, String author, String tag, Integer offset, Integer itemPerPage) {
+    public CommonResponse<?> getPosts(String text, Long dateFrom, Long dateTo, String author, String tagQuery, Integer offset, Integer itemPerPage) {
         LOGGER.debug("start getPosts: text = {}, dateFrom = {}, dateTo = {}, author = {}",
                 text, dateFrom, dateTo, author);
         SpecificationUtil<Post> spec = new SpecificationUtil<>();
         Specification<Post> s1 = spec.between("time",
                 TimeUtil.getZonedDateTimeFromMillis(dateFrom),
                 TimeUtil.getZonedDateTimeFromMillis(dateTo));
-        Specification<Post> s2 = spec.contains("title", text);
-        Specification<Post> s3 = spec.contains("postText", text);
-        Specification<Post> s4 = spec.equals("isBlocked", false);
-        Specification<Post> s5 = spec.contains("authorId.firstName", author);
-        Specification<Post> s6 = spec.contains("authorId.lastName", author);
-        Specification<Post> s7 = spec.containsTag(tag);
+        Specification<Post> s2 = spec.contains(Post_.TITLE, text);
+        Specification<Post> s3 = spec.contains(Post_.POST_TEXT, text);
+        Specification<Post> s4 = spec.equals(Post_.IS_BLOCKED, false);
+        Specification<Post> s5 = spec.contains(Post_.AUTHOR_ID, Person_.FIRST_NAME, author);
+        Specification<Post> s6 = spec.contains(Post_.AUTHOR_ID, Person_.LAST_NAME, author);
+        String[] tags = tagQuery == null || tagQuery.isEmpty() ? null : tagQuery.split(",");
+        Specification<Post> s7 = spec.containsTag(tags);
 
         List<Post> postList = postRepository.findAll(
                 Specification.
@@ -129,7 +130,7 @@ public class PostService {
                         and(s7).
                         and(s4).
                         and(s5.or(s6)),
-                PageRequest.of(offset, itemPerPage, Sort.by("time").descending())).getContent();
+                PageRequest.of(offset, itemPerPage, Sort.by("time").descending())).getContent().stream().distinct().collect(Collectors.toList());
         FeedsResponse<List<PostDto>> response = feedsResponseMapper.convertToFeedsResponse(offset,itemPerPage);
         feedsResponseMapper.updateToFeedsResponse(postList,response);
         if (!postList.isEmpty()) {
@@ -394,7 +395,6 @@ public class PostService {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return personRepository.findByEmail(email).orElseThrow(
                 () -> new EntityNotFoundException(String.format("User %s not found", email)));
-//        return personRepository.findByEmail("javaprogroup19@gmail.com").get();
     }
 
     private void createPostCommentDTOs(List<PostDto> posts){

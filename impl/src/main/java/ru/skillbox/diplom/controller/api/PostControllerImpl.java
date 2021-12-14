@@ -22,14 +22,14 @@ public class PostControllerImpl implements PostController {
                                       Long dateFrom,
                                       Long dateTo,
                                       String author,
-                                      String tag,
+                                      String tagQuery,
                                       Integer offset,
                                       Integer itemPerPage){
         return ResponseEntity.ok(postService.getPosts(text,
                 dateFrom,
                 dateTo,
                 author,
-                tag,
+                tagQuery,
                 offset,
                 itemPerPage));
     }

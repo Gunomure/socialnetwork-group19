@@ -16,7 +16,7 @@ public interface PostController {
                                @RequestParam(name = "date_from", required = false) Long dateFrom,
                                @RequestParam(name = "date_to", required = false) Long dateTo,
                                @RequestParam(name = "autor", required = false) String author,
-                               @RequestParam(name = "tag", required = false) String tag,
+                               @RequestParam(name = "tags", required = false) String tagQuery,
                                @RequestParam (defaultValue = "0", required = false) Integer offset,
                                @RequestParam (defaultValue = "10", required = false) Integer itemPerPage);
 
