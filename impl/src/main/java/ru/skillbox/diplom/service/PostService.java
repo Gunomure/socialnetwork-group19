@@ -148,8 +148,13 @@ public class PostService {
                 () -> new EntityNotFoundException(String.format("User %s not found", id)));
         PersonDto responseData = personMapper.toPersonDTO(person);
         CommonResponse<PersonDto> response = new CommonResponse<>();
-        List<Post> posts = person.getPosts();
-        List<PostDto> postsDtoList = postMapper.convertToListPostDto(posts); // if set it to personMapper stackOverflowException
+        SpecificationUtil<Post> spec = new SpecificationUtil<>();
+        List<Post> posts = postRepository.findAll(
+                Specification.
+                        where(spec.equals(Post_.IS_BLOCKED, false)).
+                        and(spec.equals(Post_.AUTHOR_ID, Person_.EMAIL, person.getEmail())),
+                Sort.by(Sort.Direction.DESC, "time"));
+        List<PostDto> postsDtoList = postMapper.convertToListPostDto(posts);
         checkResponsePostLike(posts, postsDtoList);
         createPostCommentDTOs(postsDtoList);
         responseData.setPosts(postsDtoList);

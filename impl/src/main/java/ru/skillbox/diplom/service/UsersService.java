@@ -48,9 +48,14 @@ public class UsersService {
         Person person = personRepository.findByEmail(email).orElseThrow(
                 () -> new EntityNotFoundException(String.format("User %s not found", email))
         );
-
         PersonDto personDTO = personMapper.toPersonDTO(person);
-        List<PostDto> postDtos = postMapper.convertToListPostDto(postRepository.findByAuthorId(person));
+        SpecificationUtil<Post> spec = new SpecificationUtil<>();
+        List<Post> personalPosts = postRepository.findAll(
+                        Specification.
+                                where(spec.equals(Post_.IS_BLOCKED, false)).
+                                and(spec.equals(Post_.AUTHOR_ID, Person_.EMAIL, email)),
+                        Sort.by(Sort.Direction.DESC, "time"));
+        List<PostDto> postDtos = postMapper.convertToListPostDto(personalPosts);
         personDTO.setPosts(postDtos);
         CommonResponse<PersonDto> response = new CommonResponse<>();
         response.setData(personDTO);
@@ -133,8 +138,6 @@ public class UsersService {
                 () -> new BadRequestException("User not found")
         );
         PersonDto personDto = personMapper.toPersonDTO(personEntity);
-        List<PostDto> postDtos = postMapper.convertToListPostDto(postRepository.findByAuthorId(personEntity));
-        personDto.setPosts(postDtos);
         CommonResponse<PersonDto> response = new CommonResponse<>();
         response.setData(personDto);
         response.setTimestamp(getCurrentTimestampUtc());
