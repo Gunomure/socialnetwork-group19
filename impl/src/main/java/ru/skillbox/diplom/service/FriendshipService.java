@@ -133,6 +133,15 @@ public class FriendshipService {
             friendshipFromCurrentUser.get().setStatusId(friendshipStatusService.getFriendshipStatus(FriendshipCode.FRIEND));
             friendshipRepository.save(friendshipFromCurrentUser.get());
         } else if (friendshipFromCurrentUser.isPresent() &&
+                friendshipFromCurrentUser.get().getStatusId().getCode().equals(FriendshipCode.BLOCKED)) {
+            // пользователь был заблокирован нами - разблокируем обратно в статус FRIEND
+            log.info("Update friendship from {} to {} between {} and {}",
+                    friendshipFromCurrentUser.get().getStatusId(), FriendshipCode.FRIEND, currentUser.getEmail(), personToMakeFriend.getEmail());
+
+            friendshipFromCurrentUser.get().setStatusId(friendshipStatusService.getFriendshipStatus(FriendshipCode.FRIEND));
+            friendshipRepository.save(friendshipFromCurrentUser.get());
+        }
+        else if (friendshipFromCurrentUser.isPresent() &&
                 friendshipFromCurrentUser.get().getStatusId().getCode().equals(FriendshipCode.SUBSCRIBED)) {
             friendshipFromCurrentUser.get().setStatusId(friendshipStatusService.getFriendshipStatus(FriendshipCode.REQUEST));
             friendshipRepository.save(friendshipFromCurrentUser.get());
