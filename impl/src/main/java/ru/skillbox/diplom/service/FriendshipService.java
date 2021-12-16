@@ -7,11 +7,9 @@ import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.exception.BadRequestException;
 import ru.skillbox.diplom.mappers.FriendshipMapper;
 import ru.skillbox.diplom.mappers.PersonMapper;
-import ru.skillbox.diplom.model.Friendship;
-import ru.skillbox.diplom.model.FriendshipResponseDto;
-import ru.skillbox.diplom.model.FriendshipStatus;
-import ru.skillbox.diplom.model.Person;
+import ru.skillbox.diplom.model.*;
 import ru.skillbox.diplom.model.enums.FriendshipCode;
+import ru.skillbox.diplom.model.response.FriendshipCodeDto;
 import ru.skillbox.diplom.model.response.FriendshipResponse;
 import ru.skillbox.diplom.model.response.MakeFriendResponse;
 import ru.skillbox.diplom.repository.FriendshipRepository;
@@ -72,17 +70,14 @@ public class FriendshipService {
 
         List<FriendshipResponseDto> friendsDtoResult = new ArrayList<>();
         for (Friendship friendship : friendships1) {
-            friendsDtoResult.add(friendshipMapper.personToFriendship(friendship.getDstPerson(), friendship.getStatusId()));
+            friendsDtoResult.add(friendshipMapper.personToFriendship(friendship.getDstPerson(),
+                    wrapFriendshipCode(friendship.getStatusId().getCode(), true)));
         }
         for (Friendship friendship : friendships2) {
-            friendsDtoResult.add(friendshipMapper.personToFriendship(friendship.getSrcPerson(), friendship.getStatusId()));
+            friendsDtoResult.add(friendshipMapper.personToFriendship(friendship.getSrcPerson(),
+                    wrapFriendshipCode(friendship.getStatusId().getCode(), false)));
         }
 
-//        List<FriendshipResponseDto> friendsDto1 = friendshipMapper.dstToFriendship(friendships1);
-//        List<FriendshipResponseDto> friendsDto2 = friendshipMapper.srcToFriendship(friendships2);
-//        List<FriendshipResponseDto> friendsDtoResult = Stream.concat(friendsDto1.stream(), friendsDto2.stream())
-//                .distinct()
-//                .collect(Collectors.toList());
         FriendshipResponse response = new FriendshipResponse();
         response.setOffset(offset);
         response.setPerPage(itemPerPage);
@@ -91,6 +86,24 @@ public class FriendshipService {
         log.info("finish searchFriends");
 
         return response;
+    }
+
+    private FriendshipCodeDto wrapFriendshipCode(FriendshipCode code, boolean request_to) {
+        switch (code) {
+            case REQUEST:
+                return request_to ? FriendshipCodeDto.REQUEST_TO : FriendshipCodeDto.REQUEST_FROM;
+            case FRIEND:
+                return FriendshipCodeDto.FRIEND;
+            case BLOCKED:
+                return FriendshipCodeDto.BLOCKED;
+            case DECLINED:
+                return FriendshipCodeDto.DECLINED;
+            case SUBSCRIBED:
+                return FriendshipCodeDto.SUBSCRIBED;
+
+            default:
+                return null;
+        }
     }
 
     public MakeFriendResponse makeFriend(Person currentUser, Long id) {
@@ -119,15 +132,21 @@ public class FriendshipService {
 
             friendshipFromCurrentUser.get().setStatusId(friendshipStatusService.getFriendshipStatus(FriendshipCode.FRIEND));
             friendshipRepository.save(friendshipFromCurrentUser.get());
+        } else if (friendshipFromCurrentUser.isPresent() &&
+                friendshipFromCurrentUser.get().getStatusId().getCode().equals(FriendshipCode.SUBSCRIBED)) {
+            friendshipFromCurrentUser.get().setStatusId(friendshipStatusService.getFriendshipStatus(FriendshipCode.REQUEST));
+            friendshipRepository.save(friendshipFromCurrentUser.get());
         }
         // никаких запросов от personToMakeFriend ранее не было - мы запрашиваем дружбу с ним
         else if (friendshipFromAnotherUser.isEmpty()) {
-            makeNewFriendship(currentUser, personToMakeFriend);
+            makeNewFriendship(currentUser, personToMakeFriend, FriendshipCode.REQUEST);
         }
         // personToMakeFriend уже запрашивал дружбу - мы принимаем дружбу
-        else if (friendshipFromAnotherUser.get().getStatusId().getCode().equals(FriendshipCode.REQUEST)) {
+        else if (friendshipFromAnotherUser.get().getStatusId().getCode().equals(FriendshipCode.REQUEST) ||
+                friendshipFromAnotherUser.get().getStatusId().getCode().equals(FriendshipCode.SUBSCRIBED)) {
             log.info("Update friendship from {} to {} between {} and {}",
-                    friendshipFromAnotherUser.get().getStatusId(), FriendshipCode.REQUEST, currentUser.getEmail(), personToMakeFriend.getEmail());
+                    friendshipFromAnotherUser.get().getStatusId(), FriendshipCode.FRIEND, currentUser.getEmail(),
+                    personToMakeFriend.getEmail());
 
             friendshipFromAnotherUser.get().setStatusId(friendshipStatusService.getFriendshipStatus(FriendshipCode.FRIEND));
             friendshipRepository.save(friendshipFromAnotherUser.get());
@@ -149,15 +168,39 @@ public class FriendshipService {
         return new MakeFriendResponse("ok");
     }
 
-    private void makeNewFriendship(Person currentUser, Person personToMakeFriend) {
-        log.info("start makeNewFriend between {} and {}", currentUser.getId(), personToMakeFriend.getId());
+    private void makeNewFriendship(Person currentUser, Person personToMakeFriendship, FriendshipCode code) {
+        log.info("start makeNewFriend between {} and {}", currentUser.getId(), personToMakeFriendship.getId());
         Friendship friendship = new Friendship();
         friendship.setSrcPerson(currentUser);
-        friendship.setDstPerson(personToMakeFriend);
-        FriendshipStatus status = friendshipStatusService.getFriendshipStatus(FriendshipCode.REQUEST);
+        friendship.setDstPerson(personToMakeFriendship);
+        FriendshipStatus status = friendshipStatusService.getFriendshipStatus(code);
         friendship.setStatusId(status);
         friendshipRepository.save(friendship);
-        log.info("finish makeNewFriend between {} and {}", currentUser.getId(), personToMakeFriend.getId());
+        log.info("finish makeNewFriend between {} and {}", currentUser.getId(), personToMakeFriendship.getId());
+    }
+
+    public MakeFriendResponse subscribe(Person currentUser, Long id) {
+        log.info("start subscribe: currentUser={}, id={}", currentUser, id);
+        Person personToSubscribe = personRepository.findById(id).orElseThrow(
+                () -> new BadRequestException(String.format("User with id=%d nor found", id))
+        );
+        if (currentUser.getId().equals(id)) {
+            throw new BadRequestException("Cannot subscribe to yourself");
+        }
+
+        Optional<Friendship> friendshipFromAnotherUser = friendshipRepository
+                .findBySrcPersonIdAndDstPersonId(personToSubscribe.getId(), currentUser.getId());
+        Optional<Friendship> friendshipFromCurrentUser = friendshipRepository
+                .findBySrcPersonIdAndDstPersonId(currentUser.getId(), personToSubscribe.getId());
+
+        // если уже были отношения - подписываться нельзя
+        if (friendshipFromAnotherUser.isPresent() || friendshipFromCurrentUser.isPresent()) {
+            throw new BadRequestException("Relationship already exists");
+        } else {
+            makeNewFriendship(currentUser, personToSubscribe, FriendshipCode.SUBSCRIBED);
+        }
+
+        return new MakeFriendResponse("ok");
     }
 
     public MakeFriendResponse deleteFriend(Person currentUser, Long id) {
@@ -175,7 +218,8 @@ public class FriendshipService {
                 .findBySrcPersonIdAndDstPersonId(personToDelete.getId(), currentUser.getId());
 
         if (friendshipFromCurrentUser.isPresent() &&
-                friendshipFromCurrentUser.get().getStatusId().getCode().equals(FriendshipCode.REQUEST)) {
+                (friendshipFromCurrentUser.get().getStatusId().getCode().equals(FriendshipCode.REQUEST) ||
+                        friendshipFromCurrentUser.get().getStatusId().getCode().equals(FriendshipCode.SUBSCRIBED))) {
             // текущий пользователь запрашивал дружбу и отменил запрос
             // Удаляем из таблицы, чтобы ничего не висело на странице
             log.info("Delete request to make friendship between {} and {}",
@@ -218,19 +262,23 @@ public class FriendshipService {
 
         // make it recursively with depth as a parameter
         // TODO think how to limit result by (offset, itemPerPage) considering two queries
-        List<Friendship> friendsOfFriendsForward = friendshipRepository.findFriendsOfFriendsForward(currentUser.getId(),
+        List<Person> friendsOfFriendsForward = friendshipRepository.findFriendsOfFriendsForward(currentUser.getId(),
                 PageRequest.of(offset, itemPerPage));
-        List<Friendship> friendsOfFriendsReverse = friendshipRepository.findFriendsOfFriendsReverse(currentUser.getId(),
+        List<Person> friendsOfFriendsReverse = friendshipRepository.findFriendsOfFriendsReverse(currentUser.getId(),
                 PageRequest.of(offset, itemPerPage));
 
-        friendsOfFriendsForward.addAll(friendsOfFriendsReverse);
+        friendsOfFriendsReverse.addAll(friendsOfFriendsForward);
+        List<FriendshipResponseDto> responseData = new ArrayList<>();
+        for (Person person : friendsOfFriendsReverse) {
+            // FriendshipCode.FRIEND doesn't matter because we don't show status in recommendations
+            responseData.add(friendshipMapper.personToFriendship(person, FriendshipCodeDto.FRIEND));
+        }
 
-        List<FriendshipResponseDto> friendsOfFriendsDto = friendshipMapper.dstToFriendship(friendsOfFriendsForward);
         FriendshipResponse response = new FriendshipResponse();
         response.setOffset(offset);
         response.setPerPage(itemPerPage);
-        response.setTotal(friendsOfFriendsDto.size());
-        response.setData(friendsOfFriendsDto);
+        response.setTotal(responseData.size());
+        response.setData(responseData);
         log.info("finish searchRecommendations");
 
         return response;

@@ -36,5 +36,4 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
     <include file="db/changelog/insert_into_table-friendship.changelog.xml"/>
     <include file="db/changelog/insert_into_tags.changelog.xml"/>
     <include file="db/changelog/insert_into_postToTags.changelog.xml"/>
-
 </databaseChangeLog>

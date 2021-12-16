@@ -13,7 +13,6 @@ import ru.skillbox.diplom.model.PersonDto;
 import ru.skillbox.diplom.repository.PersonRepository;
 
 import java.time.ZonedDateTime;
-import java.util.Optional;
 
 @Transactional
 public class TestDto extends AbstractIntegrationTest {
@@ -48,12 +47,12 @@ public class TestDto extends AbstractIntegrationTest {
     @Disabled
     void testDatabaseTest() throws Exception {
         System.out.println("!!!!" + password);
-        loginAsUser();
+//        loginAsUser();
 
-        Optional<Person> person = personRepository.findById(1L);
-        System.out.println(person.get());
-        System.out.println("test");
-        logout();
+//        Optional<Person> person = personRepository.findById(1L);
+//        System.out.println(person.get());
+//        System.out.println("test");
+//        logout();
         System.out.println("test2");
     }
 }

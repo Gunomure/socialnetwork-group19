@@ -7,4 +7,3 @@ public enum FriendshipCode {
     DECLINED,
     SUBSCRIBED
 }
-

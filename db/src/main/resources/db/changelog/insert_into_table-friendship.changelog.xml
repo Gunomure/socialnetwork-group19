@@ -5,55 +5,65 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
     <changeSet id="1" author="dtyunyaev">
+        <!-- 1->2 FRIEND-->
+        <insert tableName="friendship">
+            <column name="status_id">2</column>
+            <column name="src_person_id">1</column>
+            <column name="dst_person_id">2</column>
+        </insert>
+        <!-- 2->3 FRIEND-->
+        <insert tableName="friendship">
+            <column name="status_id">2</column>
+            <column name="src_person_id">2</column>
+            <column name="dst_person_id">3</column>
+        </insert>
+        <!-- 1->4 REQUEST-->
         <insert tableName="friendship">
             <column name="status_id">1</column>
             <column name="src_person_id">1</column>
             <column name="dst_person_id">4</column>
         </insert>
-        <insert tableName="friendship">
-            <column name="status_id">2</column>
-            <column name="src_person_id">1</column>
-            <column name="dst_person_id">2</column>
-        </insert>
-        <insert tableName="friendship">
-            <column name="status_id">2</column>
-            <column name="src_person_id">2</column>
-            <column name="dst_person_id">1</column>
-        </insert>
-        <insert tableName="friendship">
-            <column name="status_id">5</column>
-            <column name="src_person_id">1</column>
-            <column name="dst_person_id">3</column>
-        </insert>
-        <insert tableName="friendship">
-            <column name="status_id">3</column>
-            <column name="src_person_id">1</column>
-            <column name="dst_person_id">5</column>
-        </insert>
-        <insert tableName="friendship">
-            <column name="status_id">4</column>
-            <column name="src_person_id">1</column>
-            <column name="dst_person_id">6</column>
-        </insert>
+        <!-- 5->1 REQUEST-->
         <insert tableName="friendship">
             <column name="status_id">1</column>
-            <column name="src_person_id">3</column>
+            <column name="src_person_id">5</column>
             <column name="dst_person_id">1</column>
         </insert>
+        <!-- 2->4 DECLINED-->
         <insert tableName="friendship">
-            <column name="status_id">2</column>
-            <column name="src_person_id">3</column>
+            <column name="status_id">3</column>
+            <column name="src_person_id">2</column>
+            <column name="dst_person_id">4</column>
+        </insert>
+        <!-- 5->2 DECLINED-->
+        <insert tableName="friendship">
+            <column name="status_id">3</column>
+            <column name="src_person_id">5</column>
             <column name="dst_person_id">2</column>
         </insert>
+        <!-- 3->4 BLOCKED-->
         <insert tableName="friendship">
-            <column name="status_id">2</column>
-            <column name="src_person_id">2</column>
+            <column name="status_id">4</column>
+            <column name="src_person_id">3</column>
+            <column name="dst_person_id">4</column>
+        </insert>
+        <!-- 5->3 BLOCKED-->
+        <insert tableName="friendship">
+            <column name="status_id">4</column>
+            <column name="src_person_id">5</column>
             <column name="dst_person_id">3</column>
         </insert>
+        <!-- 4->5 SUBSCRIBED-->
         <insert tableName="friendship">
             <column name="status_id">5</column>
             <column name="src_person_id">4</column>
-            <column name="dst_person_id">1</column>
+            <column name="dst_person_id">5</column>
+        </insert>
+        <!-- 6->4 SUBSCRIBED-->
+        <insert tableName="friendship">
+            <column name="status_id">5</column>
+            <column name="src_person_id">6</column>
+            <column name="dst_person_id">4</column>
         </insert>
     </changeSet>
 </databaseChangeLog>

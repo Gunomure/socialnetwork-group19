@@ -11,7 +11,6 @@ import ru.skillbox.diplom.model.enums.UserType;
 import javax.persistence.*;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -63,13 +62,24 @@ Person extends User {
     @ToString.Exclude
     private List<Post> posts;
 
+    // join Friendship by srcPerson field
     @OneToMany(
             mappedBy = "srcPerson",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
     @ToString.Exclude
-    private List<Friendship> friends;
+    private List<Friendship> friendsLeft;
+
+    // join Friendship by dstPerson field
+    @OneToMany(
+            mappedBy = "dstPerson",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @ToString.Exclude
+    private List<Friendship> friendsRight;
 
     @Override
     @Transient
