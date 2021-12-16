@@ -23,6 +23,9 @@ public interface FriendsController {
     @DeleteMapping(value = "/{id}")
     MakeFriendResponse deleteFriend(HttpServletRequest request, @PathVariable Long id);
 
+    @PostMapping("/subscribe/{id}")
+    MakeFriendResponse subscribe(HttpServletRequest request, @PathVariable Long id);
+
     @GetMapping("/recommendations")
     FriendshipResponse recommendations(HttpServletRequest request,
                                        @RequestParam(defaultValue = "0") Integer offset,

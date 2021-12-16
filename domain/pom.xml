@@ -15,4 +15,13 @@
     <groupId>ru.skillbox.diplom.domain</groupId>
     <artifactId>domain</artifactId>
     <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-jpamodelgen</artifactId>
+            <version>5.3.7.Final</version>
+        </dependency>
+    </dependencies>
+
 </project>

@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Table(name = "friendship")
 public class Friendship extends BaseEntity {
     @NotNull
-    @OneToOne(optional=false, cascade=CascadeType.ALL)
+    @OneToOne(optional=false, cascade=CascadeType.MERGE)
     @JoinColumn (name="status_id")
     private FriendshipStatus statusId;
     @NotNull

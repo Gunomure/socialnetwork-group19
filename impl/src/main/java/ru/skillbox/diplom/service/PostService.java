@@ -402,6 +402,7 @@ public class PostService {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return personRepository.findByEmail(email).orElseThrow(
                 () -> new EntityNotFoundException(String.format("User %s not found", email)));
+//        return personRepository.findByEmail("javaprogroup19@gmail.com").get();
     }
 
     private void createPostCommentDTOs(List<PostDto> posts){

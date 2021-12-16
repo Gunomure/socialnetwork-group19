@@ -1,9 +1,9 @@
 package ru.skillbox.diplom.model;
 
 import lombok.Data;
-import ru.skillbox.diplom.model.enums.FriendshipCode;
+import ru.skillbox.diplom.model.response.FriendshipCodeDto;
 
 @Data
 public class FriendshipResponseDto extends PersonDto {
-    private FriendshipCode friendshipStatus;
+    private FriendshipCodeDto friendshipStatus;
 }

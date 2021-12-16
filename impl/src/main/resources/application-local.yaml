@@ -6,7 +6,7 @@ spring:
     password: group19
   liquibase:
     enabled: true
-    change-log: classpath:db/changelog/db.changelog-master.xml
+    change-log: classpath:changelog-master.xml
     default-schema: group19
     drop-first: true
   jpa:

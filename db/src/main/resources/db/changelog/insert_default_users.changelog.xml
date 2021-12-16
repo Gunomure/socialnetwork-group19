@@ -6,24 +6,24 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
     <changeSet author="salat23" id="insert_default_users">
         <insert tableName="users">
-            <column name="first_name" value="usero"/>
-            <column name="last_name" value="userovich"/>
-            <column name="email" value="usero-zerone@mail.ru"/>
+            <column name="first_name" value="user3"/>
+            <column name="last_name" value="user3"/>
+            <column name="email" value="user3@mail.ru"/>
             <column name="birth_date" value="1991-10-28 12:00:00.812073 +00:00"/>
             <!-- TODO: phone format? -->
-            <column name="password" value="$2a$12$MBF9YTpgkpBX9utybbYpNuGN0X.vDxpS2ARLFKVEKG0cXhQB6HCbC"/>
+            <column name="password" value="$2a$12$8z0DK/yPZIDt7p6MiJZ3PuNAeTkud8c.P8jdFWd9BpjMH8KwTT/H6"/>
             <column name="type" value="USER"/>
 
         </insert>
 
 
         <insert tableName="users">
-            <column name="first_name" value="userun"/>
-            <column name="last_name" value="userunovich"/>
-            <column name="email" value="userun-zerone@mail.ru"/>
+            <column name="first_name" value="user4"/>
+            <column name="last_name" value="user4"/>
+            <column name="email" value="user4@mail.ru"/>
             <column name="birth_date" value="1990-10-28 12:00:00.812073 +00:00"/>
             <!-- TODO: phone format? -->
-            <column name="password" value="$2a$12$D3T.JG0dedgr5.W.DWG5yu5cfrE5w4vAeBivXEqMvD69/dFGh35JC"/>
+            <column name="password" value="$2a$12$8z0DK/yPZIDt7p6MiJZ3PuNAeTkud8c.P8jdFWd9BpjMH8KwTT/H6"/>
             <column name="type" value="USER"/>
 
         </insert>
@@ -55,30 +55,26 @@
 
         </insert>
 
-
-
-
-
         <!-- Admin user insert. -->
         <insert tableName="users">
-            <column name="first_name" value="odmen"/>
-            <column name="last_name" value="odmenovich"/>
-            <column name="email" value="odmen-zerone@mail.ru"/>
+            <column name="first_name" value="user5"/>
+            <column name="last_name" value="user5"/>
+            <column name="email" value="user5@mail.ru"/>
             <column name="birth_date" value="1992-01-28 12:00:00.812073 +00:00"/>
             <!-- TODO: phone format? -->
-            <column name="password" value="$2a$12$tNCQnK86BR9IgARbPdIq7eazt9G/3s0OEQ5XNxoflr1RntmNmLvtG"/>
+            <column name="password" value="$2a$12$8z0DK/yPZIDt7p6MiJZ3PuNAeTkud8c.P8jdFWd9BpjMH8KwTT/H6"/>
            <column name="type" value="ADMIN"/>
 
         </insert>
 
         <!-- Moderator user insert. -->
         <insert tableName="users">
-            <column name="first_name" value="moder"/>
-            <column name="last_name" value="moderovich"/>
-            <column name="email" value="moder-zerone@mail.ru"/>
+            <column name="first_name" value="user6"/>
+            <column name="last_name" value="user6"/>
+            <column name="email" value="user6@mail.ru"/>
             <column name="birth_date" value="1995-12-21 12:00:00.812073 +00:00"/>
             <!-- TODO: phone format? -->
-            <column name="password" value="$2a$12$zGvNdb9RBH.97kFhHToyaOI9NEXFlKKfVXRWoFEEWY/ERpNY/IddS"/>
+            <column name="password" value="$2a$12$8z0DK/yPZIDt7p6MiJZ3PuNAeTkud8c.P8jdFWd9BpjMH8KwTT/H6"/>
             <column name="type" value="MODERATOR"/>
 
         </insert>
