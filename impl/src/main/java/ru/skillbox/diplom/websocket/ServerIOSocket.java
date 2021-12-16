@@ -106,7 +106,7 @@ public class ServerIOSocket implements CommandLineRunner {
 
                         Long iam =socketIOService.clientStorage.getUserId(client);
                         Long forWhom = data.getRecipientId();
-                        if (iam == forWhom){
+                        if (iam.equals(forWhom)){//
                             if (ackRequest.isAckRequested()) {
                                 MessageResponse messageResponse = new MessageResponse();
                                 messageResponse.setMessage("Incorrect message");
