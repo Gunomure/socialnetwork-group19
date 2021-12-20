@@ -6,7 +6,6 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,10 +24,7 @@ import ru.skillbox.diplom.util.TimeUtil;
 import ru.skillbox.diplom.util.specification.SpecificationUtil;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static ru.skillbox.diplom.util.TimeUtil.getCurrentTimestampUtc;
@@ -180,16 +176,7 @@ public class PostService {
         SpecificationUtil<Tag> spec = new SpecificationUtil<>();
         postRepository.save(post);
         for (String tagName: body.getTags()){
-            Optional<Tag> tagOptional = tagRepository.findOne(Specification.where(spec.contains("tag", tagName)));
-            if (tagOptional.isEmpty()){
-                Tag tag = new Tag(tagName);
-                tagRepository.save(tag);
-                PostToTag postToTag = new PostToTag();
-                postToTag.setPostId(post);
-                postToTag.setTagId(tag);
-                post.getPostToTags().add(postToTag);
-                postToTagRepository.save(postToTag);
-            }
+            addTagToPost(tagName, post, spec);
         }
         CommonResponse<PostDto> response = postMapper.convertToCommonResponse(post);
         response.getData().setMyLike(checkLike(post, person));
@@ -204,6 +191,22 @@ public class PostService {
         post.setTime(publishDate != null ? TimeUtil.getZonedDateTimeFromMillis(publishDate) : ZonedDateTime.now());
         post.setTitle(edit.getTitle());
         post.setPostText(edit.getPostText().replaceAll("<[^>]*>",""));
+        List<String> oldTags = post.getPostToTags().stream().map((postToTag) -> postToTag.getTag().getTagName()).collect(Collectors.toList());
+        SpecificationUtil<Tag> spec = new SpecificationUtil<>();
+        for (String tag: edit.getTags()){
+            if (!oldTags.contains(tag)){
+                addTagToPost(tag, post, spec);
+            }
+        }
+        for (String tag : oldTags){
+            if (!Arrays.asList(edit.getTags()).contains(tag)){
+                Optional<PostToTag> postToTag = postToTagRepository.findByTagTagNameAndPost(tag, post);
+                if (postToTag.isPresent()) {
+                    post.getPostToTags().remove(postToTag.get());
+                    postToTagRepository.delete(postToTag.get());
+                }
+            }
+        }
         Post savedPost = postRepository.save(post);
         CommonResponse<PostDto> response = postMapper.convertToCommonResponse(savedPost);
         Person person = getAuthenticatedUser();
@@ -370,7 +373,6 @@ public class PostService {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return personRepository.findByEmail(email).orElseThrow(
                 () -> new EntityNotFoundException(String.format("User %s not found", email)));
-//        return personRepository.findByEmail("javaprogroup19@gmail.com").get();
     }
 
     private void createPostCommentDTOs(List<PostDto> posts){
@@ -434,5 +436,20 @@ public class PostService {
             }
         }
         return false;
+    }
+
+    private void addTagToPost(String tag, Post post, SpecificationUtil<Tag> spec){
+        Optional<Tag> tagOptional = tagRepository.findOne(Specification.where(spec.contains(Tag_.TAG_NAME, tag)));
+        PostToTag postToTag = new PostToTag();
+        if (tagOptional.isEmpty()){
+            Tag newTag = new Tag(tag);
+            tagRepository.save(newTag);
+            postToTag.setTag(newTag);
+        } else {
+            postToTag.setTag(tagOptional.get());
+        }
+        postToTag.setPost(post);
+        post.getPostToTags().add(postToTag);
+        postToTagRepository.save(postToTag);
     }
 }

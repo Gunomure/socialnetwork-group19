@@ -43,8 +43,8 @@ public interface PostMapper {
     @Mapping(target = "error", ignore = true)
     CommonResponse<PostDto> convertToCommonResponse(Post post);
 
-    @Mapping(target = "tag", source = "postToTag.tagId.tag")
-    @Mapping(target = "id", source = "postToTag.tagId.id")
+    @Mapping(target = "tag", source = "postToTag.tag.tagName")
+    @Mapping(target = "id", source = "postToTag.tag.id")
     TagDto convertToTagDto(PostToTag postToTag);
 
     List<TagDto> convertToTagDtoList(List<PostToTag> postToTags);
