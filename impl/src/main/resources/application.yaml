@@ -27,6 +27,39 @@ spring:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
       mail.smtp.timeout: 10000
+  kafka:
+    bootstrap-servers: ${kafka_bootstrap_servers:localhost:9094}
+    properties:
+      sasl:
+        jaas:
+          config: org.apache.kafka.common.security.plain.PlainLoginModule required username=${kafka_username:'admin'} password=${kafka_password:'admin-secret'};
+        mechanism: PLAIN
+      security:
+        protocol: SASL_PLAINTEXT
+    consumer:
+      auto-offset-reset: earliest
+      group-id: example
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: ru.skillbox.diplom.kafka.engine.CustomDeserializer
+      max-poll-records: 1
+      fetch-max-wait: 36000
+      enable-auto-commit: false
+      client-id: example
+    producer:
+      client-id: example
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: ru.skillbox.diplom.kafka.engine.CustomSerializer
+      retries: 2
+    jaas:
+      enabled: true
+    listener:
+      poll-timeout: 1800000
+      concurrency: 1
+      ack-mode: manual_immediate
+unit:
+  kafka:
+    consumer-enabled: ${consumer-enabled:false}
+    producer-enabled: ${producer-enabled:false}
 management:
   endpoints:
     web:
@@ -53,3 +86,5 @@ values:
   socketio:
     host: 0.0.0.0
     port: 9092
+
+
