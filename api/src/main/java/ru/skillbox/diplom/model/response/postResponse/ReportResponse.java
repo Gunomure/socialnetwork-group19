@@ -1,12 +1,12 @@
 package ru.skillbox.diplom.model.response.postResponse;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.skillbox.diplom.model.CommonResponse;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class ReportResponse extends CommonResponse<ReportResponse.MessageDto> {
 

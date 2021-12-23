@@ -33,7 +33,6 @@ import static ru.skillbox.diplom.util.TimeUtil.getCurrentTimestampUtc;
 @Service
 @Transactional
 public class UsersService {
-    private final static Logger LOGGER = LogManager.getLogger(UsersService.class);
 
     private final PersonRepository personRepository;
     private final PostRepository postRepository;
@@ -53,7 +52,6 @@ public class UsersService {
     }
 
     public CommonResponse<PersonDto> getProfileData() {
-        LOGGER.info("start getProfileData");
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Person person = personRepository.findByEmail(email).orElseThrow(
                 () -> new EntityNotFoundException(String.format("User %s not found", email))
@@ -70,13 +68,11 @@ public class UsersService {
         CommonResponse<PersonDto> response = new CommonResponse<>();
         response.setData(personDTO);
         response.setTimestamp(getCurrentTimestampUtc());
-        LOGGER.info("finish getProfileData");
 
         return response;
     }
 
     public CommonResponse<PersonDto> updateProfileData(UpdateRequest data) {
-        LOGGER.info("start updateProfileData");
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Person person = personRepository.findByEmail(email).orElseThrow(
                 () -> new EntityNotFoundException(String.format("User %s not found", email))
@@ -100,7 +96,6 @@ public class UsersService {
         CommonResponse<PersonDto> response = new CommonResponse<>();
         response.setTimestamp(getCurrentTimestampUtc());
         response.setData(responseData);
-        LOGGER.info("finish updateProfileData");
         return response;
     }
 
@@ -108,10 +103,6 @@ public class UsersService {
                                            Integer ageFrom, Integer ageTo,
                                            String country, String city,
                                            Integer offset, Integer itemPerPage) {
-        LOGGER.info("start searchUsers: firstName={}, lastName={}, " +
-                        "ageFrom={}, ageTo={}, country={}, city={}, offset={}, itemPerPage={}",
-                firstName, lastName, ageFrom, ageTo, country, city, offset, itemPerPage);
-
         SpecificationUtil<Person> spec = new SpecificationUtil<>();
         Specification<Person> s1 = spec.contains(Person_.FIRST_NAME, firstName);
         Specification<Person> s2 = spec.contains(Person_.LAST_NAME, lastName);
@@ -136,14 +127,11 @@ public class UsersService {
         response.setTimestamp(getCurrentTimestampUtc());
         response.setOffset(response.getOffset());
         response.setItemPerPage(itemPerPage);
-        LOGGER.info("finish searchUsers");
 
         return response;
     }
 
     public CommonResponse<PersonDto> searchUserById(Long id) {
-        LOGGER.info("start searchUser: id={}", id);
-
         Person personEntity = personRepository.findById(id).orElseThrow(
                 () -> new BadRequestException("User not found")
         );
@@ -151,7 +139,6 @@ public class UsersService {
         CommonResponse<PersonDto> response = new CommonResponse<>();
         response.setData(personDto);
         response.setTimestamp(getCurrentTimestampUtc());
-        LOGGER.info("finish searchUser: id={}", id);
 
         return response;
     }

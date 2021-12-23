@@ -11,7 +11,6 @@ import ru.skillbox.diplom.model.request.TokenRefreshRequest;
 import ru.skillbox.diplom.service.AuthService;
 
 @RestController
-@Slf4j
 public class AuthControllerImpl implements AuthController {
 
     private final AuthService authService;
@@ -22,7 +21,6 @@ public class AuthControllerImpl implements AuthController {
 
     @Override
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        log.info("controller authenticate: {}", request);
         return ResponseEntity.ok(authService.login(request));
     }
 

@@ -1,8 +1,11 @@
 server:
   port: 8086
 spring:
+  banner:
+    location: banner.txt
   main:
     banner-mode: console
+    log-startup-info: true
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:5432/group19?currentSchema=group19
     driver-class-name: org.postgresql.Driver

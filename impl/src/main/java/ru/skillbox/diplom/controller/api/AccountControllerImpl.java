@@ -17,7 +17,6 @@ import ru.skillbox.diplom.util.TimeUtil;
 
 @RestController
 public class AccountControllerImpl implements AccountController {
-    private final static Logger LOGGER = LogManager.getLogger(AccountControllerImpl.class);
 
     private final AccountService accountService;
     private final AuthenticationManager authenticationManager;
@@ -29,21 +28,18 @@ public class AccountControllerImpl implements AccountController {
 
     @Override
     public CommonResponse<PasswordRecoveryResponse> recoverPassword(@RequestBody PasswordRecoveryRequest passwordRecoveryRequest) {
-        LOGGER.info("recoverPassword: {}", passwordRecoveryRequest.toString());
         accountService.sendPasswordRecoveryEmail(passwordRecoveryRequest.getEmail());
         return createResponse("Email has been sent");
     }
 
     @Override
     public CommonResponse<PasswordRecoveryResponse> setPassword(@RequestBody PasswordSetRequest passwordSetRequest) {
-        LOGGER.info("setPassword: {}", passwordSetRequest.toString());
         accountService.setPassword(passwordSetRequest);
         return createResponse("Password has been changed");
     }
 
     @Override
     public CommonResponse<RegisterResponse> register(@RequestBody RegisterRequest registerRequest) {
-        LOGGER.info("register: {}", registerRequest.toString());
         accountService.registerAccount(registerRequest);
         CommonResponse<RegisterResponse> response = new CommonResponse<>();
 

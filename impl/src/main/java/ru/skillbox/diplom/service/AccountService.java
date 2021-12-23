@@ -25,7 +25,6 @@ import java.util.UUID;
 
 @Service
 public class AccountService {
-    private final static Logger LOGGER = LogManager.getLogger(AccountService.class);
 
     @Value("${group19.passwordRecoveryPath}")
     private String PASSWORD_RECOVERY_PATH;
@@ -62,7 +61,6 @@ public class AccountService {
     }
 
     private void sendEmail(String to, String text) {
-        LOGGER.info("start sendEmail: to={}, text={}", to, text);
         MimeMessage message = emailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
 
@@ -73,13 +71,11 @@ public class AccountService {
             helper.setFrom(new InternetAddress(FROM));// TODO sender email doesn't change for some reason
             emailSender.send(message);
         } catch (MessagingException e) {
-            LOGGER.error("Got error while sending email to {}", to, e);
+            e.printStackTrace();
         }
-        LOGGER.info("finish sendEmail: to={}, text={}", to, text);
     }
 
     public void setPassword(PasswordSetRequest passwordSetRequest) {
-        LOGGER.debug("setPassword: {}", passwordSetRequest);
         Person currentUser = personRepository.findByConfirmationCode(passwordSetRequest.getToken()).orElseThrow(
                 () -> new EntityNotFoundException(String.format("User not found by confirmation code: %s", passwordSetRequest.getToken())));
 
@@ -88,7 +84,6 @@ public class AccountService {
     }
 
     public void registerAccount(RegisterRequest registerRequest) {
-        LOGGER.info("start registerAccount: {}", registerRequest);
         boolean personExists = personRepository.isExists(registerRequest.getEmail());
         if (!personExists) {
             Person user = new Person();
@@ -107,6 +102,5 @@ public class AccountService {
             throw new BadRequestException(String.format("User with email %s already exists",
                     registerRequest.getEmail()));
         }
-        LOGGER.info("finish registerAccount: {}", registerRequest);
     }
 }
