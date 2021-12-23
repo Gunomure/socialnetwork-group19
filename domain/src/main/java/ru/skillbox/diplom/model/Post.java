@@ -42,6 +42,6 @@ public class Post extends BaseEntity{
     private List<PostFile> files;
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<PostToTag> postToTags = new ArrayList<>();
 }

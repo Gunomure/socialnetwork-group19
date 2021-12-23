@@ -15,11 +15,11 @@ public class PostToTag extends BaseEntity {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "post_id")
-    private Post postId;
+    private Post post;
 
     @NotNull
     @ManyToOne
     @JoinColumn(name = "tag_id")
-    private Tag tagId;
+    private Tag tag;
 
 }

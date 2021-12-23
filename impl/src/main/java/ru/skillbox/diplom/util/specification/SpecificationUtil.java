@@ -50,8 +50,8 @@ public class SpecificationUtil<T> {
         return (root, query, builder) -> {
             if (tags == null) return builder.conjunction();
             Join<T, PostToTag> join = root.join(Post_.POST_TO_TAGS);
-            Join<PostToTag, Tag> secondJoin = join.join(PostToTag_.TAG_ID);
-            return builder.in(secondJoin.get(Tag_.TAG)).value(Arrays.asList(tags));
+            Join<PostToTag, Tag> secondJoin = join.join(PostToTag_.TAG);
+            return builder.in(secondJoin.get(Tag_.TAG_NAME)).value(Arrays.asList(tags));
         };
     }
 

@@ -6,19 +6,19 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
     <changeSet id="1" author="eduard">
         <insert tableName="tags">
-            <column name="tag">java</column>
+            <column name="tag_name">java</column>
         </insert>
         <insert tableName="tags">
-            <column name="tag">test</column>
+            <column name="tag_name">test</column>
         </insert>
         <insert tableName="tags">
-            <column name="tag">git</column>
+            <column name="tag_name">git</column>
         </insert>
         <insert tableName="tags">
-            <column name="tag">just-tag</column>
+            <column name="tag_name">just-tag</column>
         </insert>
         <insert tableName="tags">
-            <column name="tag">post</column>
+            <column name="tag_name">post</column>
         </insert>
     </changeSet>
 </databaseChangeLog>

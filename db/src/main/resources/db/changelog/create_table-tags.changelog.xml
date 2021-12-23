@@ -10,7 +10,7 @@
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="tag" type="varchar(255)"/>
+            <column name="tag_name" type="varchar(255)"/>
         </createTable>
     </changeSet>
 

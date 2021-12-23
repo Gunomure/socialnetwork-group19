@@ -46,8 +46,8 @@ public abstract class ResponseMapper {
     @Mapping(target = "likes", ignore = true)
     public abstract PostCommentDto convertToDtoPostComment(PostComment postComment);
 
-    @Mapping(target = "tag", source = "postToTag.tagId.tag")
-    @Mapping(target = "id", source = "postToTag.tagId.id")
+    @Mapping(target = "tag", source = "postToTag.tag.tagName")
+    @Mapping(target = "id", source = "postToTag.tag.id")
     public abstract TagDto convertToTagDto(PostToTag postToTag);
 
     public abstract List<TagDto> convertToTagDtoList(List<PostToTag> postToTags);
