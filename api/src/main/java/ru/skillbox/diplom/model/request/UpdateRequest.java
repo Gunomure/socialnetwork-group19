@@ -24,11 +24,11 @@ public class UpdateRequest {
     @JsonProperty(value = "about")
     private String about;
 
-    @JsonProperty(value = "town_id")
-    private String townId;
+    @JsonProperty(value = "city")
+    private String city;
 
-    @JsonProperty(value = "country_id")
-    private String countryId;
+    @JsonProperty(value = "country")
+    private String country;
 
     @JsonProperty(value = "messages_permission")
     private String permission;

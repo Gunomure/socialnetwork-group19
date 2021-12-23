@@ -12,11 +12,27 @@
             <column name="title" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="country_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
     <changeSet id="1" author="eduard">
         <insert tableName="cities">
-            <column name="title">Moscow</column>
+            <column name="title">Москва</column>
+            <column name="country_id">1</column>
+        </insert>
+        <insert tableName="cities">
+            <column name="title">Санкт-Петербург</column>
+            <column name="country_id">1</column>
+        </insert>
+        <insert tableName="cities">
+            <column name="title">Саратов</column>
+            <column name="country_id">1</column>
+        </insert>
+        <insert tableName="cities">
+            <column name="title">Владивосток</column>
+            <column name="country_id">1</column>
         </insert>
     </changeSet>
 </databaseChangeLog>

@@ -16,13 +16,17 @@ import ru.skillbox.diplom.mappers.PostMapper;
 import ru.skillbox.diplom.model.*;
 import ru.skillbox.diplom.model.request.UpdateRequest;
 import ru.skillbox.diplom.model.response.UsersSearchResponse;
+import ru.skillbox.diplom.repository.CityRepository;
+import ru.skillbox.diplom.repository.CountryRepository;
 import ru.skillbox.diplom.repository.PersonRepository;
 import ru.skillbox.diplom.repository.PostRepository;
+import ru.skillbox.diplom.util.ValidationUtils;
 import ru.skillbox.diplom.util.specification.SpecificationUtil;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static ru.skillbox.diplom.util.TimeUtil.getCurrentTimestampUtc;
 
@@ -33,13 +37,19 @@ public class UsersService {
 
     private final PersonRepository personRepository;
     private final PostRepository postRepository;
+    private final CityRepository cityRepository;
+    private final CountryRepository countryRepository;
     private final PersonMapper personMapper = Mappers.getMapper(PersonMapper.class);
     private final PostMapper postMapper = Mappers.getMapper(PostMapper.class);
 
     public UsersService(PersonRepository personRepository,
-                        PostRepository postRepository) {
+                        PostRepository postRepository,
+                        CityRepository cityRepository,
+                        CountryRepository countryRepository) {
         this.personRepository = personRepository;
         this.postRepository = postRepository;
+        this.cityRepository = cityRepository;
+        this.countryRepository = countryRepository;
     }
 
     public CommonResponse<PersonDto> getProfileData() {
@@ -71,21 +81,21 @@ public class UsersService {
         Person person = personRepository.findByEmail(email).orElseThrow(
                 () -> new EntityNotFoundException(String.format("User %s not found", email))
         );
-
+        ValidationUtils.validateName(String.format("%s %s", data.getFirstName(), data.getLastName()));
+        //ValidationUtils.validatePhone(data.getPhone());
 
         person.setFirstName(data.getFirstName());
         person.setLastName(data.getLastName());
         person.setBirthDate(ZonedDateTime.ofInstant(data.getBirthDate().toInstant(), ZoneId.of("UTC"))); //TODO изменить получение даты с фронта на ZonedDateTime
-        /*Optional<City> city = cityRepository.findByTitle(data.getTownId());
+        Optional<City> city = cityRepository.findByTitle(data.getCity());
         if (city.isPresent()) person.setCity(city.get());
-        else throw new EntityNotFoundException(String.format("City %s not found", data.getTownId()));
-        Optional<Country> country = countryRepository.findByTitle(data.getCountryId());
+        else throw new EntityNotFoundException(String.format("City %s not found", data.getCity()));
+        Optional<Country> country = countryRepository.findByTitle(data.getCountry());
         if (country.isPresent()) person.setCountry(country.get());
-        else throw new EntityNotFoundException(String.format("Country %s not found", data.getCountryId()));*/
+        else throw new EntityNotFoundException(String.format("Country %s not found", data.getCountry()));
         person.setPhone(data.getPhone());
         person.setDescription(data.getAbout());
         /*person.setPermission(Utils.parsePermission(data.getPermission()));*/
-
         PersonDto responseData = personMapper.toPersonDTO(person);
         CommonResponse<PersonDto> response = new CommonResponse<>();
         response.setTimestamp(getCurrentTimestampUtc());
