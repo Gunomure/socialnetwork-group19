@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServletRequest;
 @Service
 @Transactional
 public class AuthService {
-    private final static Logger LOGGER = LogManager.getLogger(AuthService.class);
 
     private final PersonRepository personRepository;
     private final PersonMapper personMapper = Mappers.getMapper(PersonMapper.class);
@@ -58,7 +57,6 @@ public class AuthService {
 
         String email = request.getEmail();
         String password = request.getPassword();
-        LOGGER.info("AuthService: Start login get data: email={}, password=ХренПокажем", email);
         Person person = personRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User doesn't exists"));
         checkUser(person.getPassword(), password);
         Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
@@ -67,16 +65,12 @@ public class AuthService {
         String refreshToken = refreshTokenService.createRefreshToken(person.getId());
         PersonDto personDTO = personMapper.toPersonDTO(person).setToken(token).setRefreshToken(refreshToken);
         CommonResponse<PersonDto> response = new CommonResponse<>("",TimeUtil.getCurrentTimestampUtc(), personDTO);
-        LOGGER.info("AuthService: Finish successful login: email={}, token=ХренПокажем", email);
 
         return response;
     }
 
     private void checkUser(String userPass, String password) {
-        LOGGER.info("AuthService: start checkUser()");
-        if(passwordEncoder.matches(password, userPass)){
-            LOGGER.info("AuthService: checkUser() successful check");
-        } else {
+        if(!passwordEncoder.matches(password, userPass)){
             throw new UsernameNotFoundException("Password is incorrect");
         }
 
@@ -114,7 +108,6 @@ public class AuthService {
         CommonResponse<MessageResponse> response = new CommonResponse<>();
         response.setTimestamp(TimeUtil.getCurrentTimestampUtc());
         response.setData(new MessageResponse("ok"));
-        LOGGER.info("success logout");
         return response;
     }
 

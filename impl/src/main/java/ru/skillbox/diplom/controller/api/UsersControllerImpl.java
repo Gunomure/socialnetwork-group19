@@ -14,7 +14,6 @@ import ru.skillbox.diplom.service.UsersService;
 
 @RestController
 public class UsersControllerImpl implements UsersController {
-    private final static Logger LOGGER = LogManager.getLogger(UsersControllerImpl.class);
 
     private final UsersService usersService;
     private final PostService postService;
@@ -34,15 +33,11 @@ public class UsersControllerImpl implements UsersController {
                                            int ageFrom, int ageTo,
                                            String country, String city,
                                            int offset, int itemPerPage) {
-        LOGGER.info("start searchUsers: firstName={}, lastName={}, " +
-                        "ageFrom={}, ageTo={}, country={}, city={}, offset={}, itemPerPage={}",
-                firstName, lastName, ageFrom, ageTo, country, city, offset, itemPerPage);
         return usersService.searchUsers(firstName, lastName, ageFrom, ageTo, country, city, offset, itemPerPage);
     }
 
     @Override
     public CommonResponse<PersonDto> searchUser(@PathVariable Long id) {
-        LOGGER.info("searchUser by id={}", id);
         return usersService.searchUserById(id);
     }
 

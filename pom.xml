@@ -45,6 +45,7 @@
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<spring-boot-maven-plugin.version>2.5.5</spring-boot-maven-plugin.version>
 		<spring-boot-starter-mail.version>2.5.5</spring-boot-starter-mail.version>
+		<spring-boot-starter-aop>2.5.5</spring-boot-starter-aop>
 		<dockerhub.repository>javaprogroup19</dockerhub.repository>
 		<java.version>11</java.version>
 		<postgresql-embedded.version>2.10</postgresql-embedded.version>
@@ -90,24 +91,15 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 			<version>${spring-boot-starter-web.version}</version>
-
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-logging</artifactId>
-				</exclusion>
-			</exclusions>
-
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-logging</artifactId>
-				</exclusion>
-			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+			<version>${spring-boot-starter-aop}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
@@ -158,11 +150,11 @@
 			<artifactId>lombok-mapstruct-binding</artifactId>
 			<version>${lombok-mapstruct-binding.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-log4j2</artifactId>
-			<version>${spring-boot-starter-log4j2.version}</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.boot</groupId>-->
+<!--			<artifactId>spring-boot-starter-log4j2</artifactId>-->
+<!--			<version>${spring-boot-starter-log4j2.version}</version>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>

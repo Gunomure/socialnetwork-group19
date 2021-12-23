@@ -37,8 +37,6 @@ import static ru.skillbox.diplom.util.TimeUtil.getCurrentTimestampUtc;
 @Transactional
 public class PostService {
 
-    private final static Logger LOGGER = LogManager.getLogger(PostService.class);
-
     private final static String POST_ID_NOT_FOUND = "Post doesn't exist or blocked";
     private final static String COMMENT_ID_NOT_FOUND = "Comment doesn't exist or blocked";
     private final static String PARENT_COMMENT_ID_NOT_FOUND = "Parent comment doesn't exist or blocked";
@@ -81,7 +79,6 @@ public class PostService {
     }
 
     public FeedsResponse<List<PostDto>> getFeeds(String name, Integer offset, Integer itemPerPage){
-        LOGGER.debug("getFeeds: text = {}, offset = {}, itemPerPage = {}", name, offset, itemPerPage);
         SpecificationUtil<Friendship> personSpec = new SpecificationUtil<>();
         String email = getAuthenticatedUser().getEmail();
         List<Person> subscriptions = friendshipRepository.findAll(
@@ -111,8 +108,6 @@ public class PostService {
     }
 
     public CommonResponse<?> getPosts(String text, Long dateFrom, Long dateTo, String author, String tagQuery, Integer offset, Integer itemPerPage) {
-        LOGGER.debug("start getPosts: text = {}, dateFrom = {}, dateTo = {}, author = {}",
-                text, dateFrom, dateTo, author);
         SpecificationUtil<Post> spec = new SpecificationUtil<>();
         Specification<Post> s1 = spec.between("time",
                 TimeUtil.getZonedDateTimeFromMillis(dateFrom),
@@ -143,7 +138,6 @@ public class PostService {
     }
 
     public CommonResponse<PersonDto> getPosts(Long id) {
-        LOGGER.info("start getPosts by user id = {}", id);
         Person person = personRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException(String.format("User %s not found", id)));
         PersonDto responseData = personMapper.toPersonDTO(person);
@@ -164,9 +158,7 @@ public class PostService {
     }
 
     public CommonResponse<?> getPostById(Long id) {
-        LOGGER.debug("start getPostById: {}", id);
         Post post = postRepository.findByIdAndIsBlocked(id, false).orElseThrow(() -> {
-            LOGGER.error(EntityNotFoundException.class.getSimpleName() + ": " + POST_ID_NOT_FOUND);
             throw new EntityNotFoundException(POST_ID_NOT_FOUND);
         });
         CommonResponse<PostDto> response = postMapper.convertToCommonResponse(post);
@@ -177,7 +169,6 @@ public class PostService {
     }
 
     public CommonResponse<?> createPost(Long id, Long publishDate, PostBodyRequest body) {
-        LOGGER.info("start createPost id = {}, body = {}", id, body.toString());
         Person person = personRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException(String.format("User %s not found", id)));
         Post post = new Post();
@@ -207,9 +198,7 @@ public class PostService {
     }
 
     public CommonResponse<?> editPost(Long id, Long publishDate, PostBodyRequest edit) {
-        LOGGER.debug("start editPost: id = {}, publish date = {}, edit = {} ", id, publishDate, edit);
         Post post = postRepository.findByIdAndIsBlocked(id, false).orElseThrow(() -> {
-            LOGGER.error(EntityNotFoundException.class.getSimpleName() + ": " + POST_ID_NOT_FOUND);
             throw new EntityNotFoundException(POST_ID_NOT_FOUND);
         });
         post.setTime(publishDate != null ? TimeUtil.getZonedDateTimeFromMillis(publishDate) : ZonedDateTime.now());
@@ -224,9 +213,7 @@ public class PostService {
     }
 
     public CommonResponse<?> deletePost(Long id) {
-        LOGGER.debug("start deletePost: {}", id);
         Post post = postRepository.findByIdAndIsBlocked(id, false).orElseThrow(() -> {
-            LOGGER.error(EntityNotFoundException.class.getSimpleName() + ": " + POST_ID_NOT_FOUND);
             throw new EntityNotFoundException(POST_ID_NOT_FOUND);
         });
         post.setIsBlocked(true);
@@ -239,7 +226,6 @@ public class PostService {
     }
 
     public CommonResponse<List<PostCommentDto>> getCommentsById(Long postId, Integer offset, Integer itemPerPage) {
-        LOGGER.debug("start getCommentsById: post_id = {}", postId);
         List<PostComment> commentList = commentRepository.findByPostIdAndIsBlockedAndParentNull(postId, false).orElse(new ArrayList<>());
         CommentListResponse response = commentMapper.convertToPostCommentListResponse(offset, itemPerPage, commentList);
         recursiveCommentsDto(response.getData());
@@ -247,20 +233,16 @@ public class PostService {
     }
 
     public CommonResponse<PostCommentDto> createComment(Long postId, CommentBodyRequest body) {
-        LOGGER.debug("start createComment: post_id = {}", postId);
         Post post = postRepository.findByIdAndIsBlocked(postId, false).orElseThrow(() -> {
-            LOGGER.error(EntityNotFoundException.class.getSimpleName() + ": " + POST_ID_NOT_FOUND);
             throw new EntityNotFoundException(POST_ID_NOT_FOUND);
         });
         Long parentId = body.getParentId();
         PostComment parentComment = null;
         if (parentId != null) {
             parentComment = commentRepository.findByIdAndIsBlocked(parentId, false).orElseThrow(() -> {
-                LOGGER.error(EntityNotFoundException.class.getSimpleName() + ": " + PARENT_COMMENT_ID_NOT_FOUND);
                 throw new EntityNotFoundException(PARENT_COMMENT_ID_NOT_FOUND);
             });
             if (!post.getComments().contains(parentComment)) {
-                LOGGER.error(EntityNotFoundException.class.getSimpleName() + ": " + ERROR);
                 throw new EntityNotFoundException(ERROR);
             }
         }
@@ -273,10 +255,8 @@ public class PostService {
     }
 
     public CommonResponse<PostCommentDto> editComment(Long postId, Long commentId, CommentBodyRequest request) {
-        LOGGER.debug("start editComment: post_id = {}, comment_id = {}", postId, commentId);
         PostComment comment = commentRepository.findByIdAndIsBlockedAndPostId(commentId, false, postId)
                 .orElseThrow(() -> {
-                    LOGGER.error(EntityNotFoundException.class.getSimpleName() + ": " + COMMENT_ID_NOT_FOUND);
                     throw new EntityNotFoundException(COMMENT_ID_NOT_FOUND);
                 });
         comment.setCommentText(request.getCommentText());
@@ -287,10 +267,8 @@ public class PostService {
     }
 
     public CommonResponse<IdResponse> deleteComment(Long postId, Long commentId) {
-        LOGGER.debug("start deleteComment: postId = {}, commentId = {}", postId, commentId);
         PostComment comment = commentRepository.findByIdAndIsBlockedAndPostId(commentId, false, postId)
                 .orElseThrow(() -> {
-                    LOGGER.error(EntityNotFoundException.class.getSimpleName() + ": " + COMMENT_ID_NOT_FOUND);
                     throw new EntityNotFoundException(COMMENT_ID_NOT_FOUND);
                 });
         comment.setIsBlocked(true);
@@ -299,10 +277,8 @@ public class PostService {
     }
 
     public CommonResponse<PostCommentDto> recoverComment(Long postId, Long commentId) {
-        LOGGER.debug("start recoverComment: postId = {}, commentId = {}", postId, commentId);
         PostComment comment = commentRepository.findByIdAndIsBlockedAndPostId(commentId, true, postId)
                 .orElseThrow(() -> {
-                    LOGGER.error(EntityNotFoundException.class.getSimpleName() + ": " + COMMENT_ID_NOT_FOUND);
                     throw new EntityNotFoundException(COMMENT_ID_NOT_FOUND);
                 });
         comment.setIsBlocked(false);
@@ -313,10 +289,8 @@ public class PostService {
     }
 
     public CommonResponse<MessageResponse> createCommentReport(Long postId, Long commentId){
-        LOGGER.debug("start createCommentReport: postId = {}, commentId = {}", postId, commentId);
         PostComment comment = commentRepository.findByIdAndIsBlockedAndPostId(commentId, false, postId)
                 .orElseThrow(() -> {
-                    LOGGER.error(EntityNotFoundException.class.getSimpleName() + ": " + COMMENT_ID_NOT_FOUND);
                     throw new EntityNotFoundException(COMMENT_ID_NOT_FOUND);
                 });
         CommentReport report = reportMapper.convertToCommentReportEntity(comment);
@@ -325,14 +299,12 @@ public class PostService {
     }
 
     public CommonResponse<?> putLike(LikeBodyRequest body) {
-        LOGGER.debug("start putLike: body = {}", body.toString());
         Person person = getAuthenticatedUser();
         Long postId;
         switch (body.getType()) {
             case "Post":
                 postId = body.getItemId();
                 Post post = postRepository.findByIdAndIsBlocked(postId, false).orElseThrow(() -> {
-                    LOGGER.error(EntityNotFoundException.class.getSimpleName() + ": " + POST_ID_NOT_FOUND);
                     throw new EntityNotFoundException(POST_ID_NOT_FOUND);
                 });
                 PostLike postLike = postLikeRepository.findByPostIdAndPersonId(post, person).orElse(null);
@@ -349,7 +321,6 @@ public class PostService {
                 Long commentId = body.getItemId();
                 PostComment comment = commentRepository.findByIdAndIsBlockedAndPostId(commentId, false, postId)
                         .orElseThrow(() -> {
-                            LOGGER.error(EntityNotFoundException.class.getSimpleName() + ": " + COMMENT_ID_NOT_FOUND);
                             throw new EntityNotFoundException(COMMENT_ID_NOT_FOUND);
                         });
                 CommentLike commentLike = commentLikeRepository.findByCommentIdAndPersonId(comment, person).orElse(null);
@@ -371,12 +342,10 @@ public class PostService {
     }
 
     public CommonResponse<?> deleteLike(Long itemId, Long postId, String type) {
-        LOGGER.debug("start deleteLike: id = {}, type = {}", itemId, type);
         Person person = getAuthenticatedUser();
         switch (type) {
             case "Post":
                 Post post = postRepository.findByIdAndIsBlocked(itemId, false).orElseThrow(() -> {
-                    LOGGER.error(EntityNotFoundException.class.getSimpleName() + ": " + POST_ID_NOT_FOUND);
                     throw new EntityNotFoundException(POST_ID_NOT_FOUND);
                 });
                 postLikeRepository.findByPostIdAndPersonId(post, person).ifPresent(postLikeRepository::delete);
@@ -384,7 +353,6 @@ public class PostService {
             case "Comment":
                 PostComment comment = commentRepository.findByIdAndIsBlockedAndPostId(itemId, false, postId)
                         .orElseThrow(() -> {
-                            LOGGER.error(EntityNotFoundException.class.getSimpleName() + ": " + COMMENT_ID_NOT_FOUND);
                             throw new EntityNotFoundException(COMMENT_ID_NOT_FOUND);
                         });
                 commentLikeRepository.findByCommentIdAndPersonId(comment, person).ifPresent(commentLikeRepository::delete);

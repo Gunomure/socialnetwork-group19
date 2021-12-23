@@ -41,7 +41,6 @@ public class SocketIOService {
     private final MessageRepository messageRepository;
     public final ClientSocketIOTempStorage clientStorage = new ClientSocketIOTempStorage();
     private final MessageMapper messageMapper = Mappers.getMapper(MessageMapper.class);
-    private final static Logger LOGGER = LogManager.getLogger(SocketIOService.class);
 
     public SocketIOService(JwtTokenProvider jwtTokenProvider, UserRepository userRepository, MessageRepository messageRepository) {
         this.jwtTokenProvider = jwtTokenProvider;

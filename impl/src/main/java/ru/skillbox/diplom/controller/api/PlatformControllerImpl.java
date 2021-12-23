@@ -10,7 +10,6 @@ import ru.skillbox.diplom.service.LanguageService;
 
 @RestController
 public class PlatformControllerImpl implements PlatformController {
-    private final static Logger LOGGER = LogManager.getLogger(PlatformControllerImpl.class);
     private final LanguageService languageService;
 
     public PlatformControllerImpl(LanguageService languageService) {
@@ -26,7 +25,6 @@ public class PlatformControllerImpl implements PlatformController {
         languageRequest.setOffset(0);
         languageRequest.setItemPerPage(10);
         // TODO delete hardcode
-        LOGGER.info("Controller getLanguage: {}", languageRequest);
         return languageService.findLanguages(languageRequest);
     }
 }

@@ -12,7 +12,6 @@ import ru.skillbox.diplom.websocket.SocketIOService;
 @RestController
 public class MessageControllerImpl implements MessageController {
 
-    private final static Logger LOGGER = LogManager.getLogger(UsersControllerImpl.class);
     private final SocketIOService socketIOService;
 
     public MessageControllerImpl(SocketIOService socketIOService) {
@@ -21,9 +20,6 @@ public class MessageControllerImpl implements MessageController {
 
     @Override
     public ResponseEntity<OneLastMessagesResponseDto> getOneLastMessageFromEverybodyFull(int offset, int itemPerPage) {
-
-        LOGGER.info("start getOneLastMessageFromEverybody:  offset={}, itemPerPage={}",
-                offset, itemPerPage);
         OneLastMessagesResponseDto oneLastMessagesResponseDto =
                 socketIOService.getOneLastMessageFromEverybodyFull(offset, itemPerPage);
         return ResponseEntity.ok(oneLastMessagesResponseDto);
@@ -32,8 +28,6 @@ public class MessageControllerImpl implements MessageController {
     @Override
     public ResponseEntity<DialogMessagesResponse> getDialogMessages(Long interlocutorId, String query, int offset, int itemPerPage) {
 
-        LOGGER.info("start etDialogMessages: interlocutorId={},  query={}, offset={}, itemPerPage={}",
-                interlocutorId,  query, offset, itemPerPage);
         DialogMessagesResponse dialogMessagesResponse = socketIOService.getDialogMessages(interlocutorId, query, offset, itemPerPage);
         return ResponseEntity.ok(dialogMessagesResponse);
     }
