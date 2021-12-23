@@ -86,7 +86,7 @@ public class PostService {
         String email = getAuthenticatedUser().getEmail();
         List<Person> subscriptions = friendshipRepository.findAll(
                         Specification.
-                                where(personSpec.equals(Friendship_.SRC_PERSON, Person_.EMAIL, email)
+                                where(personSpec.equals(    Friendship_.SRC_PERSON, Person_.EMAIL, email)
                                         .and(personSpec.equals(Friendship_.STATUS_ID, FriendshipStatus_.CODE, FriendshipCode.FRIEND)
                                                 .or(personSpec.equals(Friendship_.STATUS_ID, FriendshipStatus_.CODE, FriendshipCode.SUBSCRIBED)))),
                         PageRequest.of(offset, itemPerPage))
