@@ -3,8 +3,6 @@ package ru.skillbox.diplom.websocket;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -39,13 +37,14 @@ public class SocketIOService {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
-    public final ClientSocketIOTempStorage clientStorage = new ClientSocketIOTempStorage();
+    private final ClientSocketIOTempStorage clientStorage;
     private final MessageMapper messageMapper = Mappers.getMapper(MessageMapper.class);
 
-    public SocketIOService(JwtTokenProvider jwtTokenProvider, UserRepository userRepository, MessageRepository messageRepository) {
+    public SocketIOService(JwtTokenProvider jwtTokenProvider, UserRepository userRepository, MessageRepository messageRepository, ClientSocketIOTempStorage clientStorage) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.userRepository = userRepository;
         this.messageRepository = messageRepository;
+        this.clientStorage = clientStorage;
     }
 
 
@@ -203,6 +202,10 @@ public class SocketIOService {
 
 
         return oneLastMessagesResponseDto;
+    }
+
+    public ClientSocketIOTempStorage getClientStorage() {
+        return clientStorage;
     }
 }
 

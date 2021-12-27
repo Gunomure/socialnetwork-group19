@@ -74,7 +74,7 @@ public class ServerIOSocket implements CommandLineRunner {
                 if (user.isPresent()) {
                     //save client into bi-dir map
                     try {
-                        socketIOService.clientStorage.saveClient(user.get().getId(), client);
+                        socketIOService.getClientStorage().saveClient(user.get().getId(), client);
                         //LOGGER.info("id:  "+user.get().getId()+"  "+socketIOService.clientStorage.getUserId(client));
                     }
                     catch(Exception e){
@@ -91,7 +91,7 @@ public class ServerIOSocket implements CommandLineRunner {
         server.addDisconnectListener(new DisconnectListener() {
             @Override
             public void onDisconnect(SocketIOClient client) {
-                socketIOService.clientStorage.deleteClient(client);
+                socketIOService.getClientStorage().deleteClient(client);
                 LOGGER.info("Client has disconnected -> {}", client.getSessionId());
             }
         });
@@ -104,7 +104,7 @@ public class ServerIOSocket implements CommandLineRunner {
                     public void onData(final SocketIOClient client, MessageBody data, AckRequest ackRequest) {
                         LOGGER.info("chat: -> {}", data.toString());
 
-                        Long iam =socketIOService.clientStorage.getUserId(client);
+                        Long iam =socketIOService.getClientStorage().getUserId(client);
                         Long forWhom = data.getRecipientId();
                         if (iam.equals(forWhom)){//
                             if (ackRequest.isAckRequested()) {
@@ -129,7 +129,7 @@ public class ServerIOSocket implements CommandLineRunner {
                             message.setMessageText("empty message");
                         }
 
-                        List<SocketIOClient> recipients = socketIOService.clientStorage.getClients(data.getRecipientId());
+                        List<SocketIOClient> recipients = socketIOService.getClientStorage().getClients(data.getRecipientId());
                         Message fromDb = messageRepository.save(message);
                         if (recipients == null || recipients.isEmpty()){
                             LOGGER.info("{}  NO Active recipients ", message);
@@ -153,7 +153,7 @@ public class ServerIOSocket implements CommandLineRunner {
                             //ackRequest.sendAckData(messageResponse);
                         }
                         ////
-                        List<SocketIOClient> authors = socketIOService.clientStorage.getClients(iam);
+                        List<SocketIOClient> authors = socketIOService.getClientStorage().getClients(iam);
                         if (authors == null || authors.isEmpty()){
                             LOGGER.info("{} NO Active authors ", message);
                         }else{
@@ -203,7 +203,7 @@ public class ServerIOSocket implements CommandLineRunner {
                                     where(s1one).and(noDel));
                 }
 
-                Long id = socketIOService.clientStorage.getUserId(client);
+                Long id = socketIOService.getClientStorage().getUserId(client);
                 for (Message mes: messages){
                     if (mes.getStatus() == ReadStatus.SENT && mes.getRecipientId() == id){
                         mes.setStatus(ReadStatus.READ);
@@ -258,7 +258,7 @@ public class ServerIOSocket implements CommandLineRunner {
                                     where(s1one));
                 }
 
-                Long id = socketIOService.clientStorage.getUserId(client);
+                Long id = socketIOService.getClientStorage().getUserId(client);
                 for (Message mes: messages){
                     if (mes.getIsDeleted() == false && mes.getAuthorId() == id){
                         mes.setIsDeleted(true);

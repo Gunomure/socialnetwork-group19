@@ -2,6 +2,7 @@ package ru.skillbox.diplom.websocket;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import org.apache.logging.log4j.LogManager;
+import org.springframework.stereotype.Component;
 import ru.skillbox.diplom.controller.api.UsersControllerImpl;
 
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 
 //STORAGE for "pairs" USER ID AND SocketIOClient that are currently active
 //it solves problem "several simultaneous connections for the same user" with the same userId.
+@Component
 public class ClientSocketIOTempStorage {
 
     private HashMap<Long, List<SocketIOClient>> map = new HashMap<>();
