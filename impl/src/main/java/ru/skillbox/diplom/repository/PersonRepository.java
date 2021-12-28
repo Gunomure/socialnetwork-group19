@@ -23,4 +23,7 @@ public interface PersonRepository extends JpaRepository<Person, Integer>, JpaSpe
 
     @Query("SELECT COUNT(*) > 0 FROM Person p where p.email = :email")
     boolean isExists(String email);
+
+    @Query(value = "SELECT id from users where email = :email", nativeQuery = true)
+    Optional<Long> getIdByEmail(String email);
 }
