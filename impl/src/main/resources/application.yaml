@@ -89,5 +89,7 @@ values:
   socketio:
     host: 0.0.0.0
     port: 9092
-
-
+  cloudinary:
+    secret: ${cloudinary_api_secret}
+    key: ${cloudinary_api_key}
+    name: ${cloudinary_api_name}
