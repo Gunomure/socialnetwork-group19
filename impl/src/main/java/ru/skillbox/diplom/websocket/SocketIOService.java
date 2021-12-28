@@ -94,14 +94,16 @@ public class SocketIOService {
         if (query == null){
             messages = messageRepository.findAll(
                             Specification.
-                                    where( (s1.and(s2)).or(s1inv.and(s2inv)) ).and(noDel),
+//                                    where( (s1.and(s2)).or(s1inv.and(s2inv)) ).and(noDel),
+                                    where( (s1.and(s2)) ).and(noDel),
                             pageable)
                     .getContent();
         }else{
             Specification<Message> s3 = mesSpec.contains("messageText", query);
             messages = messageRepository.findAll(
                             Specification.
-                                    where( (s1.and(s2)).or(s1inv.and(s2inv)) ).
+//                                    where( (s1.and(s2)).or(s1inv.and(s2inv)) ).
+                                    where( (s1.and(s2)) ).
                                     and(s3).and(noDel),
                             pageable)
                     .getContent();
