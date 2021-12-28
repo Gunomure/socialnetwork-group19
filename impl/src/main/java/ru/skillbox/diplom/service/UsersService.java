@@ -78,7 +78,6 @@ public class UsersService {
                 () -> new EntityNotFoundException(String.format("User %s not found", email))
         );
         ValidationUtils.validateName(String.format("%s %s", data.getFirstName(), data.getLastName()));
-        //ValidationUtils.validatePhone(data.getPhone());
 
         person.setFirstName(data.getFirstName());
         person.setLastName(data.getLastName());
@@ -91,7 +90,6 @@ public class UsersService {
         else throw new EntityNotFoundException(String.format("Country %s not found", data.getCountry()));
         person.setPhone(data.getPhone());
         person.setDescription(data.getAbout());
-        /*person.setPermission(Utils.parsePermission(data.getPermission()));*/
         PersonDto responseData = personMapper.toPersonDTO(person);
         CommonResponse<PersonDto> response = new CommonResponse<>();
         response.setTimestamp(getCurrentTimestampUtc());
