@@ -16,6 +16,7 @@
             <column name="message_text" type="text"/>
             <column name="read_status" type="varchar(50)"/>
             <column name="is_deleted" type="TINYINT" defaultValue="0"/>
+            <column name="current_user_id" type="bigint"/>
         </createTable>
     </changeSet>
 

@@ -14,6 +14,8 @@ public class MessageDto {
     @JsonProperty(value ="message_text")
     private String messageText;
     private String status;
+    @JsonProperty(value = "current_user_id")
+    private Long currentUserId;
 }
 
 

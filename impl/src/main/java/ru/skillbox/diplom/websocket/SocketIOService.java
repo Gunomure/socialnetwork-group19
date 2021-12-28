@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.config.security.jwt.JwtTokenProvider;
 import ru.skillbox.diplom.exception.EntityNotFoundException;
 import ru.skillbox.diplom.mappers.MessageMapper;
-import ru.skillbox.diplom.model.*;
+import ru.skillbox.diplom.model.Message;
+import ru.skillbox.diplom.model.MessageDto;
+import ru.skillbox.diplom.model.User;
 import ru.skillbox.diplom.model.response.dialogs.*;
 import ru.skillbox.diplom.repository.MessageRepository;
 import ru.skillbox.diplom.repository.UserRepository;
@@ -24,7 +26,10 @@ import ru.skillbox.diplom.websocket.structs.MyPair;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 
@@ -94,16 +99,16 @@ public class SocketIOService {
         if (query == null){
             messages = messageRepository.findAll(
                             Specification.
-//                                    where( (s1.and(s2)).or(s1inv.and(s2inv)) ).and(noDel),
-                                    where( (s1.and(s2)) ).and(noDel),
+                                    where( (s1.and(s2)).or(s1inv.and(s2inv)) ).and(noDel),
+//                                    where( (s1.and(s2)) ).and(noDel),
                             pageable)
                     .getContent();
         }else{
             Specification<Message> s3 = mesSpec.contains("messageText", query);
             messages = messageRepository.findAll(
                             Specification.
-//                                    where( (s1.and(s2)).or(s1inv.and(s2inv)) ).
-                                    where( (s1.and(s2)) ).
+                                    where( (s1.and(s2)).or(s1inv.and(s2inv)) ).
+//                                    where( (s1.and(s2)) ).
                                     and(s3).and(noDel),
                             pageable)
                     .getContent();
@@ -117,6 +122,7 @@ public class SocketIOService {
         List<MessageDto> mesDtos = new ArrayList<>();
         for (Message temp:  messages) {
             MessageDto messageDto = messageMapper.toMessageDTO(temp);
+            messageDto.setCurrentUserId(getIdUser());
             mesDtos.add(messageDto);
         }
         dialogMessagesResponse.setData(mesDtos);
@@ -208,6 +214,12 @@ public class SocketIOService {
 
     public ClientSocketIOTempStorage getClientStorage() {
         return clientStorage;
+    }
+
+    public Long getIdUser() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findIdByEmail(email).orElseThrow(
+                () -> new EntityNotFoundException(String.format("User %s not found", email)));
     }
 }
 
