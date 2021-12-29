@@ -2,6 +2,7 @@ package ru.skillbox.diplom.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.skillbox.diplom.mappers.CityMapper;
 import ru.skillbox.diplom.mappers.CountryMapper;
 import ru.skillbox.diplom.model.*;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class LocationsService {
 
     private final CountryRepository countryRepository;
@@ -27,6 +29,7 @@ public class LocationsService {
         commonResponse.setData(countries);
         return commonResponse;
     }
+
 
     public CommonResponse<List<CityDto>> getCities(Long countryId) {
         List<City> cityList = cityRepository.getAllByCountryId(countryRepository.getById(countryId));
