@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  labels:
+    app: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: group19-backend
+          image: javaprogroup19/impl:1.0.3-ARM
+          imagePullPolicy: "Always"
+          ports:
+            - containerPort: 8086
+            - containerPort: 9092
+          env:
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: postgres-url
+            - name: MAIL_SERVICE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: mail-service-password
+            - name: WEBSITE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: website-host
+            - name: FRONTEND_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: frontend-port
+            - name: cloudinary_api_secret
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: cloudinary_api_secret
+            - name: cloudinary_api_key
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: cloudinary_api_key
+            - name: cloudinary_api_name
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: cloudinary_api_name
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  labels:
+    name: group19-backend
+spec:
+  type: NodePort
+  selector:
+    app: backend
+  ports:
+    - port: 8086
+      name: api-port
+      protocol: TCP
+      targetPort: 8086
+      nodePort: 30100
+    - port: 9092
+      name: socketio
+      protocol: TCP
+      targetPort: 9092
+      nodePort: 30101
