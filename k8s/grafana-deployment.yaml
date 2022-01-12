@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana-deployment
+  labels:
+    app: grafana
+spec:
+  selector:
+    matchLabels:
+      app: grafana-pod
+  replicas: 1
+  template:
+    metadata:
+      name: grafana-pod
+      labels:
+        app: grafana-pod
+    spec:
+      containers:
+      - name: grafana
+        image: grafana/grafana:latest
+        ports:
+          - containerPort: 3000
+        volumeMounts:
+          - mountPath: /etc/grafana/provisioning
+            name: grafana-volume
+        env:
+          - name: GF_SECURITY_ADMIN_USER
+            value: "admin"
+          - name: GF_SECURITY_ADMIN_PASSWORD
+            value: "admin"
+      volumes:
+        - name: grafana-volume
+          hostPath:
+            path: /metrics1/grafana
+            type: Directory

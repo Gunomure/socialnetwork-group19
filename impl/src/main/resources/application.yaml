@@ -15,7 +15,7 @@ spring:
     enabled: true
     change-log: classpath:changelog-master.xml
     default-schema: group19
-    drop-first: true
+    drop-first: false
   jpa:
     show-sql: false
     hibernate:
