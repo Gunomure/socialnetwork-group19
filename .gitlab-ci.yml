@@ -3,6 +3,8 @@ image: maven:3.8.3-jdk-11
 
 variables:
   MAVEN_LOCAL_REPOSITORY: "-Dmaven.repo.local=./.m2/repository"
+  POSTGRES_CONTAINER_STATUS: $(docker container inspect -f {{.State.Status}} $POSTGRES_CONTAINER_NAME)
+  BACKEND_CONTAINER_STATUS: $(docker container inspect -f {{.State.Status}} $BACK_CONTAINER_NAME)
 
 stages:
   - build
@@ -122,45 +124,45 @@ package_dev:
 
 # TODO update it after creating namespace
 
-#build_and_push_image_dev:
-#  image: docker:latest
-#  stage: deploy_dockerhub
-#  when: manual
-#  environment: development
-#  only:
-#    - merge_requests
-#  except:
-#    - tags
-#  before_script:
-#    - docker logout
-#    - docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASS
-#  script:
-#    - docker build -f impl/Dockerfile --platform linux/arm64/v8 -t $BACK_IMAGE .
-#    - docker push $BACK_IMAGE
-#  artifacts:
-#    paths:
-#      - impl/target/*.jar
+build_and_push_image_dev:
+  image: docker:latest
+  stage: deploy_dockerhub
+  when: manual
+  environment: development
+  only:
+    - merge_requests
+  except:
+    - tags
+  before_script:
+    - docker logout
+    - docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASS
+  script:
+    - docker build -f impl/Dockerfile --platform linux/arm64/v8 -t $BACK_IMAGE .
+    - docker push $BACK_IMAGE
+  artifacts:
+    paths:
+      - impl/target/*.jar
 
-#deploy_development:
-#  stage: deploy_prod
-#  only:
-#    - merge_requests
-#  when: manual
-#  environment: development
-#  before_script:
-#    - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
-#    - eval $(ssh-agent -s)
-#    - echo "$SSH_PRIVATE_KEY" | ssh-add -
-#    - mkdir -p ~/.ssh
-#    - chmod 700 ~/.ssh
-#    - ssh-keyscan $PROD_HOST >> ~/.ssh/known_hosts
-#    - chmod 644 ~/.ssh/known_hosts
-#  script:
-#    #rerun postgre to update container and reset structure
-#    - ssh $PROD_USER@$PROD_HOST "if [[ $POSTGRES_CONTAINER_STATUS == 'running' ]]; then docker stop $POSTGRES_CONTAINER_NAME; fi"
-#    - ssh $PROD_USER@$PROD_HOST "docker pull $POSTGRES_IMAGE"
-#    - ssh $PROD_USER@$PROD_HOST "docker run --name $POSTGRES_CONTAINER_NAME -d --rm -p 5433:5432 -e POSTGRES_PASSWORD=group19 -e POSTGRES_DB=group19 -e POSTGRES_USER=group19 --network group19-net $POSTGRES_IMAGE"
-#    #rerun backend
-#    - ssh $PROD_USER@$PROD_HOST "if [[ $BACKEND_CONTAINER_STATUS == 'running' ]]; then docker stop $BACK_CONTAINER_NAME; fi"
-#    - ssh $PROD_USER@$PROD_HOST "docker pull $BACK_IMAGE"
-#    - ssh $PROD_USER@$PROD_HOST "docker run --name $BACK_CONTAINER_NAME -d --rm -p $BACKEND_PORT:8086 -p $WEBSOCKET_PORT:9092 -e POSTGRES_HOST=$POSTGRES_CONTAINER_NAME -e  MAIL_SERVICE_PASSWORD=$MAIL_SERVICE_PASSWORD -e WEBSITE_HOST=$PROD_HOST -e FRONTEND_PORT=8099 -e cloudinary_api_secret=$CLOUDINARY_API_SECRET -e cloudinary_api_key=$CLOUDINARY_API_KEY -e cloudinary_api_name=$CLOUDINARY_API_NAME --network group19-net $BACK_IMAGE"
+deploy_development:
+  stage: deploy_prod
+  only:
+    - merge_requests
+  when: manual
+  environment: development
+  before_script:
+    - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan $PROD_HOST >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    #rerun postgre to update container and reset structure
+    - ssh $PROD_USER@$PROD_HOST "if [[ $POSTGRES_CONTAINER_STATUS == 'running' ]]; then docker stop $POSTGRES_CONTAINER_NAME; fi"
+    - ssh $PROD_USER@$PROD_HOST "docker pull $POSTGRES_IMAGE"
+    - ssh $PROD_USER@$PROD_HOST "docker run --name $POSTGRES_CONTAINER_NAME -d --rm -p 5433:5432 -e POSTGRES_PASSWORD=group19 -e POSTGRES_DB=group19 -e POSTGRES_USER=group19 --network group19-net $POSTGRES_IMAGE"
+    #rerun backend
+    - ssh $PROD_USER@$PROD_HOST "if [[ $BACKEND_CONTAINER_STATUS == 'running' ]]; then docker stop $BACK_CONTAINER_NAME; fi"
+    - ssh $PROD_USER@$PROD_HOST "docker pull $BACK_IMAGE"
+    - ssh $PROD_USER@$PROD_HOST "docker run --name $BACK_CONTAINER_NAME -d --rm -p $BACKEND_PORT:8086 -p $WEBSOCKET_PORT:9092 -e POSTGRES_HOST=$POSTGRES_CONTAINER_NAME -e  MAIL_SERVICE_PASSWORD=$MAIL_SERVICE_PASSWORD -e WEBSITE_HOST=$PROD_HOST -e FRONTEND_PORT=8099 -e cloudinary_api_secret=$CLOUDINARY_API_SECRET -e cloudinary_api_key=$CLOUDINARY_API_KEY -e cloudinary_api_name=$CLOUDINARY_API_NAME --network group19-net $BACK_IMAGE"
