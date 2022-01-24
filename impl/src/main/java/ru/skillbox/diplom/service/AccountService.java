@@ -1,14 +1,12 @@
 package ru.skillbox.diplom.service;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import ru.skillbox.diplom.exception.BadRequestException;
 import ru.skillbox.diplom.exception.EntityNotFoundException;
+import ru.skillbox.diplom.model.UserDto;
 import ru.skillbox.diplom.model.Person;
 import ru.skillbox.diplom.model.enums.MessagePermission;
 import ru.skillbox.diplom.model.enums.UserType;
@@ -17,33 +15,23 @@ import ru.skillbox.diplom.model.request.RegisterRequest;
 import ru.skillbox.diplom.repository.PersonRepository;
 import ru.skillbox.diplom.util.TimeUtil;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Service
 public class AccountService {
 
-    @Value("${group19.passwordRecoveryPath}")
-    private String PASSWORD_RECOVERY_PATH;
-    @Value("${group19.frontendPort}")
-    private int FRONTEND_PORT;
-    @Value("${group19.websiteHost}")
-    private String WEBSITE_HOST;
+    @Value("${email_service.path}")
+    private String EMAIL_SERVICE_PATH;
 
-    private final JavaMailSender emailSender;
     private final PersonRepository personRepository;
     private final PasswordEncoder passwordEncoder;
 
-    private static final String FROM = "noreply@javaprogroup19.com";
-    private static final String EMAIL_MESSAGE_SUBJECT = "Restore password";
-    private final static String EMAIL_MESSAGE_TEMPLATE = "<a href=\"http://%s:%d/%s?token=%s\">Click to restore your password</a>";
+    RestTemplate restTemplate = new RestTemplate();
 
-    public AccountService(JavaMailSender emailSender, PersonRepository personRepository,
-                          PasswordEncoder passwordEncoder) {
-        this.emailSender = emailSender;
+    public AccountService(PersonRepository personRepository,
+                          PasswordEncoder passwordEncoder
+                          ) {
         this.personRepository = personRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -52,27 +40,11 @@ public class AccountService {
         Person currentUser = personRepository.findByEmail(receiverEmail).orElseThrow(
                 () -> new EntityNotFoundException(String.format("User %s not found", receiverEmail)));
         UUID confirmationCode = UUID.randomUUID();
-
         currentUser.setConfirmationCode(confirmationCode.toString());
         personRepository.save(currentUser);
-
-        sendEmail(receiverEmail, String.format(EMAIL_MESSAGE_TEMPLATE,
-                WEBSITE_HOST, FRONTEND_PORT, PASSWORD_RECOVERY_PATH, confirmationCode));
-    }
-
-    private void sendEmail(String to, String text) {
-        MimeMessage message = emailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
-
-        try {
-            helper.setText(text, true); //true for html type
-            helper.setTo(to);
-            helper.setSubject(EMAIL_MESSAGE_SUBJECT);
-            helper.setFrom(new InternetAddress(FROM));// TODO sender email doesn't change for some reason
-            emailSender.send(message);
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }
+        restTemplate.postForEntity(EMAIL_SERVICE_PATH,
+                new UserDto(currentUser.getEmail(), currentUser.getConfirmationCode()),
+                UserDto.class);
     }
 
     public void setPassword(PasswordSetRequest passwordSetRequest) {

@@ -13,50 +13,6 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: none
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: javaproGroup19@gmail.com
-    password: ${MAIL_SERVICE_PASSWORD}
-    protocol: smtp
-    properties:
-      mail.smtp.auth: true
-      mail.smtp.starttls.enable: true
-      mail.smtp.timeout: 10000
-  kafka:
-    bootstrap-servers: ${kafka_bootstrap_servers:localhost:9094}
-    properties:
-      sasl:
-        jaas:
-          config: org.apache.kafka.common.security.plain.PlainLoginModule required username=${kafka_username:'admin'} password=${kafka_password:'admin-secret'};
-        mechanism: PLAIN
-      security:
-        protocol: SASL_PLAINTEXT
-    consumer:
-      auto-offset-reset: earliest
-      group-id: example
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: ru.skillbox.diplom.kafka.engine.CustomDeserializer
-      max-poll-records: 1
-      fetch-max-wait: 36000
-      enable-auto-commit: false
-      client-id: example
-    producer:
-      client-id: example
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: ru.skillbox.diplom.kafka.engine.CustomSerializer
-      retries: 2
-    jaas:
-      enabled: true
-    listener:
-      poll-timeout: 1800000
-      concurrency: 1
-      ack-mode: manual_immediate
-  unit:
-    kafka:
-      consumer-enabled: ${consumer-enabled:false}
-      producer-enabled: ${producer-enabled:false}
-
 group19:
   passwordRecoveryPath: change-password
   websiteHost: ${WEBSITE_HOST:localhost}
@@ -67,6 +23,13 @@ values:
     secretKey: secret
     expiration: 120
     refreshExpirationDateInMs: 9000000
+  socketio:
+    host: 0.0.0.0
+    port: 9092
+  cloudinary:
+    secret:
+    key:
+    name:
 embedded-postgresql:
   host: localhost
   port: 5432
@@ -74,3 +37,7 @@ embedded-postgresql:
   schema: group19
   user: group19
   password: group19
+email_service:
+  host: ${EMAIL_SERVICE_HOST:localhost}
+  port: ${EMAIL_SERVICE_PORT:8081}
+

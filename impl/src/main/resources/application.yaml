@@ -20,49 +20,6 @@ spring:
     show-sql: false
     hibernate:
       ddl-auto: none
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: javaproGroup19@gmail.com
-    password: ${MAIL_SERVICE_PASSWORD}
-    protocol: smtp
-    properties:
-      mail.smtp.auth: true
-      mail.smtp.starttls.enable: true
-      mail.smtp.timeout: 10000
-  kafka:
-    bootstrap-servers: ${kafka_bootstrap_servers:localhost:9094}
-    properties:
-      sasl:
-        jaas:
-          config: org.apache.kafka.common.security.plain.PlainLoginModule required username=${kafka_username:'admin'} password=${kafka_password:'admin-secret'};
-        mechanism: PLAIN
-      security:
-        protocol: SASL_PLAINTEXT
-    consumer:
-      auto-offset-reset: earliest
-      group-id: example
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: ru.skillbox.diplom.kafka.engine.CustomDeserializer
-      max-poll-records: 1
-      fetch-max-wait: 36000
-      enable-auto-commit: false
-      client-id: example
-    producer:
-      client-id: example
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: ru.skillbox.diplom.kafka.engine.CustomSerializer
-      retries: 2
-    jaas:
-      enabled: true
-    listener:
-      poll-timeout: 1800000
-      concurrency: 1
-      ack-mode: manual_immediate
-unit:
-  kafka:
-    consumer-enabled: ${consumer-enabled:false}
-    producer-enabled: ${producer-enabled:false}
 management:
   endpoints:
     web:
@@ -93,3 +50,5 @@ values:
     secret: ${cloudinary_api_secret}
     key: ${cloudinary_api_key}
     name: ${cloudinary_api_name}
+email_service:
+  path: ${EMAIL_SERVICE_PATH:http://localhost:8080}
