@@ -58,6 +58,8 @@ spec:
                 secretKeyRef:
                   name: backend-secret
                   key: cloudinary_api_name
+            - name: EMAIL_SERVICE_PATH
+              value: http://emailservice-service:8080
 ---
 apiVersion: v1
 kind: Service
