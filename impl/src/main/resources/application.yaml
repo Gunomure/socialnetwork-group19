@@ -36,7 +36,7 @@ management:
 group19:
   passwordRecoveryPath: change-password
   websiteHost: ${WEBSITE_HOST:localhost}
-  frontendPort: ${FRONTEND_PORT:8099}
+  frontendPort: ${FRONTEND_PORT:80}
 values:
   jwt:
     header: Authorization

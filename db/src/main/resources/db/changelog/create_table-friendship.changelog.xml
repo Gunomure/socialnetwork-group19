@@ -11,6 +11,7 @@
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="status_id" type="bigint"/>
+            <!-- src_person_id - friendship initiator -->
             <column name="src_person_id" type="bigint"/>
             <column name="dst_person_id" type="bigint"/>
         </createTable>

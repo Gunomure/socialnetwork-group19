@@ -54,7 +54,8 @@ public class FriendshipService {
         Specification<Friendship> s4 = personSpec.equals("dstPerson.email", currentUserEmail);
         Specification<Friendship> s5 = personSpec.contains("srcPerson.firstName", friendNameToSearch);
         Specification<Friendship> s6 = personSpec.contains("srcPerson.lastName", friendNameToSearch);
-
+        // не показываем информацию, что кто-то нас заблокировал или подписался на нас
+        Specification<Friendship> s7 = personSpec.notIn("statusId.code", List.of(FriendshipCode.BLOCKED, FriendshipCode.SUBSCRIBED));
         //TODO make it better!
         List<Friendship> friendships1 = friendshipRepository.findAll(
                 Specification.
@@ -64,7 +65,7 @@ public class FriendshipService {
 
         List<Friendship> friendships2 = friendshipRepository.findAll(
                 Specification.
-                        where(s4.and(s5.or(s6))),
+                        where(s4.and(s5.or(s6)).and(s7)),
                 PageRequest.of(offset / 2, itemPerPage / 2))
                 .getContent();
 
@@ -109,7 +110,7 @@ public class FriendshipService {
     public MakeFriendResponse makeFriend(Person currentUser, Long id) {
         log.info("start makeFriend: currentUser={}, id={}", currentUser, id);
         Person personToMakeFriend = personRepository.findById(id).orElseThrow(
-                () -> new BadRequestException(String.format("User with id=%d nor found", id))
+                () -> new BadRequestException(String.format("User with id=%d not found", id))
         );
         if (currentUser.getId().equals(id)) {
             throw new BadRequestException("Friendship cannot be formed");
@@ -120,58 +121,56 @@ public class FriendshipService {
         Optional<Friendship> friendshipFromCurrentUser = friendshipRepository
                 .findBySrcPersonIdAndDstPersonId(currentUser.getId(), personToMakeFriend.getId());
 
-        // мы уже отправляли запрос - сообщаем пользователю что уже есть запрос
-        if (friendshipFromCurrentUser.isPresent() &&
-                friendshipFromCurrentUser.get().getStatusId().getCode().equals(FriendshipCode.FRIEND)) {
-            throw new BadRequestException(String.format("Friendship between %s and %s has already been requested",
-                    currentUser.getEmail(), personToMakeFriend.getEmail()));
-        } else if (friendshipFromCurrentUser.isPresent() &&
-                friendshipFromCurrentUser.get().getStatusId().getCode().equals(FriendshipCode.DECLINED)) {
-            log.info("Update friendship from {} to {} between {} and {}",
-                    friendshipFromCurrentUser.get().getStatusId(), FriendshipCode.REQUEST, currentUser.getEmail(), personToMakeFriend.getEmail());
+        if (friendshipFromCurrentUser.isPresent()) {
+            Friendship friendshipDirect = friendshipFromCurrentUser.get();
+            switch (friendshipDirect.getStatusId().getCode()) {
+                case DECLINED:
+                    // мы отклоняли запрос на дружбу - теперь принимаем его
+                    log.info("Update friendship from {} to {} between {} and {}",
+                            friendshipDirect.getStatusId(), FriendshipCode.FRIEND, currentUser.getEmail(), personToMakeFriend.getEmail());
 
-            friendshipFromCurrentUser.get().setStatusId(friendshipStatusService.getFriendshipStatus(FriendshipCode.FRIEND));
-            friendshipRepository.save(friendshipFromCurrentUser.get());
-        } else if (friendshipFromCurrentUser.isPresent() &&
-                friendshipFromCurrentUser.get().getStatusId().getCode().equals(FriendshipCode.BLOCKED)) {
-            // пользователь был заблокирован нами - разблокируем обратно в статус FRIEND
-            log.info("Update friendship from {} to {} between {} and {}",
-                    friendshipFromCurrentUser.get().getStatusId(), FriendshipCode.FRIEND, currentUser.getEmail(), personToMakeFriend.getEmail());
+                    friendshipDirect.setStatusId(friendshipStatusService.getFriendshipStatus(FriendshipCode.FRIEND));
+                    friendshipRepository.save(friendshipDirect);
+                    break;
+                case BLOCKED:
+                case SUBSCRIBED:
+                    // пользователь был заблокирован нами - создаем заново запрос на дружбу
+                    log.info("Update friendship from {} to {} between {} and {}",
+                            friendshipDirect.getStatusId(), FriendshipCode.REQUEST, currentUser.getEmail(), personToMakeFriend.getEmail());
 
-            friendshipFromCurrentUser.get().setStatusId(friendshipStatusService.getFriendshipStatus(FriendshipCode.FRIEND));
-            friendshipRepository.save(friendshipFromCurrentUser.get());
-        }
-        else if (friendshipFromCurrentUser.isPresent() &&
-                friendshipFromCurrentUser.get().getStatusId().getCode().equals(FriendshipCode.SUBSCRIBED)) {
-            friendshipFromCurrentUser.get().setStatusId(friendshipStatusService.getFriendshipStatus(FriendshipCode.REQUEST));
-            friendshipRepository.save(friendshipFromCurrentUser.get());
-        }
-        // никаких запросов от personToMakeFriend ранее не было - мы запрашиваем дружбу с ним
-        else if (friendshipFromAnotherUser.isEmpty()) {
-            makeNewFriendship(currentUser, personToMakeFriend, FriendshipCode.REQUEST);
-        }
-        // personToMakeFriend уже запрашивал дружбу - мы принимаем дружбу
-        else if (friendshipFromAnotherUser.get().getStatusId().getCode().equals(FriendshipCode.REQUEST) ||
-                friendshipFromAnotherUser.get().getStatusId().getCode().equals(FriendshipCode.SUBSCRIBED)) {
-            log.info("Update friendship from {} to {} between {} and {}",
-                    friendshipFromAnotherUser.get().getStatusId(), FriendshipCode.FRIEND, currentUser.getEmail(),
-                    personToMakeFriend.getEmail());
+                    friendshipDirect.setStatusId(friendshipStatusService.getFriendshipStatus(FriendshipCode.REQUEST));
+                    friendshipRepository.save(friendshipDirect);
+                    break;
+                default:
+                    throw new BadRequestException(String.format("Got error while making friendship between %s and %s",
+                            currentUser.getEmail(), personToMakeFriend.getEmail()));
+            }
+        } else if (friendshipFromAnotherUser.isPresent()) {
+            Friendship friendshipReverse = friendshipFromAnotherUser.get();
+            switch (friendshipReverse.getStatusId().getCode()) {
+                case REQUEST:
+                    log.info("Update friendship from {} to {} between {} and {}",
+                            friendshipReverse.getStatusId(), FriendshipCode.FRIEND, currentUser.getEmail(),
+                            personToMakeFriend.getEmail());
 
-            friendshipFromAnotherUser.get().setStatusId(friendshipStatusService.getFriendshipStatus(FriendshipCode.FRIEND));
-            friendshipRepository.save(friendshipFromAnotherUser.get());
-        } else if (friendshipFromAnotherUser.get().getStatusId().getCode().equals(FriendshipCode.DECLINED)) {
-            // отклоняли запрос на дружбу, но теперь передумали и приняли запрос на дружбу
-            friendshipFromAnotherUser.get().setStatusId(friendshipStatusService.getFriendshipStatus(FriendshipCode.FRIEND));
-            friendshipRepository.save(friendshipFromAnotherUser.get());
-        } else if (friendshipFromAnotherUser.get().getStatusId().getCode().equals(FriendshipCode.BLOCKED)) {
-            log.info("Update friendship from {} to {} between {} and {}",
-                    friendshipFromAnotherUser.get().getStatusId(), FriendshipCode.REQUEST, currentUser.getEmail(), personToMakeFriend.getEmail());
-
-            friendshipFromAnotherUser.get().setStatusId(friendshipStatusService.getFriendshipStatus(FriendshipCode.FRIEND));
-            friendshipRepository.save(friendshipFromAnotherUser.get());
+                    friendshipReverse.setStatusId(friendshipStatusService.getFriendshipStatus(FriendshipCode.FRIEND));
+                    friendshipRepository.save(friendshipReverse);
+                    break;
+                case SUBSCRIBED:
+                    log.info("Update friendship from {} to {} between {} and {}",
+                            friendshipReverse.getStatusId(), FriendshipCode.FRIEND, currentUser.getEmail(),
+                            personToMakeFriend.getEmail());
+                    // personToMakeFriend был подписан на нас - мы инициируем запрос в друзья
+                    makeUserInitiator(friendshipReverse, currentUser);
+                    friendshipReverse.setStatusId(friendshipStatusService.getFriendshipStatus(FriendshipCode.REQUEST));
+                    friendshipRepository.save(friendshipReverse);
+                default:
+                    throw new BadRequestException(String.format("Got error while making friendship between %s and %s",
+                            currentUser.getEmail(), personToMakeFriend.getEmail()));
+            }
         } else {
-            throw new BadRequestException(String.format("Got error while making friendship between %s and %s",
-                    currentUser.getEmail(), personToMakeFriend.getEmail()));
+            // никаких запросов от personToMakeFriend ранее не было - мы запрашиваем дружбу с ним
+            makeNewFriendship(currentUser, personToMakeFriend, FriendshipCode.REQUEST);
         }
 
         return new MakeFriendResponse("ok");
@@ -191,7 +190,7 @@ public class FriendshipService {
     public MakeFriendResponse subscribe(Person currentUser, Long id) {
         log.info("start subscribe: currentUser={}, id={}", currentUser, id);
         Person personToSubscribe = personRepository.findById(id).orElseThrow(
-                () -> new BadRequestException(String.format("User with id=%d nor found", id))
+                () -> new BadRequestException(String.format("User with id=%d not found", id))
         );
         if (currentUser.getId().equals(id)) {
             throw new BadRequestException("Cannot subscribe to yourself");
@@ -215,7 +214,7 @@ public class FriendshipService {
     public MakeFriendResponse deleteFriend(Person currentUser, Long id) {
         log.info("start deleteFriend: currentUser={}, id={}", currentUser, id);
         Person personToDelete = personRepository.findById(id).orElseThrow(
-                () -> new BadRequestException(String.format("User with id=%d nor found", id))
+                () -> new BadRequestException(String.format("User with id=%d not found", id))
         );
         if (currentUser.getId().equals(id)) {
             throw new BadRequestException("Friendship cannot be formed");
@@ -226,44 +225,105 @@ public class FriendshipService {
         Optional<Friendship> friendshipFromAnotherUser = friendshipRepository
                 .findBySrcPersonIdAndDstPersonId(personToDelete.getId(), currentUser.getId());
 
-        if (friendshipFromCurrentUser.isPresent() &&
-                (friendshipFromCurrentUser.get().getStatusId().getCode().equals(FriendshipCode.REQUEST) ||
-                        friendshipFromCurrentUser.get().getStatusId().getCode().equals(FriendshipCode.SUBSCRIBED))) {
-            // текущий пользователь запрашивал дружбу и отменил запрос
-            // Удаляем из таблицы, чтобы ничего не висело на странице
-            log.info("Delete request to make friendship between {} and {}",
-                    currentUser.getEmail(), personToDelete.getEmail());
+        if (friendshipFromCurrentUser.isPresent()) {
+            Friendship friendshipDirect = friendshipFromCurrentUser.get();
+            switch (friendshipDirect.getStatusId().getCode()) {
+                case REQUEST:
+                case SUBSCRIBED:
+                case FRIEND:
+                    // текущий пользователь запрашивал дружбу/подписывался и отменил запрос
+                    // Удаляем из таблицы, чтобы ничего не висело на странице
+                    log.info("Delete relationship between {} and {}",
+                            currentUser.getEmail(), personToDelete.getEmail());
 
-            friendshipRepository.delete(friendshipFromCurrentUser.get().getId());
-        } else if (friendshipFromCurrentUser.isPresent() &&
-                friendshipFromCurrentUser.get().getStatusId().getCode().equals(FriendshipCode.FRIEND)) {
-            // если текущий стутас FRIEND и не текущий пользователь был инициатором, блокируем друга
-            log.info("User {} blocks user {}", currentUser.getEmail(), personToDelete.getEmail());
-
-            FriendshipStatus friendship = friendshipStatusService.getFriendshipStatus(FriendshipCode.BLOCKED);
-            friendshipFromCurrentUser.get().setStatusId(friendship);
-            friendshipRepository.save(friendshipFromCurrentUser.get());
-        } else if (friendshipFromAnotherUser.isPresent() &&
-                friendshipFromAnotherUser.get().getStatusId().getCode().equals(FriendshipCode.FRIEND)) {
-            // если текущий стутас FRIEND и другой пользователь был инициатором, блокируем друга
-            log.info("User {} blocks user {}", currentUser.getEmail(), personToDelete.getEmail());
-
-            FriendshipStatus friendship = friendshipStatusService.getFriendshipStatus(FriendshipCode.BLOCKED);
-            friendshipFromAnotherUser.get().setStatusId(friendship);
-            friendshipRepository.save(friendshipFromAnotherUser.get());
-        } else if (friendshipFromAnotherUser.isPresent() &&
-                friendshipFromAnotherUser.get().getStatusId().getCode().equals(FriendshipCode.REQUEST)) {
-            // другой пользователь запрашивал дружбу - отменяем запрос на дружбу
-            log.info("User {} declines friendship request from {}", currentUser.getEmail(), personToDelete.getEmail());
-            FriendshipStatus newFriendshipStatus = friendshipStatusService.getFriendshipStatus(FriendshipCode.DECLINED);
-            friendshipFromAnotherUser.get().setStatusId(newFriendshipStatus);
-            friendshipRepository.save(friendshipFromAnotherUser.get());
+                    friendshipRepository.delete(friendshipDirect.getId());
+                    break;
+            }
+        } else if (friendshipFromAnotherUser.isPresent()) {
+            Friendship friendshipReverse = friendshipFromAnotherUser.get();
+            switch (friendshipReverse.getStatusId().getCode()) {
+                case REQUEST:
+                    // другой пользователь запрашивал дружбу - отменяем запрос на дружбу
+                    log.info("User {} declines friendship request from {}", currentUser.getEmail(), personToDelete.getEmail());
+                    FriendshipStatus newFriendshipStatus = friendshipStatusService.getFriendshipStatus(FriendshipCode.DECLINED);
+                    makeUserInitiator(friendshipReverse, currentUser);
+                    friendshipReverse.setStatusId(newFriendshipStatus);
+                    friendshipRepository.save(friendshipReverse);
+                    break;
+                case FRIEND:
+                    // между пользователями был статус FRIEND, удаляем отношения из таблицы
+                    friendshipRepository.delete(friendshipReverse.getId());
+                    break;
+            }
         } else {
             throw new BadRequestException(String.format("Got error while DELETE %s to %s",
                     currentUser.getEmail(), personToDelete.getEmail()));
         }
 
         return new MakeFriendResponse("ok");
+    }
+
+    public MakeFriendResponse blockFriend(Person currentUser, Long id) {
+        log.info("start blockFriend: currentUser={}, to block={}", currentUser, id);
+        Person personToBlock = personRepository.findById(id).orElseThrow(
+                () -> new BadRequestException(String.format("User with id=%d not found", id))
+        );
+        if (currentUser.getId().equals(id)) {
+            throw new BadRequestException("Friendship cannot be formed");
+        }
+        Optional<Friendship> friendshipFromCurrentUser = friendshipRepository
+                .findBySrcPersonIdAndDstPersonId(currentUser.getId(), personToBlock.getId());
+        Optional<Friendship> friendshipFromAnotherUser = friendshipRepository
+                .findBySrcPersonIdAndDstPersonId(personToBlock.getId(), currentUser.getId());
+
+        if (friendshipFromCurrentUser.isPresent()) {
+            Friendship friendshipDirect = friendshipFromCurrentUser.get();
+            switch (friendshipDirect.getStatusId().getCode()) {
+                // блокируем при любом текущем статусе
+                case FRIEND:
+                case SUBSCRIBED:
+                case DECLINED:
+                case REQUEST:
+                    // если текущий статус FRIEND и текущий пользователь был инициатором, блокируем друга
+                    log.info("User {} blocks user {}", currentUser.getEmail(), personToBlock.getEmail());
+
+                    FriendshipStatus friendship = friendshipStatusService.getFriendshipStatus(FriendshipCode.BLOCKED);
+                    makeUserInitiator(friendshipDirect, currentUser);
+                    friendshipDirect.setStatusId(friendship);
+                    friendshipRepository.save(friendshipDirect);
+                    break;
+                default:
+                    throw new BadRequestException(String.format("Can not block user %s", personToBlock.getEmail()));
+            }
+        } else if (friendshipFromAnotherUser.isPresent()) {
+            Friendship friendshipReverse = friendshipFromAnotherUser.get();
+            switch (friendshipReverse.getStatusId().getCode()) {
+                case FRIEND:
+                    // если текущий статус FRIEND и другой пользователь был инициатором, блокируем друга
+                    log.info("User {} blocks user {}", currentUser.getEmail(), personToBlock.getEmail());
+
+                    FriendshipStatus friendship = friendshipStatusService.getFriendshipStatus(FriendshipCode.BLOCKED);
+                    makeUserInitiator(friendshipReverse, currentUser);
+                    friendshipReverse.setStatusId(friendship);
+                    friendshipRepository.save(friendshipReverse);
+                    break;
+                default:
+                    throw new BadRequestException(String.format("Can not block user %s", personToBlock.getEmail()));
+            }
+        } else {
+            makeNewFriendship(currentUser, personToBlock, FriendshipCode.BLOCKED);
+        }
+
+        log.info("finish blockFriend: currentUser={}, to block={}", currentUser, id);
+
+        return new MakeFriendResponse("ok");
+    }
+
+    private void makeUserInitiator(Friendship friendship, Person user) {
+        if (friendship.getDstPerson().getId().equals(user.getId())) {
+            friendship.setDstPerson(friendship.getSrcPerson());
+            friendship.setSrcPerson(user);
+        }
     }
 
     public FriendshipResponse searchRecommendations(Person currentUser, int offset, int itemPerPage) {

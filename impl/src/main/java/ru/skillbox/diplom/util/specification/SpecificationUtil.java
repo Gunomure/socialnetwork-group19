@@ -30,7 +30,7 @@ public class SpecificationUtil<T> {
     }
 
     public Specification<T> equals(String key, String value) {
-        return (root, query, builder) -> equals(makePath(root, key), value).toPredicate(root, query, builder);
+        return (root, query, builder) -> equals(getFieldPath(root, key), value).toPredicate(root, query, builder);
     }
 
     private Specification<T> equals(Path<String> key, String value) {
@@ -55,9 +55,9 @@ public class SpecificationUtil<T> {
         };
     }
 
-    public Specification<T> notIn(String key, List<Long> value) {
+    public Specification<T> notIn(String key, List<Object> value) {
         return (root, query, builder) -> Objects.isNull(value) ?
-                builder.conjunction() : builder.not(builder.in(root.get(key)).value(value));
+                builder.conjunction() : builder.not(getFieldPath(root, key).in(value));
     }
 
     public Specification<T> equals(String key, Boolean value) {
@@ -73,7 +73,7 @@ public class SpecificationUtil<T> {
     }
 
     public Specification<T> equals(String key, Long value) {
-        return (root, query, builder) -> equals(makePath(root, key), value).toPredicate(root, query, builder);
+        return (root, query, builder) -> equals(getFieldPath(root, key), value).toPredicate(root, query, builder);
     }
 
     private Specification<T> equals(Path<String> key, Long value) {
@@ -81,7 +81,7 @@ public class SpecificationUtil<T> {
     }
 
     public Specification<T> contains(String key, String value) {
-        return (root, query, builder) -> contains(makePath(root, key), value).toPredicate(root, query, builder);
+        return (root, query, builder) -> contains(getFieldPath(root, key), value).toPredicate(root, query, builder);
     }
 
     public Specification<T> contains(String field, String key, String value) {
@@ -89,7 +89,7 @@ public class SpecificationUtil<T> {
     }
 
     public Specification<T> contains(String key, Predicate.BooleanOperator booleanOperator, String... values) {
-        return (root, query, builder) -> contains(makePath(root, key), booleanOperator, values).toPredicate(root, query, builder);
+        return (root, query, builder) -> contains(getFieldPath(root, key), booleanOperator, values).toPredicate(root, query, builder);
     }
 
     private Specification<T> contains(Path<String> key, String value) {
@@ -107,7 +107,7 @@ public class SpecificationUtil<T> {
         return (root, query, builder) -> operator == Predicate.BooleanOperator.AND ? builder.conjunction() : builder.disjunction();
     }
 
-    private Path<String> makePath(Root<T> root, String key) {
+    private Path<String> getFieldPath(Root<T> root, String key) {
         String[] path = key.split("\\.");
         Path<String> objectPath = root.get(path[0]);
         if (path.length > 1) {
