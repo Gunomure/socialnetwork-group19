@@ -7,7 +7,10 @@ import ru.skillbox.diplom.model.PersonDto;
 import ru.skillbox.diplom.model.PostDto;
 import ru.skillbox.diplom.model.request.UpdateRequest;
 import ru.skillbox.diplom.model.request.postRequest.PostBodyRequest;
+import ru.skillbox.diplom.model.response.MakeFriendResponse;
 import ru.skillbox.diplom.model.response.UsersSearchResponse;
+
+import javax.servlet.http.HttpServletRequest;
 
 @CrossOrigin
 @RequestMapping("/api/v1/users")
@@ -28,6 +31,9 @@ public interface UsersController {
                                     @RequestParam(required = false) String city,
                                     @RequestParam(defaultValue = "0", required = false) int offset,
                                     @RequestParam(defaultValue = "10", required = false) int itemPerPage);
+
+    @PutMapping("/block/{id}")
+    MakeFriendResponse block(HttpServletRequest request, @PathVariable Long id);
 
     @GetMapping("/{id}")
     CommonResponse<PersonDto> searchUser(@PathVariable Long id);

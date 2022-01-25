@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   name: backend-config
 data:
-  frontend-port: "8099"
+  frontend-port: "80"
