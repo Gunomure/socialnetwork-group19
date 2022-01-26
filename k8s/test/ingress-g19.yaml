@@ -2,9 +2,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: example-ingress
-  #namespace: group19
+  namespace: group19-test
   annotations:
     kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1/$2
 #    ===============TIMEOUT==============================
     nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
     nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
@@ -26,14 +27,14 @@ spec:
     - host: ingress
       http:
         paths: # пути сортируются кубером в порядке уменьшения длины
-          - path: /socket.io/
+          - path: /test/(socket.io)/(.*)
             pathType: ImplementationSpecific
             backend:
               service:
                 name: backend-service
                 port:
                   number: 9092
-          - path: /api/
+          - path: /test/(api)/(.*)
             pathType: Prefix
             backend:
               service:
