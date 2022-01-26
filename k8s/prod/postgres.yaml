@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres-deployment
+  namespace: group19-prod
   labels:
     app: postgres
 spec:
@@ -39,7 +40,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres-service
+  name: postgres-service-prod
+  namespace: group19-prod
 spec:
   selector:
     app: postgres

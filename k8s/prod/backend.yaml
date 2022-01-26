@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend-deployment
+  namespace: group19-prod
   labels:
     app: backend
 spec:
@@ -65,6 +66,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: backend-service
+  namespace: group19-prod
   labels:
     name: group19-backend
 spec:
@@ -76,9 +78,7 @@ spec:
       name: api-port
       protocol: TCP
       targetPort: 8086
-      nodePort: 30100
     - port: 9092
       name: socketio
       protocol: TCP
       targetPort: 9092
-      nodePort: 30101

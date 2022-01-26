@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  namespace: group19-prod
+data:
+  postgres-url: postgres-service-prod
