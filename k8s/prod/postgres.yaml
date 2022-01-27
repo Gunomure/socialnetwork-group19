@@ -40,7 +40,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres-service-prod
+  name: postgres-service
   namespace: group19-prod
 spec:
   selector:

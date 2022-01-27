@@ -41,7 +41,7 @@ values:
   jwt:
     header: Authorization
     secretKey: secret
-    expiration: 120
+    expiration: ${JWT_TOKEN_EXPIRATION:120}
     refreshExpirationDateInMs: 9000000
   socketio:
     host: 0.0.0.0

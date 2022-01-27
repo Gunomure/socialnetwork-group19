@@ -4,4 +4,4 @@ metadata:
   name: postgres-config
   namespace: group19-prod
 data:
-  postgres-url: postgres-service-prod
+  postgres-url: postgres-service
