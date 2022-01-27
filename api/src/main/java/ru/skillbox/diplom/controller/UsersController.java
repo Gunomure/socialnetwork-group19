@@ -32,9 +32,6 @@ public interface UsersController {
                                     @RequestParam(defaultValue = "0", required = false) int offset,
                                     @RequestParam(defaultValue = "10", required = false) int itemPerPage);
 
-    @PutMapping("/block/{id}")
-    MakeFriendResponse block(HttpServletRequest request, @PathVariable Long id);
-
     @GetMapping("/{id}")
     CommonResponse<PersonDto> searchUser(@PathVariable Long id);
 

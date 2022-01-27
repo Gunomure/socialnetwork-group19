@@ -61,6 +61,11 @@ spec:
                   key: cloudinary_api_name
             - name: EMAIL_SERVICE_PATH
               value: http://emailservice-service:8080
+            - name: JWT_TOKEN_EXPIRATION
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: jwt-token-expiration
 ---
 apiVersion: v1
 kind: Service

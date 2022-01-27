@@ -5,3 +5,4 @@ metadata:
   namespace: group19-prod
 data:
   frontend-port: "80"
+  jwt-token-expiration: "86400"

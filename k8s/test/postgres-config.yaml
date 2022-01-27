@@ -4,4 +4,4 @@ metadata:
   name: postgres-config
   namespace: group19-test
 data:
-  postgres-url: postgres-service-test
+  postgres-url: postgres-service

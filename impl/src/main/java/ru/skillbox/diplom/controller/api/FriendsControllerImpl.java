@@ -1,6 +1,5 @@
 package ru.skillbox.diplom.controller.api;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import ru.skillbox.diplom.controller.FriendsController;
@@ -44,6 +43,12 @@ public class FriendsControllerImpl implements FriendsController {
     public MakeFriendResponse subscribe(HttpServletRequest request, @PathVariable Long id) {
         Person currentUser = authService.getCurrentUser(request);
         return friendshipService.subscribe(currentUser, id);
+    }
+
+    @Override
+    public MakeFriendResponse block(HttpServletRequest request, Long id) {
+        Person currentUser = authService.getCurrentUser(request);
+        return friendshipService.blockFriend(currentUser, id);
     }
 
     @Override

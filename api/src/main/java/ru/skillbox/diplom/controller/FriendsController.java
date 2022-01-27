@@ -26,6 +26,9 @@ public interface FriendsController {
     @PostMapping("/subscribe/{id}")
     MakeFriendResponse subscribe(HttpServletRequest request, @PathVariable Long id);
 
+    @PutMapping("/block/{id}")
+    MakeFriendResponse block(HttpServletRequest request, @PathVariable Long id);
+
     @GetMapping("/recommendations")
     FriendshipResponse recommendations(HttpServletRequest request,
                                        @RequestParam(defaultValue = "0") Integer offset,
