@@ -9,6 +9,7 @@ import ru.skillbox.diplom.model.*;
 import ru.skillbox.diplom.repository.CityRepository;
 import ru.skillbox.diplom.repository.CountryRepository;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,7 +33,9 @@ public class LocationsService {
 
 
     public CommonResponse<List<CityDto>> getCities(Long countryId) {
-        List<City> cityList = cityRepository.getAllByCountryId(countryRepository.getById(countryId));
+        Country country = countryRepository.findById(countryId).orElseThrow(
+                () -> new EntityNotFoundException(String.format("Country id %s was not found", countryId)));
+        List<City> cityList = cityRepository.getAllByCountryId(country);
         List<CityDto> cities = cityList.stream().map(cityMapper::toCityDTO).collect(Collectors.toList());
         CommonResponse<List<CityDto>> commonResponse = new CommonResponse();
         commonResponse.setData(cities);
