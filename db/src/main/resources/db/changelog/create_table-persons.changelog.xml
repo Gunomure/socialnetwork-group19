@@ -22,6 +22,7 @@
             <column name="message_permission" type="VARCHAR(50)" defaultValue="ALL"/>
             <column name="last_online_time" type="timestamptz"/>
             <column name="is_blocked" type="BOOLEAN" defaultValue="false"/>
+            <column name="delete_date" type="timestamptz"/>
         </createTable>
     </changeSet>
     <changeSet id="add_foreign_keys" author="eduard">

@@ -21,7 +21,7 @@ public class LikeControllerImpl implements LikeController {
     }
 
     @Override
-    public CommonResponse<?> deleteLike(Long itemId, Long postId, String type) {
-        return postService.deleteLike(itemId, postId, type);
+    public CommonResponse<?> deleteLike(LikeBodyRequest body) {
+        return postService.deleteLike(body);
     }
 }

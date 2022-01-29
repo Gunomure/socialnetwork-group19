@@ -4,6 +4,8 @@ import com.corundumstudio.socketio.*;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mapstruct.factory.Mappers;
@@ -15,9 +17,13 @@ import ru.skillbox.diplom.controller.api.AccountControllerImpl;
 import ru.skillbox.diplom.mappers.MessageMapper;
 import ru.skillbox.diplom.model.Message;
 import ru.skillbox.diplom.model.MessageDto;
+import ru.skillbox.diplom.model.Person;
 import ru.skillbox.diplom.model.User;
+import ru.skillbox.diplom.model.enums.NotificationTypes;
 import ru.skillbox.diplom.model.enums.ReadStatus;
 import ru.skillbox.diplom.repository.MessageRepository;
+import ru.skillbox.diplom.repository.PersonRepository;
+import ru.skillbox.diplom.service.NotificationService;
 import ru.skillbox.diplom.util.TimeUtil;
 import ru.skillbox.diplom.util.specification.SpecificationUtil;
 import ru.skillbox.diplom.websocket.structs.MessageBody;
@@ -31,22 +37,19 @@ import java.util.Optional;
 //Main runner for Socket IO Engine AS independent part of APP
 // + Socket IO EVENTS (messaging)
 
+@Slf4j
 @Component
+@RequiredArgsConstructor
 public class ServerIOSocket implements CommandLineRunner {
 
     private final static Logger LOGGER = LogManager.getLogger(AccountControllerImpl.class);
     private final SocketIOServer server;
     private final SocketIOService socketIOService;
     private final MessageRepository messageRepository;
+    private final NotificationService notificationService;
+    private final PersonRepository personRepository;
 
     private final MessageMapper messageMapper = Mappers.getMapper(MessageMapper.class);
-
-    @Autowired
-    public ServerIOSocket(SocketIOServer server, SocketIOService socketIOService, MessageRepository messageRepository) {
-        this.server = server;
-        this.socketIOService = socketIOService;
-        this.messageRepository = messageRepository;
-    }
 
     private boolean saveToDb(){
         return true;
@@ -104,7 +107,7 @@ public class ServerIOSocket implements CommandLineRunner {
                     public void onData(final SocketIOClient client, MessageBody data, AckRequest ackRequest) {
                         LOGGER.info("chat: -> {}", data.toString());
 
-                        Long iam =socketIOService.getClientStorage().getUserId(client);
+                        Long iam = socketIOService.getClientStorage().getUserId(client);
                         Long forWhom = data.getRecipientId();
                         if (iam.equals(forWhom)){//
                             if (ackRequest.isAckRequested()) {
@@ -133,6 +136,12 @@ public class ServerIOSocket implements CommandLineRunner {
                         Message fromDb = messageRepository.save(message);
                         if (recipients == null || recipients.isEmpty()){
                             LOGGER.info("{}  NO Active recipients ", message);
+                            Person personTo = personRepository.findById(message.getRecipientId()).orElse(null);
+                            Person personFrom = personRepository.findById(iam).orElse(null);
+                            if (personTo != null && personFrom != null) {
+                                log.info("!!!notification message person={} notification type={}", personTo.getFirstName(), NotificationTypes.MESSAGE);
+                                notificationService.createOnePersonNotification(personTo, personFrom, NotificationTypes.MESSAGE, message.getId());
+                            }
                         }else{
                             MessageDto messageDTO = messageMapper.toMessageDTO(fromDb);
                             for (SocketIOClient recipient: recipients) {

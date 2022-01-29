@@ -66,6 +66,10 @@ spec:
                 configMapKeyRef:
                   name: backend-config
                   key: jwt-token-expiration
+            - name: DROP-FIRST
+              value: true
+            - name: SECRET_KEY
+                value: true
 
 ---
 apiVersion: v1

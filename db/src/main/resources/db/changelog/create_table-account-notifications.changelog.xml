@@ -1,0 +1,23 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet author="stepan" id="create-table-account-notification">
+        <createTable tableName="account_notifications">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="author_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="POST_COMMENT" type="boolean"/>
+            <column name="COMMENT_COMMENT" type="boolean"/>
+            <column name="FRIEND_REQUEST" type="boolean"/>
+            <column name="MESSAGE" type="boolean"/>
+            <column name="FRIEND_BIRTHDAY" type="boolean"/>
+            <column name="NEW_POST" type="boolean"/>
+            <column name="SEND_EMAIL_MESSAGE" type="boolean"/>
+            <column name="SEND_PHONE_MESSAGE" type="boolean"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

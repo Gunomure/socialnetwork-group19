@@ -21,6 +21,10 @@
                 <constraints nullable="false"/>
             </column>
             <column name="contact" type="varchar(255)"/>
+            <column name="was_send" type="boolean"/>
+            <column name="content" type="varchar"/>
+            <column name="user_name" type="varchar(255)"/>
+            <column name="photo" type="varchar(255)"/>
         </createTable>
 
     </changeSet>

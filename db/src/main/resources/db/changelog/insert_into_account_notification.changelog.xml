@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet id="insert_account_notification" author="stepan">
+        <insert tableName="account_notifications">
+            <column name="author_id" valueNumeric="1"/>
+            <column name="POST_COMMENT" value="true"/>
+            <column name="COMMENT_COMMENT" value="true"/>
+            <column name="FRIEND_REQUEST" value="true"/>
+            <column name="MESSAGE" value="true"/>
+            <column name="FRIEND_BIRTHDAY" value="true"/>
+            <column name="NEW_POST" value="true"/>
+            <column name="SEND_EMAIL_MESSAGE" value="false"/>
+            <column name="SEND_PHONE_MESSAGE" value="false"/>
+        </insert>
+        <insert tableName="account_notifications">
+            <column name="author_id" valueNumeric="2"/>
+            <column name="POST_COMMENT" value="true"/>
+            <column name="COMMENT_COMMENT" value="true"/>
+            <column name="FRIEND_REQUEST" value="true"/>
+            <column name="MESSAGE" value="true"/>
+            <column name="FRIEND_BIRTHDAY" value="true"/>
+            <column name="NEW_POST" value="true"/>
+            <column name="SEND_EMAIL_MESSAGE" value="false"/>
+            <column name="SEND_PHONE_MESSAGE" value="false"/>
+        </insert>
+        <insert tableName="account_notifications">
+            <column name="author_id" valueNumeric="3"/>
+            <column name="POST_COMMENT" value="true"/>
+            <column name="COMMENT_COMMENT" value="true"/>
+            <column name="FRIEND_REQUEST" value="true"/>
+            <column name="MESSAGE" value="true"/>
+            <column name="FRIEND_BIRTHDAY" value="true"/>
+            <column name="NEW_POST" value="true"/>
+            <column name="SEND_EMAIL_MESSAGE" value="false"/>
+            <column name="SEND_PHONE_MESSAGE" value="false"/>
+        </insert>
+        <insert tableName="account_notifications">
+            <column name="author_id" valueNumeric="4"/>
+            <column name="POST_COMMENT" value="true"/>
+            <column name="COMMENT_COMMENT" value="true"/>
+            <column name="FRIEND_REQUEST" value="true"/>
+            <column name="MESSAGE" value="true"/>
+            <column name="FRIEND_BIRTHDAY" value="true"/>
+            <column name="NEW_POST" value="true"/>
+            <column name="SEND_EMAIL_MESSAGE" value="false"/>
+            <column name="SEND_PHONE_MESSAGE" value="false"/>
+        </insert>
+        <insert tableName="account_notifications">
+            <column name="author_id" valueNumeric="5"/>
+            <column name="POST_COMMENT" value="true"/>
+            <column name="COMMENT_COMMENT" value="true"/>
+            <column name="FRIEND_REQUEST" value="true"/>
+            <column name="MESSAGE" value="true"/>
+            <column name="FRIEND_BIRTHDAY" value="true"/>
+            <column name="NEW_POST" value="true"/>
+            <column name="SEND_EMAIL_MESSAGE" value="false"/>
+            <column name="SEND_PHONE_MESSAGE" value="false"/>
+        </insert>
+        <insert tableName="account_notifications">
+            <column name="author_id" valueNumeric="6"/>
+            <column name="POST_COMMENT" value="true"/>
+            <column name="COMMENT_COMMENT" value="true"/>
+            <column name="FRIEND_REQUEST" value="true"/>
+            <column name="MESSAGE" value="true"/>
+            <column name="FRIEND_BIRTHDAY" value="true"/>
+            <column name="NEW_POST" value="true"/>
+            <column name="SEND_EMAIL_MESSAGE" value="false"/>
+            <column name="SEND_PHONE_MESSAGE" value="false"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

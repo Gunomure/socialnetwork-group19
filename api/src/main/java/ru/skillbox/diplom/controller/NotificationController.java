@@ -2,10 +2,7 @@ package ru.skillbox.diplom.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
 @RequestMapping("api/v1/notifications")
@@ -13,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface NotificationController {
 
     @GetMapping
-    ResponseEntity<?> getNotifications(@RequestParam (defaultValue = "0") Integer offset,
-                                       @RequestParam (defaultValue = "20") Integer itemPerPage);
+    ResponseEntity<?> getNotifications();
+
+    @PutMapping(value = "/{id}")
+    ResponseEntity<?> changeStatus(@PathVariable Long id, @RequestParam String type);
 }

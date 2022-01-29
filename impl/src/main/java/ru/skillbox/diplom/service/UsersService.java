@@ -1,11 +1,11 @@
 package ru.skillbox.diplom.service;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,14 +25,19 @@ import ru.skillbox.diplom.util.specification.SpecificationUtil;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static ru.skillbox.diplom.util.TimeUtil.getCurrentTimestampUtc;
 
 @Service
 @Transactional
 public class UsersService {
+
+    @Value("${values.avatar.deleted}")
+    private String DELETED;
 
     private final PersonRepository personRepository;
     private final PostRepository postRepository;
@@ -117,7 +122,9 @@ public class UsersService {
                                 .and(s5)
                         , pageRequest)
                 .getContent(); // migrate Page to List
-        List<PersonDto> persons = personMapper.toListPersonDTO(personEntities);
+
+        List<PersonDto> persons = personMapper.toListPersonDTO(personEntities.stream()
+                .filter(p -> p.getEmail() != null).collect(Collectors.toList()));
 
         UsersSearchResponse response = new UsersSearchResponse();
         response.setData(persons);
@@ -139,5 +146,34 @@ public class UsersService {
         response.setTimestamp(getCurrentTimestampUtc());
 
         return response;
+    }
+
+    public CommonResponse<PersonDto> deleteProfile() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Person person = personRepository.findByEmail(email).orElseThrow(
+                () -> new EntityNotFoundException(String.format("User %s not found", email))
+        );
+        person.setDeleteDate(ZonedDateTime.now().plusDays(30));
+        person.setPhoto(DELETED);
+        personRepository.save(person);
+
+        PersonDto personDTO = personMapper.toPersonDTO(person);
+        CommonResponse<PersonDto> response = new CommonResponse<>();
+        response.setData(personDTO);
+        response.setTimestamp(getCurrentTimestampUtc());
+
+        return response;
+    }
+
+    @Scheduled(cron = "0 0 0 ? * *")
+    public void sendBirthdayEvent() {
+        List<Person> userList = personRepository.findByDeleteDateLessThanEqual(ZonedDateTime.now()).orElse(new ArrayList<>());
+        if (!userList.isEmpty()) {
+            for (Person p : userList) {
+                p.setEmail(null);
+                p.setDeleteDate(null);
+                personRepository.save(p);
+            }
+        }
     }
 }

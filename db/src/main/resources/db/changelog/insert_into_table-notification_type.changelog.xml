@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+    <changeSet id="notification_type_insert" author="stepan">
+        <insert tableName="notification_type">
+            <column name="code">1</column>
+            <column name="name">POST</column>
+        </insert>
+        <insert tableName="notification_type">
+            <column name="code">2</column>
+            <column name="name">POST_COMMENT</column>
+        </insert>
+        <insert tableName="notification_type">
+            <column name="code">3</column>
+            <column name="name">COMMENT_COMMENT</column>
+        </insert>
+        <insert tableName="notification_type">
+            <column name="code">4</column>
+            <column name="name">FRIEND_REQUEST</column>
+        </insert>
+        <insert tableName="notification_type">
+            <column name="code">5</column>
+            <column name="name">MESSAGE</column>
+        </insert>
+        <insert tableName="notification_type">
+            <column name="code">6</column>
+            <column name="name">BIRTHDAY</column>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

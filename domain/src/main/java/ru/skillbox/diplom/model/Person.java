@@ -81,10 +81,17 @@ Person extends User {
     @ToString.Exclude
     private List<Friendship> friendsRight;
 
+    @OneToOne
+    @JoinColumn(name = "id")
+    private AccountNotifications accountNotifications;
+
     @Override
     @Transient
     public UserType getType() {
         return super.getType();
     }
+
+    @Column(name = "delete_date")
+    private ZonedDateTime deleteDate;
 }
 

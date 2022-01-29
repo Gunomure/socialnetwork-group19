@@ -1,6 +1,7 @@
 package ru.skillbox.diplom.model;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,4 +32,11 @@ public class Notification extends BaseEntity {
     //@NotNull TODO: Question: Does this column matter/has value in all situations?
     @Column(name = "contact")
     private String contact;
+    @Column(name = "was_send")
+    private Boolean wasSend;
+
+    private String content;
+    @Column(name ="user_name")
+    private String userName;
+    private String photo;
 }

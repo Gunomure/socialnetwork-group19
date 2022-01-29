@@ -1,4 +1,11 @@
+server:
+  port: 8086
 spring:
+  banner:
+    location: banner.txt
+  main:
+    banner-mode: console
+    log-startup-info: true
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:5432/group19?currentSchema=group19
     driver-class-name: org.postgresql.Driver
@@ -8,36 +15,41 @@ spring:
     enabled: true
     change-log: classpath:changelog-master.xml
     default-schema: group19
-    drop-first: false
+    drop-first: true
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: none
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      percentiles-histogram:
+        "[http.server.requests]": true
+
 group19:
+  from: "noreply@javaprogroup19.com"
   passwordRecoveryPath: change-password
   websiteHost: ${WEBSITE_HOST:localhost}
-  frontendPort: ${FRONTEND_PORT:8099}
+  frontendPort: ${FRONTEND_PORT:80}
 values:
   jwt:
     header: Authorization
-    secretKey: secret
-    expiration: 120
+    secretKey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjOWYzYWI2NzY2Mjg2NDYyNDY0YTczNCIsIm5hbWUiOiJSYW5keSIsImF2YXRhciI6Ii8vd3d3LmdyYXZhdGFyLmNvbS9hdmF0YXIvMTNhN2MyYzdkOGVkNTNkMDc2MzRkOGNlZWVkZjM0NTE_cz0yMDAmcj1wZyZkPW1tIiwiaWF0IjoxNTU0NTIxNjk1LCJleHAiOjE1NTQ1MjUyOTV9._SxRurShXS-SI3SE11z6nme9EoaD29T_DBFr8Qwngkg
+    expiration: 90000
     refreshExpirationDateInMs: 9000000
   socketio:
     host: 0.0.0.0
     port: 9092
   cloudinary:
-    secret:
-    key:
-    name:
-embedded-postgresql:
-  host: localhost
-  port: 5432
-  database: group19
-  schema: group19
-  user: group19
-  password: group19
+    secret: "cARF5phMowwNMqRItCC57XD2Btg"
+    key: "271351735717536"
+    name: "dgkxuiwls"
 email_service:
-  host: ${EMAIL_SERVICE_HOST:localhost}
-  port: ${EMAIL_SERVICE_PORT:8081}
-
+  path: ${EMAIL_SERVICE_PATH:http://localhost:8080}

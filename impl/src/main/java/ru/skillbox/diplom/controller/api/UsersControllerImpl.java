@@ -29,6 +29,11 @@ public class UsersControllerImpl implements UsersController {
     }
 
     @Override
+    public CommonResponse<PersonDto> deleteProfile() {
+        return usersService.deleteProfile();
+    }
+
+    @Override
     public UsersSearchResponse searchUsers(String firstName, String lastName,
                                            int ageFrom, int ageTo,
                                            String country, String city,

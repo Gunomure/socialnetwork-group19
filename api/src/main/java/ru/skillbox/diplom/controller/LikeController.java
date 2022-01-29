@@ -12,8 +12,5 @@ public interface LikeController {
     CommonResponse<?> putLike(@RequestBody LikeBodyRequest body);
 
     @DeleteMapping()
-    CommonResponse<?> deleteLike(
-            @RequestParam(name = "item_id") Long itemId,
-            @RequestParam(name = "post_id", required = false) Long postId,
-            @RequestParam() String type);
+    CommonResponse<?> deleteLike(@RequestBody LikeBodyRequest body);
 }
