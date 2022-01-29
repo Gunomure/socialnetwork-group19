@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.skillbox.diplom.model.Person;
 
+import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -16,6 +18,8 @@ public interface PersonRepository extends JpaRepository<Person, Integer>, JpaSpe
     Optional<Person> findByConfirmationCode(String confirmationCode);
 
     Optional<Person> findById(Long id);
+
+    Optional<List<Person>> findByDeleteDateLessThanEqual(ZonedDateTime dateTime);
 
     @Query("SELECT COUNT(*) > 0 FROM Person p where p.email = :email")
     boolean isExists(String email);

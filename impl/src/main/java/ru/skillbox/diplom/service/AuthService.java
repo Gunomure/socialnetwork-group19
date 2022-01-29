@@ -3,6 +3,7 @@ package ru.skillbox.diplom.service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -34,6 +35,9 @@ import javax.servlet.http.HttpServletRequest;
 @Transactional
 public class AuthService {
 
+    @Value("${values.avatar.default}")
+    private String DEFAULT;
+
     private final PersonRepository personRepository;
     private final PersonMapper personMapper = Mappers.getMapper(PersonMapper.class);
     private final AuthenticationManager authenticationManager;
@@ -63,6 +67,11 @@ public class AuthService {
         SecurityContextHolder.getContext().setAuthentication(auth);
         String token = jwtTokenProvider.createToken(email, person.getType().name());
         String refreshToken = refreshTokenService.createRefreshToken(person.getId());
+        if (person.getDeleteDate() != null) {
+            person.setDeleteDate(null);
+            person.setPhoto(DEFAULT);
+            personRepository.save(person);
+        }
         PersonDto personDTO = personMapper.toPersonDTO(person).setToken(token).setRefreshToken(refreshToken);
         CommonResponse<PersonDto> response = new CommonResponse<>("",TimeUtil.getCurrentTimestampUtc(), personDTO);
 

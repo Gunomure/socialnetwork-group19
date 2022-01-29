@@ -1,7 +1,8 @@
 package ru.skillbox.diplom.service;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -13,6 +14,7 @@ import ru.skillbox.diplom.exception.EntityNotFoundException;
 import ru.skillbox.diplom.mappers.*;
 import ru.skillbox.diplom.model.*;
 import ru.skillbox.diplom.model.enums.FriendshipCode;
+import ru.skillbox.diplom.model.enums.NotificationTypes;
 import ru.skillbox.diplom.model.request.LikeBodyRequest;
 import ru.skillbox.diplom.model.request.postRequest.CommentBodyRequest;
 import ru.skillbox.diplom.model.request.postRequest.PostBodyRequest;
@@ -29,8 +31,10 @@ import java.util.stream.Collectors;
 
 import static ru.skillbox.diplom.util.TimeUtil.getCurrentTimestampUtc;
 
+@Slf4j
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class PostService {
 
     private final static String POST_ID_NOT_FOUND = "Post doesn't exist or blocked";
@@ -44,6 +48,7 @@ public class PostService {
     private final ResponseMapper feedsResponseMapper = Mappers.getMapper(ResponseMapper.class);
     private final PersonMapper personMapper = Mappers.getMapper(PersonMapper.class);
 
+    private final NotificationService notificationService;
     private final PersonRepository personRepository;
     private final PostRepository postRepository;
     private final PostCommentRepository commentRepository;
@@ -53,26 +58,6 @@ public class PostService {
     private final FriendshipRepository friendshipRepository;
     private final TagRepository tagRepository;
     private final PostToTagRepository postToTagRepository;
-
-    public PostService(PersonRepository personRepository,
-                       PostRepository postRepository,
-                       PostCommentRepository commentRepository,
-                       ReportCommentRepository reportCommentRepository,
-                       PostLikeRepository postLikeRepository,
-                       CommentLikeRepository commentLikeRepository,
-                       FriendshipRepository friendshipRepository,
-                       TagRepository tagRepository,
-                       PostToTagRepository postToTagRepository) {
-        this.personRepository = personRepository;
-        this.postRepository = postRepository;
-        this.commentRepository = commentRepository;
-        this.reportCommentRepository = reportCommentRepository;
-        this.postLikeRepository = postLikeRepository;
-        this.commentLikeRepository = commentLikeRepository;
-        this.friendshipRepository = friendshipRepository;
-        this.tagRepository = tagRepository;
-        this.postToTagRepository = postToTagRepository;
-    }
 
     public FeedsResponse<List<PostDto>> getFeeds(String name, Integer offset, Integer itemPerPage){
         SpecificationUtil<Friendship> personSpec = new SpecificationUtil<>();
@@ -167,17 +152,20 @@ public class PostService {
     public CommonResponse<?> createPost(Long id, Long publishDate, PostBodyRequest body) {
         Person person = personRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException(String.format("User %s not found", id)));
+        ZonedDateTime time = publishDate != null ? TimeUtil.getZonedDateTimeFromMillis(publishDate) : ZonedDateTime.now();
         Post post = new Post();
         post.setAuthorId(person);
         post.setTitle(body.getTitle());
         post.setPostText(body.getPostText().replaceAll("<[^>]*>",""));
         post.setIsBlocked(false);
-        post.setTime(publishDate != null ? TimeUtil.getZonedDateTimeFromMillis(publishDate) : ZonedDateTime.now());
+        post.setTime(time);
         SpecificationUtil<Tag> spec = new SpecificationUtil<>();
         postRepository.save(post);
         for (String tagName: body.getTags()){
             addTagToPost(tagName, post, spec);
         }
+        log.info("!!!notification createPost person={} notification type={}", person.getFirstName(), NotificationTypes.POST);
+        notificationService.createAllFriendNotification(person, NotificationTypes.POST, post.getId());
         CommonResponse<PostDto> response = postMapper.convertToCommonResponse(post);
         response.getData().setMyLike(checkLike(post, person));
         createPostCommentDTOs(Arrays.asList(response.getData()));
@@ -252,6 +240,13 @@ public class PostService {
         Person person = getAuthenticatedUser();
         PostComment comment = commentMapper.convertToPostCommentEntity(post, person, parentComment, body.getCommentText());
         commentRepository.save(comment);
+        log.info("!!!notification createComment person={} notification type={}", person.getFirstName(), NotificationTypes.POST_COMMENT);
+        notificationService.createOnePersonNotification(post.getAuthorId(), comment.getAuthor(), NotificationTypes.POST_COMMENT, comment.getId());
+        if (parentComment != null) {
+            log.info("!!!notification createComment person={} notification type={}", parentComment.getAuthor(), NotificationTypes.COMMENT_COMMENT);
+            notificationService.createOnePersonNotification(parentComment.getAuthor(), comment.getAuthor(), NotificationTypes.COMMENT_COMMENT, comment.getId());
+        }
+
         CommonResponse<PostCommentDto> response = commentMapper.convertToCommonResponse(comment);
         recursiveCommentsDto(Arrays.asList(response.getData()));
         return response;
@@ -344,17 +339,17 @@ public class PostService {
         return response;
     }
 
-    public CommonResponse<?> deleteLike(Long itemId, Long postId, String type) {
+    public CommonResponse<?> deleteLike(LikeBodyRequest body) {
         Person person = getAuthenticatedUser();
-        switch (type) {
+        switch (body.getType()) {
             case "Post":
-                Post post = postRepository.findByIdAndIsBlocked(itemId, false).orElseThrow(() -> {
+                Post post = postRepository.findByIdAndIsBlocked(body.getItemId(), false).orElseThrow(() -> {
                     throw new EntityNotFoundException(POST_ID_NOT_FOUND);
                 });
                 postLikeRepository.findByPostIdAndPersonId(post, person).ifPresent(postLikeRepository::delete);
                 break;
             case "Comment":
-                PostComment comment = commentRepository.findByIdAndIsBlockedAndPostId(itemId, false, postId)
+                PostComment comment = commentRepository.findByIdAndIsBlockedAndPostId(body.getItemId(), false, body.getPostId())
                         .orElseThrow(() -> {
                             throw new EntityNotFoundException(COMMENT_ID_NOT_FOUND);
                         });

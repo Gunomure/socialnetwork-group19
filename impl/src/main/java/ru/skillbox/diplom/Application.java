@@ -1,5 +1,6 @@
 package ru.skillbox.diplom;
 
+import com.twilio.Twilio;
 import com.cloudinary.Cloudinary;
 import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOServer;
@@ -30,6 +31,13 @@ public class Application {
     @Value("${values.cloudinary.name}")
     private String cloudinary_api_name;
 
+	@Value("${values.twilio.accountSid}")
+	private String account_sid;
+	@Value("${values.twilio.authToken}")
+	private String auth_token;
+	@Value("${values.twilio.enableTwilio}")
+	private boolean enable_twilio;
+
 	@Bean
 	public SocketIOServer socketIOServer() throws NoSuchFieldException, IOException, IllegalAccessException {
 
@@ -48,6 +56,13 @@ public class Application {
         config.put("api_secret", cloudinary_api_secret);
         return new Cloudinary(config);
     }
+
+	@Bean
+	public void twilioInit() {
+		if (enable_twilio) {
+			Twilio.init(account_sid, auth_token);
+		}
+	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);

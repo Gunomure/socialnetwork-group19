@@ -68,7 +68,6 @@ public class ClientSocketIOTempStorage {
         return map.get(clientId);
     }
 
-
     public Long  getUserId(SocketIOClient client){
         for (Long k: map.keySet()){
             List<SocketIOClient> list = map.get(k);
@@ -87,7 +86,6 @@ public class ClientSocketIOTempStorage {
         LOGGER.info("it is strange.... error getUserId");
         return null;
     }
-
 
     public void clear(){
         map.clear();

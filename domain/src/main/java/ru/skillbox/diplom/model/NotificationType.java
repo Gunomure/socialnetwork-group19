@@ -15,7 +15,7 @@ public class NotificationType extends BaseEntity {
     @NotNull
     private String code;
     @NotNull
-    @Column(columnDefinition = "enum('POST', 'POST_COMMENT', 'COMMENT_COMMENT', 'FRIEND_REQUEST', 'MESSAGE')")
+    @Column(columnDefinition = "enum('POST', 'POST_COMMENT', 'COMMENT_COMMENT', 'FRIEND_REQUEST', 'MESSAGE', 'BIRTHDAY')")
     @Enumerated(EnumType.STRING)
     private NotificationTypes name;
 }

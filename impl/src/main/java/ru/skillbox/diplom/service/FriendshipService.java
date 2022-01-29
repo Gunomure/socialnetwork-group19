@@ -1,5 +1,6 @@
 package ru.skillbox.diplom.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
@@ -9,11 +10,11 @@ import ru.skillbox.diplom.mappers.FriendshipMapper;
 import ru.skillbox.diplom.mappers.PersonMapper;
 import ru.skillbox.diplom.model.*;
 import ru.skillbox.diplom.model.enums.FriendshipCode;
+import ru.skillbox.diplom.model.enums.NotificationTypes;
 import ru.skillbox.diplom.model.response.FriendshipCodeDto;
 import ru.skillbox.diplom.model.response.FriendshipResponse;
 import ru.skillbox.diplom.model.response.MakeFriendResponse;
 import ru.skillbox.diplom.repository.FriendshipRepository;
-import ru.skillbox.diplom.repository.FriendshipStatusRepository;
 import ru.skillbox.diplom.repository.PersonRepository;
 import ru.skillbox.diplom.util.specification.SpecificationUtil;
 
@@ -23,23 +24,14 @@ import java.util.Optional;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class FriendshipService {
 
-    private PersonRepository personRepository;
-    private FriendshipRepository friendshipRepository;
-    private PersonMapper personMapper;
-    private FriendshipMapper friendshipMapper;
-    private AuthService authService;
-    private FriendshipStatusService friendshipStatusService;
-
-    public FriendshipService(PersonRepository personRepository, FriendshipRepository friendshipRepository, PersonMapper personMapper, FriendshipMapper friendshipMapper, AuthService authService, FriendshipStatusRepository friendshipStatusRepository, FriendshipStatusService friendshipStatusService) {
-        this.personRepository = personRepository;
-        this.friendshipRepository = friendshipRepository;
-        this.personMapper = personMapper;
-        this.friendshipMapper = friendshipMapper;
-        this.authService = authService;
-        this.friendshipStatusService = friendshipStatusService;
-    }
+    private final PersonRepository personRepository;
+    private final FriendshipRepository friendshipRepository;
+    private final FriendshipMapper friendshipMapper;
+    private final FriendshipStatusService friendshipStatusService;
+    private final NotificationService notificationService;
 
     public FriendshipResponse searchFriends(String currentUserEmail, String friendNameToSearch,
                                             Integer offset, Integer itemPerPage) {
@@ -184,6 +176,8 @@ public class FriendshipService {
         FriendshipStatus status = friendshipStatusService.getFriendshipStatus(code);
         friendship.setStatusId(status);
         friendshipRepository.save(friendship);
+        log.info("!!!notification makeNewFriendship person={} notification type={}", personToMakeFriendship.getFirstName(), NotificationTypes.FRIEND_REQUEST);
+        notificationService.createOnePersonNotification(personToMakeFriendship, currentUser, NotificationTypes.FRIEND_REQUEST, friendship.getId());
         log.info("finish makeNewFriend between {} and {}", currentUser.getId(), personToMakeFriendship.getId());
     }
 

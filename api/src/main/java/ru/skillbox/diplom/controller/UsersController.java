@@ -21,6 +21,8 @@ public interface UsersController {
     CommonResponse<PersonDto> getProfile();
     @PutMapping("/me")
     CommonResponse<PersonDto> updateProfile(@RequestBody UpdateRequest updateRequest);
+    @DeleteMapping("/me")
+    CommonResponse<PersonDto> deleteProfile();
 
     @GetMapping("/search")
     UsersSearchResponse searchUsers(@RequestParam(name = "first_name", required = false) String firstName,
