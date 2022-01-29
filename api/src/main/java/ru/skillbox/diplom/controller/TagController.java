@@ -7,7 +7,8 @@ import ru.skillbox.diplom.model.TagDto;
 
 @CrossOrigin
 @RequestMapping("api/v1/tags")
-//@PreAuthorize("hasAuthority('developers:read')")
+@PreAuthorize("hasAuthority('developers:read')")
+@Deprecated
 public interface TagController {
 
     @GetMapping

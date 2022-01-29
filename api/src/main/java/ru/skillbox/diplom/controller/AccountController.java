@@ -1,5 +1,6 @@
 package ru.skillbox.diplom.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.model.CommonResponse;
 import ru.skillbox.diplom.model.request.*;

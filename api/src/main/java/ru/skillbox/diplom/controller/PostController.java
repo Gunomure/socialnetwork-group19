@@ -7,7 +7,7 @@ import ru.skillbox.diplom.model.request.postRequest.CommentBodyRequest;
 import ru.skillbox.diplom.model.request.postRequest.PostBodyRequest;
 
 @CrossOrigin
-//@PreAuthorize("hasAuthority('developers:read')")
+@PreAuthorize("hasAuthority('developers:read')")
 @RequestMapping("/api/v1/post")
 public interface PostController {
 

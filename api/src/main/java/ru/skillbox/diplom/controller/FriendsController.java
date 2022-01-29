@@ -1,5 +1,6 @@
 package ru.skillbox.diplom.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.model.response.FriendshipResponse;
 import ru.skillbox.diplom.model.response.MakeFriendResponse;
@@ -8,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @CrossOrigin
 @RequestMapping("/api/v1/friends")
-//@PreAuthorize("hasAuthority('developers:read')")
+@PreAuthorize("hasAuthority('developers:read')")
 public interface FriendsController {
 
     @GetMapping
