@@ -9,5 +9,5 @@ public class NotificationEmailDto {
 
     private String email;
 
-    private String notificationPath;
+    private String notificationMessage;
 }

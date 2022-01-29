@@ -37,19 +37,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers("/api/v1/auth/login").permitAll()
-                .antMatchers("/api/v1/auth/refresh").permitAll()
-                .antMatchers("/api/v1/auth/logout").permitAll()
+                .antMatchers("/api/v1/auth/**").permitAll()
                 .antMatchers("/api/v1/account/**").permitAll()
-                .antMatchers("/api/v1/platform/**").permitAll()
-                .antMatchers("/api/v1/geo/**").permitAll()
-                .antMatchers("/api/v1/feeds/**").permitAll()
-                .antMatchers("/api/v1/users/**").permitAll()
-                .antMatchers("/api/v1/post/**").permitAll()
-                .antMatchers("/api/v1/tags/**").permitAll()
                 .antMatchers("/actuator/**").permitAll()
-                .antMatchers("/api/v1/dialogs/**").permitAll()
-                .antMatchers("/api/v1/friends/**").permitAll()
                 .antMatchers("/v2/api-docs",
                         "/configuration/ui",
                         "/swagger-resources/**",
