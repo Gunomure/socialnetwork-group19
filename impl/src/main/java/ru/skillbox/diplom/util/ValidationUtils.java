@@ -5,7 +5,7 @@ import ru.skillbox.diplom.exception.BadCredentialsException;
 public class ValidationUtils {
 
     private static final String emailRegex = "^[a-z0-9](\\.?[a-z0-9_-]){0,}@[a-z0-9-]+\\.([a-z]{1,6}\\.)?[a-z]{2,}$";
-    private static final String nameRegex = "([A-ZА-Я][а-яА-Яa-zA-Z]*\\s[А-ЯA-Z][А-Яа-яa-zA-Z]*)";
+    private static final String nameRegex = "[A-ZА-Яа-яА-Яa-zA-Z]";
     private static final String passwordRegex = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$";
     private static final String phoneRegex = "^(\\+|\\d)*(\\(\\d{3}\\)\\s*)*\\d{3}(-{0,1}|\\s{0,1})\\d{2}(-{0,1}|\\s{0,1})\\d{2}$";
 

@@ -1,5 +1,6 @@
 package ru.skillbox.diplom.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -20,7 +21,6 @@ import ru.skillbox.diplom.repository.CityRepository;
 import ru.skillbox.diplom.repository.CountryRepository;
 import ru.skillbox.diplom.repository.PersonRepository;
 import ru.skillbox.diplom.repository.PostRepository;
-import ru.skillbox.diplom.util.ValidationUtils;
 import ru.skillbox.diplom.util.specification.SpecificationUtil;
 
 import java.time.ZoneId;
@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 
 import static ru.skillbox.diplom.util.TimeUtil.getCurrentTimestampUtc;
 
+@Slf4j
 @Service
 @Transactional
 public class UsersService {
@@ -78,11 +79,12 @@ public class UsersService {
     }
 
     public CommonResponse<PersonDto> updateProfileData(UpdateRequest data) {
+
+
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Person person = personRepository.findByEmail(email).orElseThrow(
                 () -> new EntityNotFoundException(String.format("User %s not found", email))
         );
-        ValidationUtils.validateName(String.format("%s %s", data.getFirstName(), data.getLastName()));
 
         person.setFirstName(data.getFirstName());
         person.setLastName(data.getLastName());
@@ -90,7 +92,9 @@ public class UsersService {
         Optional<City> city = cityRepository.findByTitle(data.getCity());
         if (city.isPresent()) person.setCity(city.get());
         else throw new EntityNotFoundException(String.format("City %s not found", data.getCity()));
-        Optional<Country> country = countryRepository.findByTitle(data.getCountry());
+
+        Optional<Country> country = countryRepository.findById(data.getCountry());
+        log.info(String.format("Country from bd %s ", data.getCountry()));
         if (country.isPresent()) person.setCountry(country.get());
         else throw new EntityNotFoundException(String.format("Country %s not found", data.getCountry()));
         person.setPhone(data.getPhone());

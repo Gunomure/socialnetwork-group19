@@ -1,6 +1,8 @@
 package ru.skillbox.diplom.controller.api;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.skillbox.diplom.controller.LocationsController;
 import ru.skillbox.diplom.model.CityDto;
@@ -22,7 +24,13 @@ public class LocationController implements LocationsController {
     }
 
     @Override
-    public CommonResponse<List<CityDto>> getCities(Long countryId) {
+    public CommonResponse<List<CityDto>> getCitiesById(Long countryId) {
         return locationsService.getCities(countryId);
+    }
+
+    @Override
+    @ResponseStatus(HttpStatus.OK)
+    public void getCities() {
+
     }
 }

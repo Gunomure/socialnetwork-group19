@@ -21,4 +21,5 @@ public class Country extends BaseEntity {
     @OneToMany(mappedBy = "countryId", cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<City> cities;
+
 }
