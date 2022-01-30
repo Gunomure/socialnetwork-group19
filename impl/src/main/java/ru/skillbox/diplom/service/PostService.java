@@ -59,28 +59,34 @@ public class PostService {
     private final TagRepository tagRepository;
     private final PostToTagRepository postToTagRepository;
 
-    public FeedsResponse<List<PostDto>> getFeeds(String name, Integer offset, Integer itemPerPage){
+    public FeedsResponse<List<PostDto>> getFeeds(String name, Integer offset, Integer itemPerPage) {
         SpecificationUtil<Friendship> personSpec = new SpecificationUtil<>();
         String email = getAuthenticatedUser().getEmail();
+        Specification<Friendship> s1 = personSpec.equals(Friendship_.SRC_PERSON, Person_.EMAIL, email);
+        Specification<Friendship> s2 = personSpec.equals(Friendship_.STATUS_ID, FriendshipStatus_.CODE, FriendshipCode.FRIEND);
+        Specification<Friendship> s3 = personSpec.equals(Friendship_.STATUS_ID, FriendshipStatus_.CODE, FriendshipCode.SUBSCRIBED);
+        Specification<Friendship> s4 = personSpec.equals(Friendship_.DST_PERSON, Person_.EMAIL, email);
+        Specification<Friendship> s5 = personSpec.equals(Friendship_.STATUS_ID, FriendshipStatus_.CODE, FriendshipCode.FRIEND);
         List<Person> subscriptions = friendshipRepository.findAll(
                         Specification.
-                                where(personSpec.equals(    Friendship_.SRC_PERSON, Person_.EMAIL, email)
-                                        .and(personSpec.equals(Friendship_.STATUS_ID, FriendshipStatus_.CODE, FriendshipCode.FRIEND)
-                                                .or(personSpec.equals(Friendship_.STATUS_ID, FriendshipStatus_.CODE, FriendshipCode.SUBSCRIBED)))),
+                                where((s1.and(s2.or(s3))).or(s4.and(s5))),
                         PageRequest.of(offset, itemPerPage))
-                .getContent().stream().map(Friendship::getDstPerson).collect(Collectors.toList());
+                .getContent().stream().map((friendship) -> {
+                    if (friendship.getSrcPerson().getEmail().equals(name)) return friendship.getDstPerson();
+                    else return friendship.getSrcPerson();
+                }).collect(Collectors.toList());
         SpecificationUtil<Post> spec = new SpecificationUtil<>();
         List<Post> feeds = postRepository.findAll(
                         Specification.
                                 where(spec.contains(Post_.TITLE, name).or(spec.contains(Post_.POST_TEXT, name))).
                                 and(spec.belongsToCollection(Post_.AUTHOR_ID, subscriptions).
-                                                or(spec.equals(Post_.AUTHOR_ID, Person_.EMAIL, email))).
+                                        or(spec.equals(Post_.AUTHOR_ID, Person_.EMAIL, email))).
                                 and(spec.equals(Post_.IS_BLOCKED, false)).
                                 and(spec.between(Post_.TIME, null, ZonedDateTime.now())),
                         PageRequest.of(offset, itemPerPage, Sort.by("time").descending()))
                 .getContent();
-        FeedsResponse<List<PostDto>> response = feedsResponseMapper.convertToFeedsResponse(offset,itemPerPage);
-        feedsResponseMapper.updateToFeedsResponse(feeds,response);
+        FeedsResponse<List<PostDto>> response = feedsResponseMapper.convertToFeedsResponse(offset, itemPerPage);
+        feedsResponseMapper.updateToFeedsResponse(feeds, response);
         if (!feeds.isEmpty()) {
             checkResponsePostLike(feeds, response.getData());
             createPostCommentDTOs(response.getData());
@@ -109,8 +115,8 @@ public class PostService {
                         and(s4).
                         and(s5.or(s6)),
                 PageRequest.of(offset, itemPerPage, Sort.by("time").descending())).getContent().stream().distinct().collect(Collectors.toList());
-        FeedsResponse<List<PostDto>> response = feedsResponseMapper.convertToFeedsResponse(offset,itemPerPage);
-        feedsResponseMapper.updateToFeedsResponse(postList,response);
+        FeedsResponse<List<PostDto>> response = feedsResponseMapper.convertToFeedsResponse(offset, itemPerPage);
+        feedsResponseMapper.updateToFeedsResponse(postList, response);
         if (!postList.isEmpty()) {
             checkResponsePostLike(postList, response.getData());
             createPostCommentDTOs(response.getData());
@@ -156,12 +162,12 @@ public class PostService {
         Post post = new Post();
         post.setAuthorId(person);
         post.setTitle(body.getTitle());
-        post.setPostText(body.getPostText().replaceAll("<[^>]*>",""));
+        post.setPostText(body.getPostText().replaceAll("<[^>]*>", ""));
         post.setIsBlocked(false);
         post.setTime(time);
         SpecificationUtil<Tag> spec = new SpecificationUtil<>();
         postRepository.save(post);
-        for (String tagName: body.getTags()){
+        for (String tagName : body.getTags()) {
             addTagToPost(tagName, post, spec);
         }
         log.info("!!!notification createPost person={} notification type={}", person.getFirstName(), NotificationTypes.POST);
@@ -178,16 +184,16 @@ public class PostService {
         });
         post.setTime(publishDate != null ? TimeUtil.getZonedDateTimeFromMillis(publishDate) : ZonedDateTime.now());
         post.setTitle(edit.getTitle());
-        post.setPostText(edit.getPostText().replaceAll("<[^>]*>",""));
+        post.setPostText(edit.getPostText().replaceAll("<[^>]*>", ""));
         List<String> oldTags = post.getPostToTags().stream().map((postToTag) -> postToTag.getTag().getTagName()).collect(Collectors.toList());
         SpecificationUtil<Tag> spec = new SpecificationUtil<>();
-        for (String tag: edit.getTags()){
-            if (!oldTags.contains(tag)){
+        for (String tag : edit.getTags()) {
+            if (!oldTags.contains(tag)) {
                 addTagToPost(tag, post, spec);
             }
         }
-        for (String tag : oldTags){
-            if (!Arrays.asList(edit.getTags()).contains(tag)){
+        for (String tag : oldTags) {
+            if (!Arrays.asList(edit.getTags()).contains(tag)) {
                 Optional<PostToTag> postToTag = postToTagRepository.findByTagTagNameAndPost(tag, post);
                 if (postToTag.isPresent()) {
                     post.getPostToTags().remove(postToTag.get());
@@ -286,7 +292,7 @@ public class PostService {
         return response;
     }
 
-    public CommonResponse<MessageResponse> createCommentReport(Long postId, Long commentId){
+    public CommonResponse<MessageResponse> createCommentReport(Long postId, Long commentId) {
         PostComment comment = commentRepository.findByIdAndIsBlockedAndPostId(commentId, false, postId)
                 .orElseThrow(() -> {
                     throw new EntityNotFoundException(COMMENT_ID_NOT_FOUND);
@@ -370,8 +376,8 @@ public class PostService {
                 () -> new EntityNotFoundException(String.format("User %s not found", email)));
     }
 
-    private void createPostCommentDTOs(List<PostDto> posts){
-        for (PostDto postDto: posts) {
+    private void createPostCommentDTOs(List<PostDto> posts) {
+        for (PostDto postDto : posts) {
             List<PostComment> commentList = commentRepository.findByPostIdAndIsBlockedAndParentNull(postDto.getId(), false).orElse(new ArrayList<>());
             List<PostCommentDto> commentDtoList = commentMapper.convertToPostCommentListDto(commentList);
             recursiveCommentsDto(commentDtoList);
@@ -379,7 +385,7 @@ public class PostService {
         }
     }
 
-    private void recursiveCommentsDto(List<PostCommentDto> comments){
+    private void recursiveCommentsDto(List<PostCommentDto> comments) {
         if (!comments.isEmpty()) {
             Person person = getAuthenticatedUser();
             comments.forEach(c -> {
@@ -388,7 +394,7 @@ public class PostService {
                         .orElse(new ArrayList<>());
                 List<Long> hasLike = new ArrayList<>();
                 children.forEach(comment -> {
-                    for (CommentLike like: comment.getLikes()) {
+                    for (CommentLike like : comment.getLikes()) {
                         if (like.getPersonId().equals(person)) {
                             hasLike.add(comment.getId());
                             break;
@@ -404,19 +410,19 @@ public class PostService {
         }
     }
 
-    private void checkResponsePostLike(List<Post> posts, List<PostDto> postDtoList){
+    private void checkResponsePostLike(List<Post> posts, List<PostDto> postDtoList) {
         List<Long> hasLike = getUserPostLikes(posts);
         postDtoList.stream().filter(p -> hasLike.contains(p.getId()))
                 .forEach(p -> p.setMyLike(true));
     }
 
-    private List<Long> getUserPostLikes(List<Post> posts){
+    private List<Long> getUserPostLikes(List<Post> posts) {
         List<Long> hasLike = new ArrayList<>();
         Person person = getAuthenticatedUser();
         posts.forEach(p -> {
-                if (checkLike(p, person)) {
-                    hasLike.add(p.getId());
-                }
+            if (checkLike(p, person)) {
+                hasLike.add(p.getId());
+            }
         });
         return hasLike;
     }
@@ -433,10 +439,10 @@ public class PostService {
         return false;
     }
 
-    private void addTagToPost(String tag, Post post, SpecificationUtil<Tag> spec){
+    private void addTagToPost(String tag, Post post, SpecificationUtil<Tag> spec) {
         Optional<Tag> tagOptional = tagRepository.findOne(Specification.where(spec.contains(Tag_.TAG_NAME, tag)));
         PostToTag postToTag = new PostToTag();
-        if (tagOptional.isEmpty()){
+        if (tagOptional.isEmpty()) {
             Tag newTag = new Tag(tag);
             tagRepository.save(newTag);
             postToTag.setTag(newTag);
