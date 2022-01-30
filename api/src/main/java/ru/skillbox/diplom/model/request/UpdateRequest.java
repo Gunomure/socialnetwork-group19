@@ -28,7 +28,7 @@ public class UpdateRequest {
     private String city;
 
     @JsonProperty(value = "country")
-    private String country;
+    private Long country;
 
     @JsonProperty(value = "messages_permission")
     private String permission;
