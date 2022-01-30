@@ -32,6 +32,7 @@ public class StorageService {
 
     @Transactional
     public ResponseEntity<?> saveImage(MultipartFile file) {
+        if (file == null) return ResponseEntity.ok("ok");
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Person person = personRepository.findByEmail(email).orElseThrow(
                 () -> new EntityNotFoundException(String.format("User %s not found", email))

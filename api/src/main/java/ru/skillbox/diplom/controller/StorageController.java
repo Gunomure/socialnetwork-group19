@@ -11,6 +11,5 @@ import org.springframework.web.multipart.MultipartFile;
 public interface StorageController {
 
     @PostMapping()
-    ResponseEntity<?> storage(@RequestParam("file")MultipartFile file);
-
+    ResponseEntity<?> storage(@RequestParam(value = "file", required = false) MultipartFile file);
 }
