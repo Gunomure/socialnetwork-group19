@@ -12,6 +12,9 @@ public interface NotificationController {
     @GetMapping
     ResponseEntity<?> getNotifications();
 
+    @PutMapping
+    ResponseEntity<?> changeAllStatus();
+
     @PutMapping(value = "/{id}")
     ResponseEntity<?> changeStatus(@PathVariable Long id, @RequestParam String type);
 }

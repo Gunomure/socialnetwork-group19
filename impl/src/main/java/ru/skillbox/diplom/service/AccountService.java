@@ -125,6 +125,14 @@ public class AccountService {
 
             AccountNotifications accountNotifications = new AccountNotifications();
             accountNotifications.setAuthorId(user);
+            accountNotifications.setNewPost(true);
+            accountNotifications.setPostComment(true);
+            accountNotifications.setCommentComment(true);
+            accountNotifications.setMessage(true);
+            accountNotifications.setFriendRequest(true);
+            accountNotifications.setFriendBirthday(true);
+            accountNotifications.setSendEmailMessage(false);
+            accountNotifications.setSendPhoneMessage(false);
             accountNotificationRepository.save(accountNotifications);
 
         } else {
