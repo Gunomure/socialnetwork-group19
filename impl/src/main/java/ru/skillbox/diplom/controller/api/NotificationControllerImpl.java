@@ -21,4 +21,9 @@ public class NotificationControllerImpl implements NotificationController {
     public ResponseEntity<?> changeStatus(Long id, String type) {
         return ResponseEntity.ok(notificationService.changeStatus(id, type));
     }
+
+    @Override
+    public ResponseEntity<?> changeAllStatus() {
+        return ResponseEntity.ok(notificationService.changeAllStatus());
+    }
 }

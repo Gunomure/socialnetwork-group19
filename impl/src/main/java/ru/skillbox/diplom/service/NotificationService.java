@@ -65,14 +65,30 @@ public class NotificationService {
         NotificationType notificationType = notificationTypeRepository.findByName(NotificationTypes.valueOf(type));
 
         List<Notification> notifications = notificationRepository.findByPersonIdAndTypeId(id, notificationType.getId()).orElse(new ArrayList<>());
-        for (Notification n: notifications) {
-            n.setWasSend(true);
-            notificationRepository.save(n);
-        }
+        setWasSend(notifications);
         CommonResponse<List<NotificationDto>> response = new CommonResponse<>();
         response.setTimestamp(ZonedDateTime.now().toEpochSecond());
         response.setData(notificationMapper.convertToListDto(notifications));
         return response;
+    }
+
+    public CommonResponse<?> changeAllStatus() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Person person =  personRepository.findByEmail(email).orElseThrow(
+                () -> new EntityNotFoundException(String.format("User %s not found", email)));
+        List<Notification> notifications = notificationRepository.findByPersonId(person.getId()).orElse(new ArrayList<>());
+        setWasSend(notifications);
+        CommonResponse<List<NotificationDto>> response = new CommonResponse<>();
+        response.setTimestamp(ZonedDateTime.now().toEpochSecond());
+        response.setData(notificationMapper.convertToListDto(notifications));
+        return response;
+    }
+
+    private void setWasSend(List<Notification> notifications) {
+        for (Notification n: notifications) {
+            n.setWasSend(true);
+            notificationRepository.save(n);
+        }
     }
 
     public void createAllFriendNotification(Person person, NotificationTypes type, Long entityId) {
@@ -181,6 +197,8 @@ public class NotificationService {
         }
     }
 
+
+
     @Scheduled(cron = "0 0 0 ? * *")
     public void sendBirthdayEvent() {
         List<Person> userList = personRepository.findAll();
@@ -192,4 +210,6 @@ public class NotificationService {
             }
         }
     }
+
+
 }
